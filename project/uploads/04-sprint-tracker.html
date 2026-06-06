@@ -1,0 +1,109 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<title>FF — Enablement Sprint Tracker</title><style>*{box-sizing:border-box;margin:0;padding:0}
+body{background:#09090f;color:#f1f5f9;font-family:system-ui,sans-serif;padding:2rem 1rem}
+.w{max-width:800px;margin:0 auto}
+.brand{font-size:12px;color:#7c3aed;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem}
+h1{font-size:24px;font-weight:600;margin-bottom:.4rem}
+.sub{font-size:14px;color:#94a3b8;margin-bottom:1.75rem}
+.card{background:#12121e;border:1px solid rgba(124,58,237,.25);border-radius:12px;padding:1.5rem;margin-bottom:1rem}
+.ct{font-size:11px;color:#7c3aed;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:1rem}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem}
+.field{margin-bottom:.75rem}
+label{font-size:12px;color:#94a3b8;display:block;margin-bottom:.4rem}
+input,select,textarea{width:100%;background:#0d0a1a;border:1px solid rgba(124,58,237,.3);border-radius:6px;color:#f1f5f9;padding:.5rem .75rem;font-size:13px;font-family:system-ui}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#7c3aed}
+.btn{padding:.75rem 1.5rem;background:#7c3aed;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer}
+.btn:hover{background:#6d28d9}
+.btn-ghost{background:transparent;border:1px solid rgba(124,58,237,.4);color:#a78bfa}
+.badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:500}
+.badge-purple{background:rgba(124,58,237,.2);color:#a78bfa;border:1px solid rgba(124,58,237,.3)}
+.badge-green{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.25)}
+.badge-amber{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.25)}
+.badge-red{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.25)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.06em;padding:.5rem .75rem;border-bottom:1px solid rgba(124,58,237,.15)}
+td{padding:.6rem .75rem;border-bottom:1px solid rgba(255,255,255,.05);color:#cbd5e1}
+tr:hover td{background:rgba(124,58,237,.05)}
+.score-ring{display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;border:3px solid;font-size:16px;font-weight:700}
+.week{background:#12121e;border:1px solid rgba(124,58,237,.2);border-radius:10px;padding:1.25rem;margin-bottom:.875rem}
+.week-header{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem}
+.week-num{background:rgba(124,58,237,.2);color:#a78bfa;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0}
+.week-title{font-size:14px;font-weight:600}
+.week-status{margin-left:auto}
+.task{display:flex;align-items:center;gap:.75rem;padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.task:last-child{border-bottom:none}
+.task input[type=checkbox]{accent-color:#7c3aed;width:16px;height:16px;cursor:pointer;flex-shrink:0}
+.task-text{font-size:13px;color:#cbd5e1;flex:1}
+.task-text.done{text-decoration:line-through;color:#475569}
+.prog-bar{height:4px;background:#1a1a2e;border-radius:4px;overflow:hidden;margin-top:.75rem}
+.prog-fill{height:100%;background:linear-gradient(90deg,#7c3aed,#06b6d4);transition:width .3s}
+.summary-card{background:#0d0a1a;border:1px solid rgba(124,58,237,.35);border-radius:12px;padding:1.5rem;margin-bottom:1rem}
+</style></head><body><div class="w">
+<div class="brand">FlashFusion AI Enablement</div>
+<h1>Enablement Sprint Tracker</h1>
+<p class="sub">5-week AI enablement sprint — shared client view.</p>
+<div class="summary-card">
+<div class="g3">
+<div class="m" style="background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.2);border-radius:8px;padding:.875rem">
+<div style="font-size:11px;color:#64748b;margin-bottom:.3rem">Overall progress</div>
+<div style="font-size:24px;font-weight:600" id="ovr">0%</div>
+</div>
+<div class="m" style="background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.2);border-radius:8px;padding:.875rem">
+<div style="font-size:11px;color:#64748b;margin-bottom:.3rem">Tasks complete</div>
+<div style="font-size:24px;font-weight:600" id="tc">0/0</div>
+</div>
+<div class="m" style="background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.2);border-radius:8px;padding:.875rem">
+<div style="font-size:11px;color:#64748b;margin-bottom:.3rem">Current week</div>
+<div style="font-size:24px;font-weight:600" id="cw">—</div>
+</div>
+</div>
+</div>
+<div id="weeks"></div>
+<script>
+var WEEKS=[
+{n:1,title:"Audit and Discovery",tasks:["Kickoff call — align on goals and stakeholders","Conduct AI Setup Audit (scorecard + interview)","Map current tool stack and workflows","Identify top 3 automation opportunities","Deliver audit report with gap analysis"]},
+{n:2,title:"Skill Pack Selection and Configuration",tasks:["Select skill packs from library based on audit","Configure skill packs for client's Claude environment","Set up allowed-tools and trigger phrases","Test skill activation across target workflows","Client review of configured skill set"]},
+{n:3,title:"Pilot Deployment",tasks:["Deploy skill packs to pilot user group (3-5 people)","Run hands-on walkthrough session (60 min)","Collect day-1 feedback via async form","Troubleshoot any activation or trigger issues","Document initial wins and friction points"]},
+{n:4,title:"Full Rollout and Training",tasks:["Deploy to full team","Deliver skills library user guide","Run team training session (90 min)","Set up usage tracking and feedback loop","Identify candidates for custom skill development"]},
+{n:5,title:"Measurement and Handoff",tasks:["Collect usage data and self-reported time savings","Build ROI summary with actuals vs projections","Deliver Sprint Summary Report","Present retainer or follow-on options","Handoff documentation and admin access"]},
+];
+var checks={};
+var el=document.getElementById("weeks");
+WEEKS.forEach(function(w){
+checks[w.n]={};
+var tasks="";
+w.tasks.forEach(function(t,i){
+checks[w.n][i]=false;
+tasks+='<div class="task"><input type="checkbox" id="c'+w.n+'_'+i+'" onchange="updateProgress('+w.n+','+i+',this.checked)"><label class="task-text" id="tl'+w.n+'_'+i+'" for="c'+w.n+'_'+i+'">'+t+'</label></div>';
+});
+var d=document.createElement("div");d.className="week";
+d.innerHTML='<div class="week-header"><div class="week-num">'+w.n+'</div><div class="week-title">Week '+w.n+': '+w.title+'</div><div class="week-status"><span class="badge badge-purple" id="ws'+w.n+'">0/'+w.tasks.length+'</span></div></div>'+tasks+'<div class="prog-bar"><div class="prog-fill" id="pf'+w.n+'" style="width:0%"></div></div>';
+el.appendChild(d);
+});
+function updateProgress(wn,ti,val){
+checks[wn][ti]=val;
+var el=document.getElementById("tl"+wn+"_"+ti);
+el.classList.toggle("done",val);
+var done=Object.values(checks[wn]).filter(Boolean).length;
+var total=Object.values(checks[wn]).length;
+document.getElementById("ws"+wn).textContent=done+"/"+total;
+document.getElementById("pf"+wn).style.width=(done/total*100)+"%";
+updateOverall();
+}
+function updateOverall(){
+var totalDone=0,totalAll=0;
+WEEKS.forEach(function(w){
+totalDone+=Object.values(checks[w.n]).filter(Boolean).length;
+totalAll+=Object.values(checks[w.n]).length;
+});
+document.getElementById("ovr").textContent=Math.round(totalDone/totalAll*100)+"%";
+document.getElementById("tc").textContent=totalDone+"/"+totalAll;
+var cw=1;
+WEEKS.forEach(function(w){
+var d=Object.values(checks[w.n]).filter(Boolean).length,t=Object.values(checks[w.n]).length;
+if(d===t) cw=Math.min(w.n+1,5);
+});
+document.getElementById("cw").textContent="Week "+cw;
+}
+</script></body></html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>FF — Battle Card Browser</title><style>*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0F0618;color:#f1f5f9;font-family:'Inter',system-ui,sans-serif;padding:2rem 1rem}
+.w{max-width:820px;margin:0 auto}
+.brand{font-size:12px;color:#A855F7;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem}
+h1{font-size:24px;font-weight:600;margin-bottom:.4rem}
+.sub{font-size:14px;color:#94a3b8;margin-bottom:1.75rem}
+.card{background:#1A0B2E;border:1px solid rgba(168,85,247,.25);border-radius:12px;padding:1.5rem;margin-bottom:1rem}
+.ct{font-size:11px;color:#A855F7;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:1rem}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem}
+.field{margin-bottom:.75rem}
+label{font-size:12px;color:#94a3b8;display:block;margin-bottom:.4rem}
+input,select,textarea{width:100%;background:#0A0414;border:1px solid rgba(168,85,247,.3);border-radius:6px;color:#f1f5f9;padding:.5rem .75rem;font-size:13px;font-family:system-ui}
+input:focus,select:focus{outline:none;border-color:#A855F7}
+.btn{padding:.75rem 1.5rem;background:#A855F7;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer}
+.btn:hover{background:#9333EA}
+.btn-ghost{background:transparent;border:1px solid rgba(168,85,247,.4);color:#C99BFF}
+.badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:500}
+.badge-green{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.25)}
+.badge-amber{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.25)}
+.badge-red{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.25)}
+.badge-purple{background:rgba(168,85,247,.2);color:#C99BFF;border:1px solid rgba(168,85,247,.3)}
+.badge-blue{background:rgba(59,130,246,.15);color:#93c5fd;border:1px solid rgba(59,130,246,.25)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.06em;padding:.5rem .75rem;border-bottom:1px solid rgba(168,85,247,.15)}
+td{padding:.6rem .75rem;border-bottom:1px solid rgba(255,255,255,.05);color:#cbd5e1;vertical-align:top}
+tr:hover td{background:rgba(168,85,247,.04)}
+.mcard{background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.2);border-radius:8px;padding:.875rem}
+.mlbl{font-size:11px;color:#64748b;margin-bottom:.3rem}
+.mval{font-size:22px;font-weight:600}
+.msub{font-size:10px;color:#475569;margin-top:.2rem}
+.comp-tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.5rem}
+.comp-tab{padding:.5rem 1rem;border-radius:8px;border:1px solid rgba(168,85,247,.25);background:transparent;color:#94a3b8;cursor:pointer;font-size:13px;font-family:system-ui}
+.comp-tab.on{border-color:#A855F7;background:rgba(168,85,247,.15);color:#C99BFF;font-weight:500}
+.bc-section{margin-bottom:1.5rem}
+.bc-title{font-size:12px;color:#A855F7;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:.75rem}
+.bc-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.bc-item{background:#0A0414;border:1px solid rgba(168,85,247,.15);border-radius:8px;padding:.875rem}
+.bc-label{font-size:11px;color:#64748b;margin-bottom:.3rem}
+.bc-val{font-size:13px;color:#e2e8f0;line-height:1.5}
+.win{border-left:3px solid #34d399}
+.loss{border-left:3px solid #f87171}
+.neutral{border-left:3px solid #A855F7}
+.objection{background:#1A0B2E;border-radius:8px;padding:1rem;margin-bottom:.75rem}
+.obj-q{font-size:13px;color:#fbbf24;margin-bottom:.5rem}
+.obj-a{font-size:13px;color:#cbd5e1;line-height:1.5}
+
+/* ---- FlashFusion elevated layer ---- */
+body{font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;position:relative}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background:radial-gradient(620px 380px at 16% -8%,rgba(168,85,247,.16),transparent 70%),radial-gradient(520px 340px at 94% 2%,rgba(34,211,238,.08),transparent 70%)}
+h1{font-family:'Poppins',sans-serif;letter-spacing:-.02em}
+.brand{font-family:'JetBrains Mono',monospace;color:#A855F7;font-weight:500}
+.ct,.section-label{font-family:'JetBrains Mono',monospace}
+.card{border-color:rgba(168,85,247,.18);box-shadow:0 1px 0 rgba(255,255,255,.02) inset}
+.btn{background:linear-gradient(135deg,#A855F7,#9333EA);box-shadow:0 4px 16px rgba(168,85,247,.24);transition:filter .15s,box-shadow .15s}
+.btn:hover{background:linear-gradient(135deg,#A855F7,#9333EA);filter:brightness(1.09);box-shadow:0 6px 22px rgba(168,85,247,.34)}
+.btn-ghost{background:transparent;box-shadow:none}
+input:focus,select:focus,textarea:focus{box-shadow:0 0 0 3px rgba(168,85,247,.16)}
+code{font-family:'JetBrains Mono',monospace}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(168,85,247,.22);border-radius:10px}::-webkit-scrollbar-thumb:hover{background:rgba(168,85,247,.36)}
+@media(prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style></head><body><div class="w">
+<div class="brand">FlashFusion AI Enablement</div>
+<h1>Battle Card Browser</h1>
+<p class="sub">Live competitive intelligence for sales calls.</p>
+<div class="comp-tabs" id="tabs"></div>
+<div id="bc-content"></div>
+</div>
+<script>
+var COMPS=[
+{id:"copilot",name:"Microsoft Copilot",
+pos:"Productivity-first, locked to Microsoft stack, no native compliance layer.",
+their_pitch:"AI integrated with M365. Your team already uses Teams and Outlook.",
+our_counter:"Copilot doesn't have a Trust layer. No audit trail. No auto-generated compliance artifacts. When your auditor asks what your AI agents did last quarter, Copilot has no answer.",
+wins:[
+{lbl:"Compliance requirement",val:"We generate audit artifacts automatically. Copilot requires manual documentation sprints."},
+{lbl:"Stack flexibility",val:"FlashFusion is platform-agnostic. We work with your existing tools, not Microsoft's."},
+{lbl:"Audit trail",val:"Every agent action is logged with timestamp and actor. Copilot has no equivalent."},
+],
+losses:[
+{lbl:"M365 native integration",val:"If they're 100% Microsoft and have no compliance obligations, Copilot may be sufficient."},
+{lbl:"Price per seat",val:"Copilot is bundled into E3/E5. Appears 'free' even if ROI isn't there."},
+],
+objs:[
+{q:"We already have Copilot.",a:"Copilot is a productivity tool. FlashFusion is a governance and enablement layer. They solve different problems. Ask your auditor how they'd document your Copilot agent actions."},
+{q:"Copilot is cheaper.",a:"Copilot appears free because it's bundled. But when you factor in manual compliance documentation time — 40-80 hours per audit cycle at your team's rates — FlashFusion is cheaper."}
+]
+},
+{id:"langchain",name:"LangChain / DIY",
+pos:"Powerful but requires significant engineering effort. No compliance layer.",
+their_pitch:"Open source, infinitely customizable. We can build exactly what we need.",
+our_counter:"LangChain gives you the engine. You have to build the compliance infrastructure yourself — and maintain it. That's an ongoing engineering cost most teams underestimate by 3-5x.",
+wins:[
+{lbl:"Time to value",val:"FlashFusion deploys in 4-5 weeks. DIY LangChain takes 3-6 months for comparable capability."},
+{lbl:"Compliance layer",val:"We ship a Trust layer as a first-class feature. LangChain has nothing built in."},
+{lbl:"Ongoing maintenance",val:"We own the platform. You don't pay an engineer to maintain it every time the API changes."},
+],
+losses:[
+{lbl:"Full customization",val:"If they need truly custom agent logic not covered by our builder, LangChain wins on flexibility."},
+{lbl:"Open source credibility",val:"Some engineering teams have strong OSS bias. Hard to overcome without a technical champion."},
+],
+objs:[
+{q:"We can build this ourselves.",a:"You can. Most teams that try spend 3-6 months getting to parity, then 20% of an engineer's ongoing time maintaining it. What's the opportunity cost of that engineering capacity?"},
+{q:"LangChain is more flexible.",a:"True. What specific workflow requires LangChain-level customization? In most cases, FlashFusion's builder covers it — and ships in weeks, not months."}
+]
+},
+{id:"nothing",name:"Doing Nothing",
+pos:"Status quo. No AI tooling in production, or ad-hoc usage with no governance.",
+their_pitch:"We're not ready. We'll evaluate AI later when it's more mature.",
+our_counter:"Every month of delay is a month of compounding competitive disadvantage. The teams moving fast now are the ones who will have the institutional knowledge when AI becomes table stakes.",
+wins:[
+{lbl:"Regulatory risk",val:"Every unaudited AI agent you deploy today is a liability tomorrow. The question isn't if regulators will scrutinize AI — it's when."},
+{lbl:"Competitive lag",val:"Your competitors are already deploying. Waiting 6-12 months to start means starting with 6-12 months of disadvantage."},
+{lbl:"Low entry cost",val:"An AI Setup Audit is $4,500 and takes one week. The cost of inaction compounds monthly."},
+],
+losses:[
+{lbl:"Budget cycle timing",val:"If there's genuinely no budget until next FY, nothing to do but stay warm and follow up."},
+{lbl:"Org readiness",val:"If leadership hasn't bought in at all, a single champion can't move it. Find the blocker."},
+],
+objs:[
+{q:"We're not ready for AI yet.",a:"What would ready look like? In most cases, 'not ready' means 'we haven't scoped it.' An AI Setup Audit is designed for that exact moment — it tells you exactly where you are and what to do first."},
+{q:"We'll wait until it's more stable.",a:"The underlying models are already stable enough for production. What's unstable is your team's process for using them. That's exactly what FlashFusion fixes."}
+]
+},
+{id:"openai",name:"OpenAI / ChatGPT Enterprise",
+pos:"Strong model capability, enterprise tier available. Limited workflow integration.",
+their_pitch:"GPT-4o is the best model. Enterprise tier has SSO and data privacy.",
+our_counter:"ChatGPT Enterprise solves data privacy. It doesn't solve workflow integration, skill deployment, or compliance artifact generation. It's a chat interface with guardrails — not an enablement platform.",
+wins:[
+{lbl:"Skill deployment",val:"FlashFusion deploys configured skill packs to your team. ChatGPT Enterprise requires each user to configure their own custom instructions."},
+{lbl:"Audit trail",val:"ChatGPT Enterprise has no agent audit trail. No auto-generated compliance artifacts."},
+{lbl:"Workflow integration",val:"We integrate with your existing stack — n8n, Notion, HubSpot, Drive. ChatGPT stays in the chat interface."},
+],
+losses:[
+{lbl:"Model quality for raw generation",val:"If they need the best raw writing or code generation, GPT-4o has an edge for some use cases."},
+{lbl:"Brand recognition",val:"OpenAI has better brand recognition with non-technical buyers. FlashFusion is unknown."},
+],
+objs:[
+{q:"We use ChatGPT Enterprise already.",a:"Great. FlashFusion isn't a replacement — it's a deployment and governance layer. You can use Claude models or GPT-4o underneath. We add the skill packs, the audit trail, and the compliance artifacts ChatGPT doesn't have."},
+{q:"GPT-4o is smarter.",a:"Model benchmarks matter for generation tasks. For workflow enablement and compliance, model quality is table stakes — the layer above it is where value gets created. That's where FlashFusion lives."}
+]
+}
+];
+
+function renderComp(c){
+var wins=c.wins.map(function(w){return '<div class="bc-item win"><div class="bc-label">'+w.lbl+'</div><div class="bc-val">'+w.val+'</div></div>'}).join("");
+var losses=c.losses.map(function(l){return '<div class="bc-item loss"><div class="bc-label">'+l.lbl+'</div><div class="bc-val">'+l.val+'</div></div>'}).join("");
+var objs=c.objs.map(function(o){return '<div class="objection"><div class="obj-q">Objection: "'+o.q+'"</div><div class="obj-a">→ '+o.a+'</div></div>'}).join("");
+return '<div class="bc-section"><div class="bc-title">Their positioning</div><div class="bc-item neutral"><div class="bc-val">'+c.their_pitch+'</div></div></div><div class="bc-section"><div class="bc-title">Our counter</div><div class="bc-item" style="background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.3)"><div class="bc-val" style="color:#C99BFF">'+c.our_counter+'</div></div></div><div class="bc-section"><div class="bc-title">We win when</div><div class="bc-grid">'+wins+'</div></div><div class="bc-section"><div class="bc-title">We lose when</div><div class="bc-grid">'+losses+'</div></div><div class="bc-section"><div class="bc-title">Objections and responses</div>'+objs+'</div>';
+}
+
+var active=COMPS[0].id;
+var tabs=document.getElementById("tabs");
+COMPS.forEach(function(c){
+var btn=document.createElement("button");
+btn.className="comp-tab"+(c.id===active?" on":"");
+btn.textContent=c.name;btn.id="tab-"+c.id;
+btn.onclick=function(){
+active=c.id;
+document.querySelectorAll(".comp-tab").forEach(function(t){t.classList.remove("on")});
+btn.classList.add("on");
+document.getElementById("bc-content").innerHTML=renderComp(c);
+};
+tabs.appendChild(btn);
+});
+document.getElementById("bc-content").innerHTML=renderComp(COMPS[0]);
+</script></body></html>

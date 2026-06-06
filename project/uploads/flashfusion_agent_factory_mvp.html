@@ -1,0 +1,600 @@
+
+<div style="max-width: 1000px; margin: 0 auto; font-family: var(--font-sans); color: var(--color-text-primary);">
+  <style>
+    .metric-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 1rem; text-align: center; }
+    .metric-label { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 8px; }
+    .metric-value { font-size: 28px; font-weight: 500; }
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 2rem; }
+    .tabs { display: flex; gap: 8px; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .tab-btn { background: none; border: none; padding: 12px 16px; font-size: 14px; cursor: pointer; color: var(--color-text-secondary); border-bottom: 2px solid transparent; font-weight: 500; }
+    .tab-btn.active { color: var(--color-text-primary); border-bottom-color: var(--color-text-primary); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .approval-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 12px; }
+    .approval-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+    .approval-title { font-weight: 500; font-size: 15px; }
+    .approval-risk { font-size: 12px; padding: 4px 8px; border-radius: 4px; font-weight: 500; }
+    .risk-high { background: var(--color-background-danger); color: var(--color-text-danger); }
+    .risk-medium { background: var(--color-background-warning); color: var(--color-text-warning); }
+    .approval-details { background: var(--color-background-secondary); padding: 12px; border-radius: 6px; margin-bottom: 12px; font-size: 13px; }
+    .detail-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .detail-label { color: var(--color-text-secondary); }
+    .approval-actions { display: flex; gap: 8px; }
+    .btn-approve { background: var(--color-background-success); color: var(--color-text-success); padding: 8px 16px; border: 0.5px solid var(--color-border-success); border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; }
+    .btn-deny { background: var(--color-background-danger); color: var(--color-text-danger); padding: 8px 16px; border: 0.5px solid var(--color-border-danger); border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; }
+    .run-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; padding: 12px; border-bottom: 0.5px solid var(--color-border-tertiary); font-size: 13px; align-items: center; }
+    .status-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; }
+    .status-completed { background: var(--color-background-success); color: var(--color-text-success); }
+    .status-waiting { background: var(--color-background-warning); color: var(--color-text-warning); }
+    .status-running { background: var(--color-background-info); color: var(--color-text-info); }
+    .code-block { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: 6px; padding: 12px; font-family: var(--font-mono); font-size: 12px; overflow-x: auto; max-height: 300px; margin-bottom: 12px; position: relative; }
+    .copy-btn { position: absolute; top: 8px; right: 8px; background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+    .checklist { list-style: none; padding: 0; }
+    .checklist li { padding: 12px; border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; gap: 12px; }
+    .checklist li:before { content: "□"; font-size: 16px; color: var(--color-text-secondary); width: 20px; }
+    .section-title { font-size: 16px; font-weight: 500; margin-top: 2rem; margin-bottom: 1rem; }
+  </style>
+
+  <h1 style="font-size: 22px; margin-bottom: 2rem;">FlashFusion Agent Factory — Phase 1 MVP</h1>
+
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-label">Pending approvals</div>
+      <div class="metric-value" id="pending-count">3</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Total cost (7d)</div>
+      <div class="metric-value">$42.80</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Runs completed</div>
+      <div class="metric-value">24</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Success rate</div>
+      <div class="metric-value">92%</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('dashboard')">Dashboard</button>
+    <button class="tab-btn" onclick="switchTab('approvals')">Approvals</button>
+    <button class="tab-btn" onclick="switchTab('code')">Code setup</button>
+    <button class="tab-btn" onclick="switchTab('deploy')">Deployment</button>
+  </div>
+
+  <!-- Dashboard Tab -->
+  <div id="dashboard" class="tab-content active">
+    <div class="section-title">Recent runs</div>
+    <div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden;">
+      <div class="run-row" style="background: var(--color-background-secondary); font-weight: 500;">
+        <div>Task</div>
+        <div>Status</div>
+        <div>Cost</div>
+        <div>Model</div>
+      </div>
+      <div class="run-row">
+        <div>Research Acme Inc</div>
+        <div><span class="status-badge status-completed">Completed</span></div>
+        <div>$8.42</div>
+        <div>claude-opus</div>
+      </div>
+      <div class="run-row">
+        <div>Code review PR #487</div>
+        <div><span class="status-badge status-waiting">Waiting approval</span></div>
+        <div>$3.15</div>
+        <div>claude-opus</div>
+      </div>
+      <div class="run-row">
+        <div>Generate report</div>
+        <div><span class="status-badge status-completed">Completed</span></div>
+        <div>$2.89</div>
+        <div>claude-sonnet</div>
+      </div>
+      <div class="run-row">
+        <div>Summarize docs</div>
+        <div><span class="status-badge status-running">Running</span></div>
+        <div>$1.23</div>
+        <div>claude-sonnet</div>
+      </div>
+    </div>
+
+    <div class="section-title">Cost by day (7d)</div>
+    <div style="display: flex; gap: 6px; align-items: flex-end; height: 140px; background: var(--color-background-secondary); padding: 1rem; border-radius: var(--border-radius-lg);">
+      <div style="flex: 1; background: var(--color-background-info); height: 60%; border-radius: 4px; position: relative;"><span style="position: absolute; bottom: -20px; left: 0; right: 0; text-align: center; font-size: 11px; color: var(--color-text-secondary);">Mon</span></div>
+      <div style="flex: 1; background: var(--color-background-info); height: 45%;"><span style="position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); font-size: 11px; color: var(--color-text-secondary);">Tue</span></div>
+      <div style="flex: 1; background: var(--color-background-info); height: 75%;"><span style="position: absolute; bottom: -20px; left: 100%; transform: translateX(-100%); font-size: 11px; color: var(--color-text-secondary);">Wed</span></div>
+      <div style="flex: 1; background: var(--color-background-info); height: 55%;"><span style="position: absolute; bottom: -20px; left: 50%; font-size: 11px; color: var(--color-text-secondary);">Thu</span></div>
+      <div style="flex: 1; background: var(--color-background-info); height: 40%;"><span style="position: absolute; bottom: -20px; font-size: 11px; color: var(--color-text-secondary);">Fri</span></div>
+      <div style="flex: 1; background: var(--color-background-info); height: 35%;"><span style="position: absolute; bottom: -20px; font-size: 11px; color: var(--color-text-secondary);">Sat</span></div>
+      <div style="flex: 1; background: var(--color-background-info); height: 50%;"><span style="position: absolute; bottom: -20px; font-size: 11px; color: var(--color-text-secondary);">Sun</span></div>
+    </div>
+    <div style="margin-top: 40px; font-size: 12px; color: var(--color-text-secondary);">Peak: Wed ($12.40) | Avg: $6.11/day | Projected: $42.77/week</div>
+  </div>
+
+  <!-- Approvals Tab -->
+  <div id="approvals" class="tab-content">
+    <div class="section-title">Pending approvals</div>
+
+    <div class="approval-card">
+      <div class="approval-header">
+        <div>
+          <div class="approval-title">Send email campaign</div>
+          <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: 4px;">Run ID: run_8a3d2f</div>
+        </div>
+        <span class="approval-risk risk-high">CRITICAL</span>
+      </div>
+      <div class="approval-details">
+        <div class="detail-row">
+          <span class="detail-label">Tool:</span>
+          <span>send_email_bulk</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Recipients:</span>
+          <span>1,247</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Estimated cost:</span>
+          <span>$6.24</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Message preview:</span>
+          <span style="font-style: italic;">"New feature launch: 50% off…"</span>
+        </div>
+      </div>
+      <div class="approval-actions">
+        <button class="btn-approve" onclick="approveAction('run_8a3d2f', true)">Approve</button>
+        <button class="btn-deny" onclick="approveAction('run_8a3d2f', false)">Deny</button>
+      </div>
+    </div>
+
+    <div class="approval-card">
+      <div class="approval-header">
+        <div>
+          <div class="approval-title">Execute SQL migration</div>
+          <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: 4px;">Run ID: run_5e9c1b</div>
+        </div>
+        <span class="approval-risk risk-high">CRITICAL</span>
+      </div>
+      <div class="approval-details">
+        <div class="detail-row">
+          <span class="detail-label">Tool:</span>
+          <span>execute_sql_write</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Rows affected:</span>
+          <span>~15,000</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Query:</span>
+          <span style="font-family: monospace; font-size: 11px;">ALTER TABLE users ADD COLUMN…</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Rollback available:</span>
+          <span style="color: var(--color-text-success);">Yes</span>
+        </div>
+      </div>
+      <div class="approval-actions">
+        <button class="btn-approve" onclick="approveAction('run_5e9c1b', true)">Approve</button>
+        <button class="btn-deny" onclick="approveAction('run_5e9c1b', false)">Deny</button>
+      </div>
+    </div>
+
+    <div class="approval-card">
+      <div class="approval-header">
+        <div>
+          <div class="approval-title">Deploy to production</div>
+          <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: 4px;">Run ID: run_7f2e8d</div>
+        </div>
+        <span class="approval-risk risk-high">CRITICAL</span>
+      </div>
+      <div class="approval-details">
+        <div class="detail-row">
+          <span class="detail-label">Tool:</span>
+          <span>deploy_vercel</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Environment:</span>
+          <span>production</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Commits:</span>
+          <span>3 commits | +124 lines</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Tests passed:</span>
+          <span style="color: var(--color-text-success);">92/92</span>
+        </div>
+      </div>
+      <div class="approval-actions">
+        <button class="btn-approve" onclick="approveAction('run_7f2e8d', true)">Approve</button>
+        <button class="btn-deny" onclick="approveAction('run_7f2e8d', false)">Deny</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Code Setup Tab -->
+  <div id="code" class="tab-content">
+    <div class="section-title">1. Supabase schema</div>
+    <div class="code-block">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre>create table agent_runs (
+  id uuid primary key default gen_random_uuid(),
+  org_id uuid not null,
+  user_id uuid not null,
+  status text check (status in ('queued','running','waiting_approval','failed','completed','cancelled')),
+  input jsonb not null,
+  output jsonb,
+  model_policy jsonb default '{}',
+  autonomy_level text check (autonomy_level in ('manual','semi_autonomous','autonomous')),
+  cost_cents integer default 0,
+  cost_ceiling_cents integer default 50000,
+  token_usage jsonb default '{}',
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create table tool_calls (
+  id uuid primary key default gen_random_uuid(),
+  run_id uuid references agent_runs(id) on delete cascade,
+  tool_name text not null,
+  risk_level text check (risk_level in ('low','medium','high','critical')),
+  input jsonb not null,
+  output jsonb,
+  status text check (status in ('pending','approved','denied','running','failed','completed')),
+  idempotency_key text not null unique,
+  requires_approval boolean default false,
+  cost_estimate_cents integer,
+  created_at timestamptz default now()
+);
+
+create table approvals (
+  id uuid primary key default gen_random_uuid(),
+  run_id uuid references agent_runs(id) on delete cascade,
+  tool_call_id uuid references tool_calls(id) on delete cascade,
+  status text check (status in ('pending','approved','denied')),
+  requested_by uuid not null,
+  reviewed_by uuid,
+  reason text,
+  created_at timestamptz default now(),
+  reviewed_at timestamptz
+);
+
+create table audit_logs (
+  id uuid primary key default gen_random_uuid(),
+  org_id uuid not null,
+  actor_type text check (actor_type in ('human','agent','system')),
+  action text not null,
+  target_type text not null,
+  target_id text,
+  metadata jsonb default '{}',
+  created_at timestamptz default now()
+);
+
+create index idx_runs_org on agent_runs(org_id);
+create index idx_runs_user on agent_runs(user_id);
+create index idx_tool_calls_run on tool_calls(run_id);
+create index idx_approvals_run on approvals(run_id);</pre>
+    </div>
+
+    <div class="section-title">2. LangGraph orchestrator (Python)</div>
+    <div class="code-block">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre>from langgraph.graph import StateGraph
+from typing import TypedDict, Any
+import anthropic
+import json
+
+class AgentState(TypedDict):
+    run_id: str
+    org_id: str
+    user_id: str
+    input_task: str
+    cost_cents: int
+    cost_ceiling: int
+    tool_calls: list
+    output: Any
+
+async def intake_node(state: AgentState):
+    state['cost_cents'] += 5
+    return state
+
+async def plan_node(state: AgentState):
+    client = anthropic.Anthropic()
+    msg = client.messages.create(
+        model="claude-opus-4-20250514",
+        max_tokens=500,
+        messages=[{"role": "user", "content": state['input_task']}]
+    )
+    state['cost_cents'] += int(msg.usage.input_tokens * 0.05 / 100)
+    return state
+
+async def execute_node(state: AgentState):
+    if state['cost_cents'] >= state['cost_ceiling']:
+        raise Exception(f"Cost ceiling ${state['cost_ceiling']/100} exceeded")
+    return state
+
+async def finalize_node(state: AgentState):
+    return state
+
+workflow = StateGraph(AgentState)
+workflow.add_node("intake", intake_node)
+workflow.add_node("plan", plan_node)
+workflow.add_node("execute", execute_node)
+workflow.add_node("finalize", finalize_node)
+
+workflow.add_edge("intake", "plan")
+workflow.add_edge("plan", "execute")
+workflow.add_edge("execute", "finalize")
+
+app = workflow.compile()</pre>
+    </div>
+
+    <div class="section-title">3. Next.js API handler</div>
+    <div class="code-block">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre>// app/api/runs/route.ts
+import { createClient } from '@supabase/supabase-js'
+import { NextRequest, NextResponse } from 'next/server'
+
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_KEY!
+)
+
+export async function POST(req: NextRequest) {
+  try {
+    const { org_id, user_id, task, autonomy_level = 'semi_autonomous', cost_ceiling_cents = 50000 } = await req.json()
+    
+    const { data: run, error } = await supabase
+      .from('agent_runs')
+      .insert({
+        org_id,
+        user_id,
+        input: { task },
+        status: 'queued',
+        autonomy_level,
+        cost_ceiling_cents,
+        model_policy: {}
+      })
+      .select('id')
+      .single()
+
+    if (error) throw error
+
+    return NextResponse.json({ run_id: run.id }, { status: 201 })
+  } catch (err) {
+    return NextResponse.json(
+      { error: String(err) },
+      { status: 400 }
+    )
+  }
+}
+
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url)
+  const org_id = searchParams.get('org_id')
+
+  const { data: runs } = await supabase
+    .from('agent_runs')
+    .select('*')
+    .eq('org_id', org_id)
+    .order('created_at', { ascending: false })
+    .limit(20)
+
+  return NextResponse.json(runs)
+}</pre>
+    </div>
+
+    <div class="section-title">4. Tool registry (TypeScript)</div>
+    <div class="code-block">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre>// tools/registry.ts
+import { z } from 'zod'
+
+export const toolRegistry = {
+  web_search: {
+    name: 'web_search',
+    description: 'Search the web for information',
+    risk_level: 'low',
+    requires_approval: false,
+    cost_estimate_cents: 5,
+    timeout_ms: 30000,
+    schema: z.object({
+      query: z.string(),
+      max_results: z.number().max(10)
+    })
+  },
+  read_file: {
+    name: 'read_file',
+    description: 'Read a file from storage',
+    risk_level: 'low',
+    requires_approval: false,
+    cost_estimate_cents: 1,
+    timeout_ms: 10000,
+    schema: z.object({
+      path: z.string()
+    })
+  },
+  write_file: {
+    name: 'write_file',
+    description: 'Write a file to storage',
+    risk_level: 'high',
+    requires_approval: true,
+    cost_estimate_cents: 2,
+    timeout_ms: 15000,
+    schema: z.object({
+      path: z.string(),
+      content: z.string()
+    })
+  },
+  send_email: {
+    name: 'send_email',
+    description: 'Send an email',
+    risk_level: 'critical',
+    requires_approval: true,
+    cost_estimate_cents: 5,
+    timeout_ms: 20000,
+    schema: z.object({
+      to: z.string().email(),
+      subject: z.string(),
+      body: z.string()
+    })
+  },
+  execute_sql_read: {
+    name: 'execute_sql_read',
+    description: 'Execute a SELECT query',
+    risk_level: 'low',
+    requires_approval: false,
+    cost_estimate_cents: 3,
+    timeout_ms: 30000,
+    schema: z.object({
+      query: z.string()
+    })
+  },
+  execute_sql_write: {
+    name: 'execute_sql_write',
+    description: 'Execute INSERT/UPDATE/DELETE',
+    risk_level: 'critical',
+    requires_approval: true,
+    cost_estimate_cents: 10,
+    timeout_ms: 45000,
+    schema: z.object({
+      query: z.string()
+    })
+  }
+}</pre>
+    </div>
+
+    <div class="section-title">5. Environment variables (.env.local)</div>
+    <div class="code-block">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre># Supabase
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_KEY=your-service-key
+SUPABASE_JWT_SECRET=your-jwt-secret
+
+# Anthropic
+ANTHROPIC_API_KEY=sk-ant-...
+
+# Agent config
+AGENT_AUTONOMY_LEVEL=semi_autonomous
+AGENT_COST_CEILING_CENTS=50000
+AGENT_APPROVAL_TIMEOUT_SECONDS=3600
+
+# Observability
+SENTRY_DSN=https://...@sentry.io/...
+POSTHOG_API_KEY=phc_...
+OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318</pre>
+    </div>
+  </div>
+
+  <!-- Deployment Tab -->
+  <div id="deploy" class="tab-content">
+    <div class="section-title">Deployment checklist</div>
+    <ul class="checklist">
+      <li><strong>Prerequisites</strong>: Supabase project created, Anthropic API key, Vercel account</li>
+      <li><strong>Step 1</strong>: Clone repo and install deps: <code>npm install</code></li>
+      <li><strong>Step 2</strong>: Run Supabase migrations: <code>supabase db push</code></li>
+      <li><strong>Step 3</strong>: Add RLS policies (see code below)</li>
+      <li><strong>Step 4</strong>: Set all env vars in Vercel dashboard</li>
+      <li><strong>Step 5</strong>: Deploy frontend: <code>vercel deploy</code></li>
+      <li><strong>Step 6</strong>: Deploy LangGraph worker: Docker → Fly.io or Railway</li>
+      <li><strong>Step 7</strong>: Run smoke tests: <code>npm run test:integration</code></li>
+      <li><strong>Step 8</strong>: Invite first beta customer</li>
+    </ul>
+
+    <div class="section-title">RLS policies (Supabase SQL)</div>
+    <div class="code-block">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre>-- Enable RLS
+alter table agent_runs enable row level security;
+alter table tool_calls enable row level security;
+alter table approvals enable row level security;
+alter table audit_logs enable row level security;
+
+-- Users can only see their org's runs
+create policy "Users see own org runs" on agent_runs
+  for select using (auth.uid() = user_id);
+
+create policy "Users insert own runs" on agent_runs
+  for insert with check (
+    auth.uid() = user_id and 
+    org_id in (
+      select org_id from user_orgs where user_id = auth.uid()
+    )
+  );
+
+-- Tool calls follow run visibility
+create policy "Tool calls inherit run visibility" on tool_calls
+  for select using (
+    run_id in (
+      select id from agent_runs where user_id = auth.uid()
+    )
+  );
+
+-- Approvals only visible to reviewers
+create policy "Approvals visible to reviewers" on approvals
+  for select using (
+    reviewed_by = auth.uid() or 
+    requested_by = auth.uid()
+  );
+
+-- Audit logs only visible to org admins
+create policy "Audit logs org-scoped" on audit_logs
+  for select using (
+    org_id in (
+      select org_id from users where id = auth.uid()
+    )
+  );</pre>
+    </div>
+
+    <div class="section-title">Verification steps</div>
+    <div style="background: var(--color-background-secondary); padding: 1rem; border-radius: var(--border-radius-lg); font-size: 13px; line-height: 1.8;">
+      <p><strong>1. Test auth:</strong> Log in, verify org isolation (org A cannot see org B)</p>
+      <p><strong>2. Test run creation:</strong> POST /api/runs → should return run_id</p>
+      <p><strong>3. Test approvals:</strong> Create high-risk tool call → should show in approval queue</p>
+      <p><strong>4. Test cost ceiling:</strong> Set cost_ceiling=500 cents, run tasks until $5 spent → should halt with cost_exceeded error</p>
+      <p><strong>5. Test audit logging:</strong> Query audit_logs table → should show all user actions</p>
+      <p><strong>6. Test rollback:</strong> Approve a write, deny another → check that denied writes don't execute</p>
+      <p><strong>7. Load test:</strong> Spawn 10 concurrent runs → monitor latency/errors</p>
+    </div>
+
+    <div class="section-title">Go-live readiness</div>
+    <div style="background: var(--color-background-secondary); padding: 1rem; border-radius: var(--border-radius-lg); font-size: 13px; line-height: 1.8; margin-bottom: 2rem;">
+      <p>✅ Single orchestrator can run 3-step task with approval</p>
+      <p>✅ All runs logged to Supabase with full audit trail</p>
+      <p>✅ Cost ceiling hard-stops run</p>
+      <p>✅ Approval UI is usable</p>
+      <p>✅ Multi-tenant RLS tested</p>
+      <p>✅ Secret-leak eval blocks run</p>
+      <p>✅ First 3 beta customers onboarded</p>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');
+  document.querySelector(`button[onclick="switchTab('${tab}')"]`).classList.add('active');
+}
+
+function approveAction(runId, approved) {
+  const action = approved ? 'APPROVED' : 'DENIED';
+  alert(`✓ ${runId} ${action}`);
+  document.getElementById('pending-count').textContent = Math.max(0, parseInt(document.getElementById('pending-count').textContent) - 1);
+}
+
+function copyCode(btn) {
+  const pre = btn.nextElementSibling;
+  const text = pre.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const original = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = original; }, 2000);
+  });
+}
+</script>

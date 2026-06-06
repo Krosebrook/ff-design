@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Prompt Forge v3</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#070612;--surf:rgba(255,255,255,0.04);--surf2:rgba(255,255,255,0.07);
+  --brd:rgba(255,255,255,0.09);--brd2:rgba(255,255,255,0.15);
+  --txt:#e8eaf0;--mut:#8a8fa3;--mut2:#5b6075;
+  --cyan:#22d3ee;--fuch:#d946ef;--vio:#7c3aed;--em:#10b981;--am:#f59e0b;--rose:#f43f5e;
+  --grid:rgba(255,255,255,0.025);
+}
+html,body,#root{height:100%;background:var(--bg);color:var(--txt)}
+body{font-family:'Space Grotesk',sans-serif;font-feature-settings:"ss01","cv11";overflow-y:auto;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:40px 40px;background-position:0 0,0 0;background-attachment:fixed}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.2)}
+
+button,input,textarea,select{font-family:inherit;font-feature-settings:inherit}
+button{cursor:pointer;border:none;background:none;color:inherit}
+button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+*:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;font-weight:700;font-size:12px;transition:transform .12s ease,background .12s ease,border-color .12s ease;border:1px solid transparent;letter-spacing:0.01em}
+.btn:hover:not(:disabled){transform:translateY(-1px)}
+.btn:active:not(:disabled){transform:translateY(0)}
+.btn:disabled{opacity:0.4;cursor:not-allowed}
+.btn-w{background:#fff;color:#0a0614}
+.btn-w:hover:not(:disabled){background:#f2f2f5}
+.btn-c{background:var(--cyan);color:#06121a}
+.btn-c:hover:not(:disabled){background:#5cdcef}
+.btn-f{background:var(--fuch);color:#fff}
+.btn-f:hover:not(:disabled){background:#e879f9}
+.btn-v{background:var(--vio);color:#fff}
+.btn-v:hover:not(:disabled){background:#8b5cf6}
+.btn-e{background:var(--em);color:#04150f}
+.btn-e:hover:not(:disabled){background:#34d399}
+.btn-g{background:var(--surf);color:var(--txt);border-color:var(--brd)}
+.btn-g:hover:not(:disabled){background:var(--surf2);border-color:var(--brd2)}
+.btn-d{background:rgba(244,63,94,0.1);color:#fb7185;border-color:rgba(244,63,94,0.25)}
+.btn-d:hover:not(:disabled){background:rgba(244,63,94,0.18)}
+
+.card{background:var(--surf);border:1px solid var(--brd);border-radius:14px}
+.card-2{background:rgba(0,0,0,0.25);border:1px solid var(--brd);border-radius:12px}
+
+.lbl{display:block;font-weight:700;font-size:10px;margin-bottom:8px;color:var(--mut);letter-spacing:0.08em;text-transform:uppercase}
+
+.ta{width:100%;background:rgba(0,0,0,0.3);border:1px solid var(--brd);border-radius:10px;padding:12px;color:var(--txt);font-size:13px;line-height:1.6;outline:none;resize:vertical;transition:border-color .12s}
+.ta:focus{border-color:var(--cyan)}
+.ta-mono{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#a5f3fc}
+
+.sel{width:100%;background:rgba(0,0,0,0.4);border:1px solid var(--brd);border-radius:8px;padding:9px 11px;color:var(--txt);font-size:12px;outline:none;cursor:pointer;transition:border-color .12s;appearance:none;
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none' stroke='%238a8fa3' stroke-width='1.5'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.sel:focus{border-color:var(--cyan)}
+
+.chip{border:1px solid var(--brd);background:rgba(0,0,0,0.2);border-radius:999px;padding:5px 11px;font-size:11px;font-weight:600;cursor:pointer;transition:all .12s;color:var(--mut);position:relative}
+.chip:hover{border-color:var(--brd2);background:rgba(255,255,255,0.06);color:var(--txt)}
+.chip.active{border-color:var(--fuch);background:rgba(217,70,239,0.12);color:#f0abfc}
+.chip[data-info]:hover::after{content:attr(data-info);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#000;color:#e8eaf0;border:1px solid var(--brd2);padding:6px 10px;border-radius:6px;font-size:10.5px;font-weight:500;line-height:1.4;white-space:normal;width:max-content;max-width:240px;z-index:30;pointer-events:none;text-transform:none;letter-spacing:0}
+
+.mcard{display:flex;flex-direction:column;border:1px solid var(--brd);background:rgba(0,0,0,0.2);border-radius:10px;padding:10px;cursor:pointer;transition:all .12s;text-align:left;min-height:74px}
+.mcard:hover{border-color:var(--brd2)}
+.mcard.active{border-color:var(--cyan);background:rgba(34,211,238,0.07)}
+.mcard-ic{font-size:14px;margin-bottom:4px;color:var(--cyan);font-family:'JetBrains Mono',monospace}
+.mcard-l{font-weight:800;font-size:12px;margin-bottom:2px}
+.mcard-d{font-size:10.5px;color:var(--mut);line-height:1.35}
+
+.tog{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--brd);background:rgba(0,0,0,0.2);border-radius:8px;padding:9px 12px;cursor:pointer;font-size:11.5px;font-weight:600;transition:all .12s;color:var(--txt);text-align:left}
+.tog:hover{border-color:var(--brd2)}
+.tog.on{border-color:rgba(16,185,129,0.45);background:rgba(16,185,129,0.08);color:#6ee7b7}
+.tog-mark{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:4px;border:1.5px solid var(--mut2);font-size:9px;font-weight:900;flex-shrink:0}
+.tog.on .tog-mark{border-color:#6ee7b7;background:#6ee7b7;color:#04150f}
+
+.bar{height:5px;border-radius:3px;background:rgba(255,255,255,0.06);overflow:hidden}
+.barf{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--cyan),var(--fuch));transition:width .35s ease}
+.barf-em{background:var(--em)}
+.barf-am{background:var(--am)}
+.barf-rose{background:var(--rose)}
+
+.pre{max-height:480px;overflow:auto;white-space:pre-wrap;background:rgba(0,0,0,0.4);border:1px solid var(--brd);border-radius:10px;padding:14px;font-size:11.5px;line-height:1.7;color:#a5f3fc;font-family:'JetBrains Mono',monospace}
+
+.alert{border-radius:8px;padding:9px 12px;font-size:11.5px;display:flex;gap:8px;align-items:flex-start;line-height:1.5;margin-bottom:8px}
+.alert-am{background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.22);color:#fde68a}
+.alert-em{background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.22);color:#6ee7b7}
+.alert-rose{background:rgba(244,63,94,0.07);border:1px solid rgba(244,63,94,0.22);color:#fda4af}
+.alert-info{background:rgba(34,211,238,0.06);border:1px solid rgba(34,211,238,0.18);color:#a5f3fc}
+.alert-ic{font-family:'JetBrains Mono',monospace;font-weight:900;flex-shrink:0;width:16px;text-align:center}
+
+.stat{background:rgba(255,255,255,0.025);border:1px solid var(--brd);border-radius:10px;padding:11px 13px}
+.stat-k{font-size:9px;font-weight:800;color:var(--mut);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px}
+.stat-v{font-size:18px;font-weight:900;font-family:'JetBrains Mono',monospace;line-height:1.1}
+
+.tab-bar{display:inline-flex;background:rgba(0,0,0,0.3);border:1px solid var(--brd);border-radius:10px;padding:3px;gap:2px}
+.tab-btn{padding:7px 16px;border-radius:7px;font-size:11.5px;font-weight:700;color:var(--mut);transition:all .12s;letter-spacing:0.02em}
+.tab-btn:hover:not(.act){color:var(--txt);background:rgba(255,255,255,0.04)}
+.tab-btn.act{background:var(--surf2);color:var(--txt)}
+
+h1.title{font-size:clamp(22px,3.2vw,32px);font-weight:900;line-height:1.05;letterSpacing:-0.025em}
+.gradtxt{background:linear-gradient(135deg,#fff 20%,#22d3ee 60%,#d946ef 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.muted{color:var(--mut)}
+.mono{font-family:'JetBrains Mono',monospace}
+.row{display:flex;align-items:center;gap:8px}
+.between{display:flex;align-items:center;justify-content:space-between;gap:8px}
+
+@media(max-width:880px){
+  .grid2{grid-template-columns:1fr!important}
+  .g3c{grid-template-columns:1fr 1fr!important}
+  .g4c{grid-template-columns:1fr 1fr!important}
+}
+</style>
+</head>
+<body><div id="root"></div>
+
+<script type="text/babel" data-presets="env,react">
+const{useState,useMemo,useEffect,useCallback,useRef}=React;
+
+// =========================== CONSTANTS ===========================
+const STORAGE_KEY="ff-prompt-forge-v3";
+const MAX_TOPIC=4000, MAX_EXTRA=4000, MAX_LINT=20000;
+
+const MODES=[
+  {id:"basic",     lbl:"General",      ic:"::",  d:"Open-ended request. Clear, short, practical."},
+  {id:"coding",    lbl:"Coding",       ic:"</>",d:"Production code. Diffs, tests, acceptance."},
+  {id:"technical", lbl:"Architecture", ic:"#=", d:"System design. Tradeoffs, decision matrix."},
+  {id:"research",  lbl:"Research",     ic:"@?", d:"Evidence-based. Citations, confidence labels."},
+  {id:"creative",  lbl:"Creative",     ic:"~*", d:"Style anchors, anti-references, variants."},
+  {id:"business",  lbl:"Business",     ic:"$>", d:"Decision-support. Stakeholders, pre-mortem."},
+  {id:"agentic",   lbl:"Agentic",      ic:">>", d:"Multi-step. Tools, checkpoints, recovery."},
+];
+
+const PLATFORMS=[
+  {id:"ChatGPT",       note:"Conversational. Be explicit about output structure and constraints."},
+  {id:"Claude",        note:"XML tags for structure. Examples > rules. Clear instruction hierarchy."},
+  {id:"Gemini",        note:"Multimodal grounding. Prefer concise, explicitly-structured outputs."},
+  {id:"Cursor",        note:"Repo-aware. Specify exact file paths. Request diffs, not rewrites."},
+  {id:"Claude Code",   note:"Terminal-safe steps. Include checkpoints, rollback, smoke checks."},
+  {id:"Codex",         note:"Direct task spec. Tests + failure handling required."},
+  {id:"Copilot",       note:"In-editor. Comment intent above the target function. Tight scope."},
+  {id:"Lovable",       note:"Screens, data model, Supabase RLS, acceptance criteria."},
+  {id:"Base44",        note:"App behavior + entities + flows. No-code clarity required."},
+  {id:"v0",            note:"UI components. Specify props, variants, responsive behavior."},
+  {id:"Bolt",          note:"Full-stack scaffold. Be explicit about auth and data flow."},
+  {id:"AI Studio",     note:"Schemas + safety constraints + eval cases."},
+];
+
+const TONES=["Direct","Concise","Friendly","Professional","Staff-level","Instructional","Playful"];
+
+const LENGTHS=[
+  {id:"compact",   lbl:"Compact",   tok:200,  note:"Keep the prompt compact. Cut filler. Essentials only."},
+  {id:"standard",  lbl:"Standard",  tok:500,  note:"Standard length. Include essentials and acceptance criteria."},
+  {id:"detailed",  lbl:"Detailed",  tok:900,  note:"Enough specificity to execute without guesswork."},
+  {id:"exhaustive",lbl:"Exhaustive",tok:1600, note:"Cover edge cases, validation, troubleshooting, examples."},
+];
+
+const FORMATS=["Markdown","Numbered plan","Table","JSON","Checklist","Code-first","Plain prose"];
+
+// Corpus-bound quickstarts — derived from actual templates in the Knowledge Project
+const QUICKSTARTS=[
+  {lb:"C-suite deck",          t:"Build a 30-min C-suite deck for [TOPIC]. Audience: mixed technical. Decision: approve budget. Verify every quantitative claim with a citation. Include a Risks & Mitigations slide and a 'What Could Prove Us Wrong' appendix.", m:"business",  p:["Claude","ChatGPT"]},
+  {lb:"ADR (architecture)",    t:"Write ADR-NNNN comparing 3 viable options for [DECISION]. Include 'do nothing' as option 4. For each: pros, cons, why-not-chosen. Recommend one with reasoning. Top 3 risks with mitigations. Reversibility rating. One-sentence pre-mortem.", m:"technical", p:["Claude","ChatGPT"]},
+  {lb:"Surgical refactor",     t:"Refactor `[FILE_PATH]` to [GOAL]. Constraints: do not modify files outside scope, do not change public API, smallest viable diff. Add at least one happy-path and one edge-case test. PR description must list files NOT touched.", m:"coding",    p:["Cursor","Claude Code"]},
+  {lb:"Webhook handler",       t:"Implement /api/webhooks/[PROVIDER] handler. Verify HMAC signature before parsing body. Validate event with Zod. Schema drift returns 200 + logs. Bad signature returns 400 + does not log signature/body. Add tests for: valid sig, invalid sig, replay, schema drift.", m:"coding",    p:["Cursor","Claude Code"]},
+  {lb:"Research synthesis",    t:"Synthesize current state of [TOPIC] as of 2026. Source hierarchy: primary > reputable secondary > tertiary. Per finding: claim, evidence, source, confidence label (HIGH/MED/LOW). Include one counterargument. End with 'What we don't know' section.", m:"research",  p:["Claude","ChatGPT","Gemini"]},
+  {lb:"Post-mortem",           t:"Write a blameless post-mortem for [INCIDENT]. Sections: timeline (UTC), what happened, why (direct cause + contributing factors), what worked, what didn't, action items with owners + dates, lessons for the pattern library. No blame language.", m:"basic",     p:["Claude","ChatGPT"]},
+  {lb:"Experiment design",     t:"Design an A/B test for [HYPOTHESIS]. Include: primary metric (must move ≥X%), 2-3 guardrails (must not regress >Y%), sample size calc, randomization unit, SRM tolerance ±2%, pre-registered check-in cadence, stop conditions. No peeking on primary.", m:"technical", p:["Claude","ChatGPT"]},
+  {lb:"Agent spec",            t:"Write a Claude sub-agent spec for [PURPOSE]. YAML frontmatter: name, role, framework, tools, permissions (read/write/execute), triggers, escalates_to. Body: Identity (≤3 sentences), Operating Framework with phase table, Hard boundaries (specific NEVER list), Self-check section.", m:"agentic",   p:["Claude Code","Claude"]},
+];
+
+// =========================== HELPERS ===========================
+
+const safeStorage=()=>{
+  try{
+    if(typeof window==="undefined"||!window.localStorage)return null;
+    const k="__ff_test__";window.localStorage.setItem(k,"1");window.localStorage.removeItem(k);
+    return window.localStorage;
+  }catch{return null}
+};
+
+const tokenEstimate=(s)=>Math.ceil((String(s||"").length)/4);
+const wordCount=(s)=>String(s||"").trim().split(/\s+/).filter(Boolean).length;
+
+const inferRole=(topic,mode)=>{
+  const t=String(topic||"").toLowerCase();
+  if(mode==="coding")    return "You are a senior software engineer. You ship production-ready code with input validation, error handling, and minimal-surface diffs.";
+  if(mode==="technical") return "You are a staff platform engineer. You compare options, name tradeoffs, and produce decision matrices.";
+  if(mode==="research")  return "You are a research analyst. You synthesize evidence, cite sources, and label confidence.";
+  if(mode==="creative")  return "You are a creative director and prompt designer. You commit to aesthetic choices and avoid clichés.";
+  if(mode==="business")  return "You are a strategy advisor. You identify decision-makers, surface risks, and recommend an action.";
+  if(mode==="agentic")   return "You are an agent architect. You design reliable multi-step workflows with checkpoints and recovery.";
+  // basic — try to be slightly smart from topic
+  if(/\b(code|debug|refactor|build|ship|deploy)\b/.test(t)) return "You are a senior engineer.";
+  if(/\b(write|draft|post|essay|article)\b/.test(t))         return "You are a sharp writer who eliminates filler.";
+  if(/\b(research|compare|review|analyze)\b/.test(t))        return "You are a research analyst.";
+  return "You are a helpful, careful assistant. You ask one clarifying question only when correctness is at stake.";
+};
+
+const lengthGuidance=(id)=>{const m=LENGTHS.find(l=>l.id===id);return m?m.note:LENGTHS[1].note;};
+const formatGuidance=(f)=>{
+  const m={
+    "Markdown":"Use Markdown headings and concise paragraphs.",
+    "Numbered plan":"Use a numbered execution plan with named steps, inputs, outputs, and validation.",
+    "Table":"Return a compact table of requirements, decisions, constraints, and acceptance checks.",
+    "JSON":"Return a single valid JSON object. Document each key.",
+    "Checklist":"Use a checklist with completion criteria per item.",
+    "Code-first":"Lead with code. Comments explain non-obvious choices only.",
+    "Plain prose":"Plain prose. No headers, no lists, no decoration.",
+  };
+  return m[f]||m["Markdown"];
+};
+
+// ----- Per-mode prompt builders -----
+
+const sec=(h,b)=>`# ${h}\n${b}`;
+
+function buildCodingPrompt(o){
+  const{topic,platforms,tone,length,format,inclEx,inclCit,inclVal,inclQ,inclCoT,inclXml,inclSelf,extra}=o;
+  const parts=[];
+  parts.push(sec("Role",inferRole(topic,"coding")));
+  parts.push(sec("Task",topic||"[Specify the change. Name files in scope.]"));
+  const constraints=[
+    "Do not modify files outside the explicit scope.",
+    "Validate inputs and handle errors with clear, actionable messages.",
+    "Prefer surgical edits and small diffs over rewrites.",
+    "No secrets in source. Read from env."
+  ];
+  if(inclVal)constraints.push("Add at least one happy-path test and one edge-case test.");
+  parts.push(sec("Constraints",constraints.map(c=>`- ${c}`).join("\n")));
+  parts.push(sec("Output",`${formatGuidance(format)}\n${lengthGuidance(length)} Tone: ${tone}.`));
+  if(inclCoT)parts.push(sec("Reasoning","Before code, briefly outline your approach: which files you will touch, what you will leave alone, and what could go wrong."));
+  if(inclEx)parts.push(sec("Example shape","Show the diff format you will use: a fenced block per file, with the path on the first comment line."));
+  if(inclSelf)parts.push(sec("Self-check before responding","- Did I introduce new dependencies? Justify each.\n- Are inputs validated and errors actionable?\n- Is the diff minimal and reversible?\n- Did I touch unrelated files?"));
+  parts.push(sec("Acceptance","- Compiles. Existing tests pass.\n- New tests cover the change.\n- No secrets introduced. No console.log in committed code."));
+  if(inclQ)parts.push(sec("On ambiguity","Ask one clarifying question only if a wrong assumption would force a rewrite. Otherwise state assumptions inline and proceed."));
+  if(extra)parts.push(sec("Extra context",extra));
+  return parts.join("\n\n");
+}
+
+function buildTechnicalPrompt(o){
+  const{topic,tone,length,format,inclEx,inclVal,inclSelf,extra}=o;
+  const parts=[];
+  parts.push(sec("Role",inferRole(topic,"technical")));
+  parts.push(sec("Decision",topic||"[State the architectural decision being made.]"));
+  parts.push(sec("Context",extra||"[Current stack, scale, team size, existing constraints.]"));
+  parts.push(sec("Quality attributes (priority order)","1. Correctness & security  2. Maintainability  3. Operability  4. Performance  5. Cost"));
+  parts.push(sec("Required output","- Compare 3 viable options.\n- Decision matrix: rows = options, columns = quality attributes + cost + risk.\n- Recommendation with reasoning.\n- Top 3 risks per option with mitigations.\n- One pre-mortem: 'we picked option X and it failed because…'"));
+  parts.push(sec("Format",`${formatGuidance(format)}\n${lengthGuidance(length)} Tone: ${tone}.`));
+  if(inclEx)parts.push(sec("Example",'Use the format: "Option | Correctness | Maintainability | Operability | Cost | Verdict".'));
+  if(inclVal)parts.push(sec("Validation","Cite the evidence behind each tradeoff. Mark unverified claims as [assumption]."));
+  if(inclSelf)parts.push(sec("Self-check","- Did I name the decision-makers?\n- Did I include a 'do nothing' option?\n- Did I separate facts from opinions?"));
+  return parts.join("\n\n");
+}
+
+function buildResearchPrompt(o){
+  const{topic,tone,length,format,inclCit,inclSelf,extra}=o;
+  const parts=[];
+  parts.push(sec("Role",inferRole(topic,"research")));
+  parts.push(sec("Question",topic||"[Specific research question. Avoid overbroad framing.]"));
+  parts.push(sec("Source hierarchy","1. Primary sources (official docs, papers, regulator filings)\n2. Reputable secondary (major outlets, established research orgs)\n3. Tertiary (blogs, forums) — cite with caveat"));
+  parts.push(sec("Required output",`- Direct answer in 2 sentences.\n- 3-5 supporting findings, each with: claim, evidence, source.\n- Confidence label per finding: HIGH / MEDIUM / LOW.\n- One counterargument or limitation.\n- "What we don't know" section.`));
+  parts.push(sec("Format",`${formatGuidance(format)}\n${lengthGuidance(length)} Tone: ${tone}.`));
+  if(inclCit)parts.push(sec("Citations","Cite every factual claim. Format: [n] Title — Publisher — Date — URL. If a claim has no source, mark it [unverified] and explain how to verify."));
+  else parts.push(sec("Citations","Cite where helpful. Mark unverified claims with [unverified]."));
+  if(inclSelf)parts.push(sec("Self-check","- Did I conflate correlation with causation?\n- Did I hand-wave any number? (Add source or mark estimate.)\n- Did I include a contrary finding?"));
+  if(extra)parts.push(sec("Extra context",extra));
+  return parts.join("\n\n");
+}
+
+function buildCreativePrompt(o){
+  const{topic,tone,length,format,inclEx,inclSelf,extra}=o;
+  const parts=[];
+  parts.push(sec("Role",inferRole(topic,"creative")));
+  parts.push(sec("Vision",topic||"[Describe the feeling, not the features.]"));
+  parts.push(sec("Style anchors","Name 3 reference points (artists, products, eras, films). Be specific."));
+  parts.push(sec("Anti-references","Avoid these tropes: generic neon glow, hero-stock-photo collage, 'futuristic' clichés, gradient overload, every emoji."));
+  parts.push(sec("Audience","[Who reads this? What do they already know?]"));
+  parts.push(sec("Output",`Produce 3 variants. For each: a 1-line concept, the execution, and what's deliberately omitted.\n${formatGuidance(format)}\n${lengthGuidance(length)} Tone: ${tone}.`));
+  if(inclEx)parts.push(sec("Example shape",'Variant 1 — "Editorial calm": ...what / what is omitted'));
+  if(inclSelf)parts.push(sec("Self-check","- Did I commit to a clear aesthetic, or hedge?\n- Could a competitor produce this verbatim? If yes, push further.\n- Is there one detail that makes it memorable?"));
+  if(extra)parts.push(sec("Extra context",extra));
+  return parts.join("\n\n");
+}
+
+function buildBusinessPrompt(o){
+  const{topic,tone,length,format,inclEx,inclSelf,extra}=o;
+  const parts=[];
+  parts.push(sec("Role",inferRole(topic,"business")));
+  parts.push(sec("Decision",topic||"[State the decision being made and the deadline.]"));
+  parts.push(sec("Stakeholders","Who decides? Who is affected? Who must be informed?"));
+  parts.push(sec("Constraints","Budget, timeline, risk tolerance, regulatory, brand."));
+  parts.push(sec("Required output","- 1-paragraph TL;DR with recommendation.\n- 3 options compared (including 'do nothing').\n- Top 3 risks with mitigations.\n- Pre-mortem: '6 months from now, this failed because…'\n- One unknown that, if resolved, would change the recommendation."));
+  parts.push(sec("Format",`${formatGuidance(format)}\n${lengthGuidance(length)} Tone: ${tone}.`));
+  if(inclEx)parts.push(sec("Example shape",'Option | Cost | Effort | Upside | Downside | Reversible? | Verdict'));
+  if(inclSelf)parts.push(sec("Self-check","- Did I separate the decision from the analysis?\n- Did I price-tag each option?\n- Did I include a reversibility check?"));
+  if(extra)parts.push(sec("Extra context",extra));
+  return parts.join("\n\n");
+}
+
+function buildAgenticPrompt(o){
+  const{topic,tone,length,format,inclEx,inclVal,inclSelf,extra}=o;
+  const parts=[];
+  parts.push(sec("Role",inferRole(topic,"agentic")));
+  parts.push(sec("Mission",topic||"[State the multi-step goal. Define done.]"));
+  parts.push(sec("Tools available","[List exactly which tools/MCPs the agent may call. No improvisation.]"));
+  parts.push(sec("Plan format","Output a numbered plan before acting. Each step: action, expected output, validation, fallback."));
+  parts.push(sec("Checkpoints","After every 3 steps OR every state change, summarize: what was done, what's pending, any blockers."));
+  parts.push(sec("Stop conditions","- Goal achieved (criteria below).\n- Same error twice in a row.\n- Budget cap hit (define cap).\n- Anything irreversible without confirmation."));
+  parts.push(sec("Done criteria","[Specific, measurable. e.g., 'all 12 tests pass and coverage >= 80%'.]"));
+  parts.push(sec("Format",`${formatGuidance(format)}\n${lengthGuidance(length)} Tone: ${tone}.`));
+  if(inclEx)parts.push(sec("Example step",'Step 3 — Run tests. Expect: "12 passed". Validation: exit code 0. Fallback: report failures, do not auto-fix.'));
+  if(inclVal)parts.push(sec("Validation","After each tool call, verify the result matches expected shape before proceeding."));
+  if(inclSelf)parts.push(sec("Self-check","- Did I list tools or improvise?\n- Did I define done?\n- Did I name the budget cap?\n- Is there a kill-switch on irreversible ops?"));
+  if(extra)parts.push(sec("Extra context",extra));
+  return parts.join("\n\n");
+}
+
+function buildBasicPrompt(o){
+  const{topic,tone,length,format,inclEx,inclCit,inclVal,inclQ,extra}=o;
+  const parts=[];
+  parts.push(sec("Role",inferRole(topic,"basic")));
+  parts.push(sec("Task",topic||"[State the task in one sentence.]"));
+  parts.push(sec("Output",`${formatGuidance(format)}\n${lengthGuidance(length)} Tone: ${tone}.`));
+  const cons=["Do not invent facts, sources, or user preferences.","Avoid filler and hedging."];
+  if(inclVal)cons.push("Verify internal consistency before responding.");
+  parts.push(sec("Constraints",cons.map(c=>`- ${c}`).join("\n")));
+  if(inclEx)parts.push(sec("Example","Include one short, concrete example."));
+  if(inclCit)parts.push(sec("Citations","Cite factual claims. Mark unverified claims [unverified]."));
+  if(inclQ)parts.push(sec("On ambiguity","Ask one clarifying question only if a wrong assumption would waste user time. Otherwise state assumptions and proceed."));
+  if(extra)parts.push(sec("Extra context",extra));
+  return parts.join("\n\n");
+}
+
+const BUILDERS={
+  basic:buildBasicPrompt,coding:buildCodingPrompt,technical:buildTechnicalPrompt,
+  research:buildResearchPrompt,creative:buildCreativePrompt,business:buildBusinessPrompt,
+  agentic:buildAgenticPrompt,
+};
+
+function platformAddenda(plats){
+  const items=PLATFORMS.filter(p=>plats.includes(p.id)).map(p=>`- **${p.id}**: ${p.note}`);
+  return items.length?sec("Platform notes",items.join("\n")):"";
+}
+
+function maybeWrapXml(body,plats,inclXml){
+  if(!inclXml||!plats.includes("Claude"))return body;
+  // Convert # headings to XML sections — light-touch, only top-level
+  const wrapped=body.split(/\n\n(?=# )/).map(block=>{
+    const m=block.match(/^# (.+)\n([\s\S]*)$/);
+    if(!m)return block;
+    const tag=m[1].toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_|_$/g,"");
+    return `<${tag}>\n${m[2]}\n</${tag}>`;
+  }).join("\n\n");
+  return wrapped;
+}
+
+function build(o){
+  const safeMode=BUILDERS[o.mode]?o.mode:"basic";
+  const fn=BUILDERS[safeMode];
+  let body=fn(o);
+  const addenda=platformAddenda(o.platforms||[]);
+  if(addenda)body+="\n\n"+addenda;
+  body=maybeWrapXml(body,o.platforms||[],o.inclXml);
+  // warnings
+  const warns=[];
+  if(!String(o.topic||"").trim())warns.push("Topic is empty — output uses placeholder slots.");
+  if(!(o.platforms||[]).length)warns.push("No platform selected — platform-specific guidance will be omitted.");
+  if(safeMode==="research"&&!o.inclCit)warns.push("Research mode without citations — most LLMs will hallucinate sources unless required.");
+  if(safeMode==="coding"&&!o.inclVal)warns.push("Coding mode without validation — generated code may skip tests.");
+  if(o.inclXml&&!(o.platforms||[]).includes("Claude"))warns.push("XML wrapping is enabled but Claude isn't selected — wrapping skipped.");
+  if(tokenEstimate(o.topic)+tokenEstimate(o.extra)>3000)warns.push("Topic + extra context is very long — consider trimming.");
+  return{prompt:body,warns,mode:safeMode};
+}
+
+// ----- Real content-based scoring -----
+
+function scorePrompt(text,mode,platforms){
+  const s=String(text||"");
+  const checks=[
+    {k:"role",       lbl:"Has explicit role",       max:14, hit:/^# Role|<role>/im.test(s)},
+    {k:"task",       lbl:"Specific task/objective", max:16, hit:/^# (Task|Decision|Question|Mission|Vision)/im.test(s)&&!/\[Specify|\[State|\[Describe/.test(s)},
+    {k:"format",     lbl:"Output format defined",   max:12, hit:/^# (Output|Format)/im.test(s)},
+    {k:"constraints",lbl:"Constraints listed",      max:14, hit:/^# Constraints/im.test(s)},
+    {k:"accept",     lbl:"Acceptance / required output", max:12, hit:/^# (Acceptance|Required output|Done criteria)/im.test(s)},
+    {k:"selfcheck",  lbl:"Self-check / validation", max:10, hit:/^# (Self-check|Validation)/im.test(s)},
+    {k:"plat",       lbl:"Platform-targeted",       max:10, hit:/^# Platform notes/im.test(s)||(platforms||[]).length>0},
+    {k:"length",     lbl:"Length appropriate",      max:6,  hit:(()=>{const t=tokenEstimate(s);return t>=80&&t<=2500;})()},
+    {k:"placeholders",lbl:"No unfilled placeholders",max:6, hit:!/\[Specify|\[State|\[Describe|\[fill in|\[List|\[Who/.test(s)},
+  ];
+  let raw=0,total=0;
+  checks.forEach(c=>{total+=c.max;if(c.hit)raw+=c.max;});
+  const score=Math.round((raw/total)*100);
+  const recs=[];
+  checks.forEach(c=>{if(!c.hit)recs.push({k:c.k,lbl:c.lbl,fix:fixFor(c.k)});});
+  return{score,checks,recs};
+}
+
+const fixFor=(k)=>({
+  role:"Add a 'You are…' line so the model knows what perspective to take.",
+  task:"Replace the placeholder with a concrete task. Specifics beat adjectives.",
+  format:"Tell the model what shape the output should take (markdown / table / JSON / etc).",
+  constraints:"List what NOT to do. Constraints are usually more useful than instructions.",
+  accept:"State acceptance criteria — how will you know the output is correct?",
+  selfcheck:"Add a self-check section so the model audits its own output before responding.",
+  plat:"Pick a target platform — guidance differs significantly across models.",
+  length:"Prompt is too short or too long for typical output. Aim for 80-2500 tokens.",
+  placeholders:"Fill in or remove the [bracketed] placeholders before sending.",
+}[k]||"Address this issue.");
+
+// ----- Lint mode -----
+
+function lintPrompt(text){
+  const issues=[];
+  const s=String(text||"");
+  if(!s.trim()){return{issues:[{sev:"info",msg:"Paste a prompt above to lint."}],summary:{error:0,warn:0,info:0}};}
+  // ERROR — secrets
+  const secretPatterns=[
+    {re:/\bsk-[A-Za-z0-9]{20,}/,name:"OpenAI-style key"},
+    {re:/\bsk-ant-[A-Za-z0-9_\-]{20,}/,name:"Anthropic-style key"},
+    {re:/\bghp_[A-Za-z0-9]{20,}/,name:"GitHub PAT"},
+    {re:/\bAKIA[0-9A-Z]{16}\b/,name:"AWS access key"},
+    {re:/\bxox[bp]-[A-Za-z0-9-]{10,}/,name:"Slack token"},
+    {re:/-----BEGIN [A-Z ]*PRIVATE KEY-----/,name:"private key"},
+    {re:/(api[_-]?key|password|secret|token)\s*[:=]\s*["'][^"']{6,}/i,name:"credential assignment"},
+  ];
+  secretPatterns.forEach(p=>{if(p.re.test(s))issues.push({sev:"error",msg:`Possible ${p.name} found. Move to env vars before sending.`,fix:"Replace with {{ENV_VAR_NAME}} placeholder."});});
+  // WARN — structural
+  if(!/^#|<role>|^role:|^you are/im.test(s))issues.push({sev:"warn",msg:"No explicit role / persona statement.",fix:"Add a '# Role\\nYou are…' line."});
+  if(!/format|json|markdown|table|checklist|bullets?|list|paragraph/i.test(s))issues.push({sev:"warn",msg:"No output format specified.",fix:"Tell the model what shape the response should take."});
+  if(!/constraint|do not|don't|avoid|never|must not|forbid/i.test(s))issues.push({sev:"warn",msg:"No constraints (no 'do not / avoid / never').",fix:"Constraints are usually more effective than positive instructions."});
+  // WARN — vague verbs
+  const vague=["help me","make it good","make it nice","do something","figure it out","whatever you think"];
+  vague.forEach(v=>{if(s.toLowerCase().includes(v))issues.push({sev:"warn",msg:`Vague phrase: "${v}".`,fix:"Replace with a specific verb and a measurable outcome."});});
+  // INFO — hedging
+  const hedgeRe=/\b(maybe|perhaps|kind of|sort of|try to|if possible|might be)\b/gi;
+  const hedges=s.match(hedgeRe);
+  if(hedges&&hedges.length>=2)issues.push({sev:"info",msg:`Hedge language used ${hedges.length} times.`,fix:"Hedging tells the model the requirements are negotiable. Be direct."});
+  // INFO — length
+  const tok=tokenEstimate(s);
+  if(tok<30)issues.push({sev:"info",msg:`Very short (~${tok} tok). Likely missing context.`,fix:"Add: who, what, why, output shape, success criteria."});
+  if(tok>3000)issues.push({sev:"warn",msg:`Very long (~${tok} tok). Consider chaining or trimming.`,fix:"Long single prompts compete with themselves for attention. Split into a chain."});
+  // INFO — no example
+  if(!/example|e\.g\.|for instance/i.test(s))issues.push({sev:"info",msg:"No example provided.",fix:"One concrete example often outperforms three rules."});
+  // INFO — no acceptance
+  if(!/acceptance|criteria|done when|success|verify|validate/i.test(s))issues.push({sev:"info",msg:"No acceptance criteria.",fix:"State how you'll know the output is correct."});
+  // INFO — politeness padding
+  if(/\bplease\b/i.test(s)&&s.match(/\bplease\b/gi).length>=3)issues.push({sev:"info",msg:"'Please' used 3+ times — politeness padding.",fix:"Direct instructions perform as well or better."});
+  // INFO — placeholders left
+  if(/\[(specify|fill in|todo|placeholder|insert)/i.test(s))issues.push({sev:"warn",msg:"Unfilled [placeholder] left in prompt.",fix:"Fill in or remove before sending."});
+  // INFO — corpus rule: business/strategy without pre-mortem
+  if(/\b(strategy|decision|choice|recommend|pitch)\b/i.test(s)&&!/\b(pre-?mortem|what could go wrong|6 months from now|prove us wrong|counterargument)\b/i.test(s))
+    issues.push({sev:"info",msg:"Strategic/decision prompt without a pre-mortem.",fix:"Add: 'Six months from now this failed because…' or 'What would prove us wrong?'"});
+  // INFO — corpus rule: architecture without 'do nothing'
+  if(/\b(compare options|architecture|ADR|tradeoff|vs)\b/i.test(s)&&!/\b(do nothing|status quo|none of the above|no change)\b/i.test(s))
+    issues.push({sev:"info",msg:"Architecture/comparison prompt without a 'do nothing' option.",fix:"Always include 'do nothing' as a valid option in comparisons."});
+  // WARN — corpus rule: creative without anti-references
+  if(/\b(design|illustration|hero|landing|aesthetic|brand|visual)\b/i.test(s)&&!/\b(avoid|anti-?reference|do not|don.?t|no\s+(neon|generic|cliche|stock))\b/i.test(s))
+    issues.push({sev:"info",msg:"Creative prompt without anti-references.",fix:"Name what to AVOID. 'Don't do X' is often more useful than 'do Y'."});
+  // INFO — corpus rule: acceptance criteria framing
+  if(/\b(build|implement|ship|deploy|create)\b/i.test(s)&&!/\b(acceptance|done when|criteria|verify|pass|test)\b/i.test(s))
+    issues.push({sev:"info",msg:"Build prompt without acceptance criteria.",fix:"Add 'Acceptance: …' so done is observable, not subjective."});
+  // INFO — corpus rule: research without confidence labels
+  if(/\b(research|synthesize|review|investigate|find out)\b/i.test(s)&&!/\b(confidence|HIGH|MEDIUM|LOW|verified|unverified|\[unverified\])\b/i.test(s))
+    issues.push({sev:"info",msg:"Research prompt without confidence labeling.",fix:"Require labels like HIGH/MEDIUM/LOW or [unverified] to prevent overstated certainty."});
+
+  const summary={
+    error:issues.filter(i=>i.sev==="error").length,
+    warn: issues.filter(i=>i.sev==="warn").length,
+    info: issues.filter(i=>i.sev==="info").length,
+  };
+  if(!issues.length)issues.push({sev:"info",msg:"No issues found. Prompt looks well-formed."});
+  return{issues,summary};
+}
+
+// ----- Improve / Simplify (idempotent) -----
+
+const QUALITY_LOCK="# Quality lock\nBefore answering, verify the response is specific, internally consistent, free of hallucinated facts, and immediately usable. If a critical detail is missing, ask one targeted follow-up; otherwise proceed and state assumptions inline.";
+
+function improvePrompt(text){
+  const s=String(text||"");
+  if(s.includes("# Quality lock"))return s;  // idempotent
+  return s.trimEnd()+"\n\n"+QUALITY_LOCK;
+}
+
+function simplifyPrompt(text){
+  // remove META commentary and self-check (keeps the user's actual config)
+  return String(text||"")
+    .replace(/\n\n# Self-check[\s\S]*?(?=\n\n# |$)/g,"")
+    .replace(/\n\n# Reasoning[\s\S]*?(?=\n\n# |$)/g,"")
+    .replace(/\n\n# On ambiguity[\s\S]*?(?=\n\n# |$)/g,"")
+    .replace(/\n{3,}/g,"\n\n")
+    .trim();
+}
+
+// ----- Clipboard with feedback -----
+
+async function copyToClipboard(text){
+  try{
+    if(navigator?.clipboard?.writeText){await navigator.clipboard.writeText(text);return{ok:true};}
+    const ta=document.createElement("textarea");
+    ta.value=text;ta.style.position="fixed";ta.style.opacity="0";
+    document.body.appendChild(ta);ta.select();
+    const ok=document.execCommand("copy");
+    ta.remove();
+    return{ok,err:ok?null:"execCommand failed"};
+  }catch(e){return{ok:false,err:String(e?.message||e)};}
+}
+
+function downloadText(filename,text){
+  try{
+    const b=new Blob([text],{type:"text/markdown;charset=utf-8"});
+    const u=URL.createObjectURL(b);
+    const a=document.createElement("a");
+    a.href=u;a.download=filename;document.body.appendChild(a);a.click();a.remove();
+    URL.revokeObjectURL(u);
+    return{ok:true};
+  }catch(e){return{ok:false,err:String(e?.message||e)};}
+}
+
+// =========================== UI ===========================
+
+function App(){
+  // tab
+  const[tab,setTab]=useState("generate");
+  // generate state
+  const[topic,setTopic]=useState("");
+  const[mode,setMode]=useState("basic");
+  const[platforms,setPlatforms]=useState(["Claude","ChatGPT"]);
+  const[tone,setTone]=useState("Direct");
+  const[length,setLength]=useState("standard");
+  const[format,setFormat]=useState("Markdown");
+  const[extra,setExtra]=useState("");
+  const[inclEx,setInclEx]=useState(false);
+  const[inclCit,setInclCit]=useState(false);
+  const[inclVal,setInclVal]=useState(true);
+  const[inclQ,setInclQ]=useState(true);
+  const[inclCoT,setInclCoT]=useState(false);
+  const[inclXml,setInclXml]=useState(false);
+  const[inclSelf,setInclSelf]=useState(false);
+  // output state
+  const[manual,setManual]=useState("");
+  const[dirty,setDirty]=useState(false);
+  const[pv,setPv]=useState("preview");
+  const[copyState,setCopyState]=useState({label:"Copy",ok:null});
+  const[saveState,setSaveState]=useState("");
+  // lint state
+  const[lintInput,setLintInput]=useState("");
+  // hydrate from storage
+  const[hydrated,setHydrated]=useState(false);
+  const[storageOk,setStorageOk]=useState(true);
+
+  useEffect(()=>{
+    const ls=safeStorage();
+    setStorageOk(!!ls);
+    if(ls){
+      try{
+        const raw=ls.getItem(STORAGE_KEY);
+        if(raw){
+          const p=JSON.parse(raw);
+          setTopic(p.topic??"");setMode(p.mode??"basic");
+          setPlatforms(Array.isArray(p.platforms)?p.platforms:["Claude","ChatGPT"]);
+          setTone(p.tone??"Direct");setLength(p.length??"standard");setFormat(p.format??"Markdown");
+          setExtra(p.extra??"");
+          setInclEx(!!p.inclEx);setInclCit(!!p.inclCit);setInclVal(p.inclVal??true);
+          setInclQ(p.inclQ??true);setInclCoT(!!p.inclCoT);setInclXml(!!p.inclXml);setInclSelf(!!p.inclSelf);
+          setManual(p.manual??"");setDirty(!!p.dirty);
+        }
+      }catch(e){ls.removeItem(STORAGE_KEY);}
+    }
+    setHydrated(true);
+  },[]);
+
+  // autosave
+  useEffect(()=>{
+    if(!hydrated)return;
+    const ls=safeStorage();
+    if(!ls)return;
+    const t=setTimeout(()=>{
+      try{
+        ls.setItem(STORAGE_KEY,JSON.stringify({topic,mode,platforms,tone,length,format,extra,inclEx,inclCit,inclVal,inclQ,inclCoT,inclXml,inclSelf,manual,dirty}));
+        setSaveState("Saved");
+        setTimeout(()=>setSaveState(""),900);
+      }catch{}
+    },600);
+    return()=>clearTimeout(t);
+  },[hydrated,topic,mode,platforms,tone,length,format,extra,inclEx,inclCit,inclVal,inclQ,inclCoT,inclXml,inclSelf,manual,dirty]);
+
+  // build
+  const opts=useMemo(()=>({
+    topic,mode,platforms,tone,length,format,extra,inclEx,inclCit,inclVal,inclQ,inclCoT,inclXml,inclSelf
+  }),[topic,mode,platforms,tone,length,format,extra,inclEx,inclCit,inclVal,inclQ,inclCoT,inclXml,inclSelf]);
+  const built=useMemo(()=>build(opts),[opts]);
+  const generated=dirty?manual:built.prompt;
+  const sc=useMemo(()=>scorePrompt(generated,mode,platforms),[generated,mode,platforms]);
+  const tok=useMemo(()=>tokenEstimate(generated),[generated]);
+  const wc=useMemo(()=>wordCount(generated),[generated]);
+  const lint=useMemo(()=>lintPrompt(lintInput),[lintInput]);
+
+  // sync manual when not dirty
+  useEffect(()=>{if(!dirty)setManual(built.prompt);},[built.prompt,dirty]);
+
+  // handlers
+  const togglePlatform=(p)=>{setPlatforms(c=>c.includes(p)?c.filter(x=>x!==p):[...c,p]);if(dirty)confirmDiscard();};
+  const confirmDiscard=()=>{
+    if(window.confirm("You have manual edits. Reset to generated prompt?")){setDirty(false);}
+  };
+  const safeSet=(setter)=>(v)=>{
+    if(dirty){
+      if(window.confirm("You have manual edits. Changing this will overwrite them. Continue?")){
+        setter(v);setDirty(false);
+      }
+    }else setter(v);
+  };
+  const applyQuickstart=(q)=>{
+    if(dirty&&!window.confirm("You have manual edits. Apply quickstart anyway?"))return;
+    setTopic(q.t);setMode(q.m);setPlatforms(q.p);
+    setInclCit(q.m==="research");setInclVal(true);setInclQ(true);setDirty(false);
+  };
+  const handleCopy=async()=>{
+    const r=await copyToClipboard(generated);
+    if(r.ok){setCopyState({label:"Copied ✓",ok:true});setTimeout(()=>setCopyState({label:"Copy",ok:null}),1400);}
+    else{setCopyState({label:"Copy failed",ok:false});setTimeout(()=>setCopyState({label:"Copy",ok:null}),2200);}
+  };
+  const handleExport=()=>{
+    const fn=`prompt-${mode}-${Date.now()}.md`;
+    downloadText(fn,generated);
+  };
+  const handleImprove=()=>{
+    const next=improvePrompt(generated);
+    if(next===generated){setSaveState("Already improved (idempotent)");setTimeout(()=>setSaveState(""),1500);return;}
+    setManual(next);setDirty(true);setPv("edit");
+  };
+  const handleSimplify=()=>{
+    const next=simplifyPrompt(generated);
+    setManual(next);setDirty(true);setPv("edit");
+  };
+  const handleRegenerate=()=>{
+    if(dirty&&!window.confirm("Discard manual edits and regenerate?"))return;
+    setManual(built.prompt);setDirty(false);setPv("preview");
+  };
+  const handleClearAll=()=>{
+    if(!window.confirm("Clear all configuration and saved drafts?"))return;
+    setTopic("");setMode("basic");setPlatforms(["Claude","ChatGPT"]);setTone("Direct");setLength("standard");setFormat("Markdown");
+    setExtra("");setInclEx(false);setInclCit(false);setInclVal(true);setInclQ(true);setInclCoT(false);setInclXml(false);setInclSelf(false);
+    setManual("");setDirty(false);setPv("preview");
+    const ls=safeStorage();if(ls)ls.removeItem(STORAGE_KEY);
+  };
+
+  return (
+    <div style={{position:"relative",minHeight:"100vh",padding:"0 0 48px"}}>
+      <div style={{position:"relative",zIndex:1,maxWidth:1240,margin:"0 auto",padding:"20px 16px"}}>
+
+        {/* Header */}
+        <header className="between" style={{marginBottom:18,gap:12,flexWrap:"wrap"}}>
+          <div>
+            <div className="row" style={{gap:8,marginBottom:8}}>
+              <span className="mono" style={{fontSize:11,color:"var(--cyan)",fontWeight:700,padding:"3px 8px",background:"rgba(34,211,238,0.08)",border:"1px solid rgba(34,211,238,0.2)",borderRadius:6}}>v4</span>
+              <span className="muted mono" style={{fontSize:11}}>prompt-forge · corpus-bound</span>
+              {saveState&&<span style={{fontSize:10,color:"var(--em)",fontWeight:700}}>{saveState}</span>}
+              {!storageOk&&<span style={{fontSize:10,color:"var(--am)",fontWeight:700}}>Drafts won't persist (storage blocked)</span>}
+            </div>
+            <h1 className="title gradtxt">Prompt Forge</h1>
+            <p className="muted" style={{fontSize:12.5,marginTop:6,maxWidth:640,lineHeight:1.55}}>Generate prompts using mode-specific scaffolds. Quickstarts and lint rules are derived from your Knowledge Project — ADRs, post-mortems, deck-gen meta-prompts, agent specs.</p>
+          </div>
+          <nav className="tab-bar" role="tablist">
+            <button role="tab" aria-selected={tab==="generate"} onClick={()=>setTab("generate")} className={`tab-btn${tab==="generate"?" act":""}`}>Generate</button>
+            <button role="tab" aria-selected={tab==="lint"}     onClick={()=>setTab("lint")}     className={`tab-btn${tab==="lint"?" act":""}`}>Lint</button>
+          </nav>
+        </header>
+
+        {tab==="generate"&&(
+          <div className="grid2" style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) minmax(0,1.05fr)",gap:14,alignItems:"start"}}>
+
+            {/* LEFT — config */}
+            <div className="card" style={{padding:18}}>
+              <label className="lbl" htmlFor="topic">Topic / Task</label>
+              <textarea id="topic" className="ta" rows={4} maxLength={MAX_TOPIC} placeholder="What do you actually need? Specific beats general." value={topic} onChange={e=>{if(dirty)return confirmDiscard();setTopic(e.target.value);}}/>
+              <div className="between" style={{marginTop:6}}>
+                <span className="mono muted" style={{fontSize:10}}>{topic.length}/{MAX_TOPIC}</span>
+                <span className="mono muted" style={{fontSize:10}}>~{tokenEstimate(topic)} tok</span>
+              </div>
+
+              <div style={{marginTop:14}}>
+                <div className="lbl">Quickstarts</div>
+                <div style={{display:"flex",flexWrap:"wrap",gap:5}}>
+                  {QUICKSTARTS.map(q=>(<button key={q.lb} className="chip" onClick={()=>applyQuickstart(q)} aria-label={`Apply quickstart: ${q.lb}`}>{q.lb}</button>))}
+                </div>
+              </div>
+
+              <div style={{marginTop:18}}>
+                <label className="lbl">Mode</label>
+                <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:6}} role="radiogroup" aria-label="Prompt mode">
+                  {MODES.map(m=>(
+                    <button key={m.id} role="radio" aria-checked={mode===m.id} className={`mcard${mode===m.id?" active":""}`} onClick={()=>safeSet(setMode)(m.id)} title={m.d}>
+                      <span className="mcard-ic">{m.ic}</span>
+                      <span className="mcard-l">{m.lbl}</span>
+                      <span className="mcard-d">{m.d}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{marginTop:18}}>
+                <label className="lbl">Platforms <span className="muted" style={{textTransform:"none",letterSpacing:0,fontSize:10}}>· hover for guidance</span></label>
+                <div style={{display:"flex",flexWrap:"wrap",gap:5}} role="group" aria-label="Target platforms">
+                  {PLATFORMS.map(p=>(
+                    <button key={p.id} aria-pressed={platforms.includes(p.id)} className={`chip${platforms.includes(p.id)?" active":""}`} onClick={()=>togglePlatform(p.id)} data-info={p.note}>{p.id}</button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="g3c" style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginTop:18}}>
+                <div>
+                  <label className="lbl" htmlFor="tone">Tone</label>
+                  <select id="tone" className="sel" value={tone} onChange={e=>safeSet(setTone)(e.target.value)}>
+                    {TONES.map(o=><option key={o}>{o}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="lbl" htmlFor="length">Length</label>
+                  <select id="length" className="sel" value={length} onChange={e=>safeSet(setLength)(e.target.value)}>
+                    {LENGTHS.map(l=><option key={l.id} value={l.id}>{l.lbl} (~{l.tok}t)</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="lbl" htmlFor="format">Format</label>
+                  <select id="format" className="sel" value={format} onChange={e=>safeSet(setFormat)(e.target.value)}>
+                    {FORMATS.map(o=><option key={o}>{o}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div style={{marginTop:18}}>
+                <label className="lbl">Behavior toggles</label>
+                <div className="g4c" style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:6}}>
+                  {[
+                    [inclVal,setInclVal,"Validation","Add an explicit verify-before-respond block."],
+                    [inclQ,setInclQ,"Clarify on ambiguity","Allow one targeted follow-up question if needed."],
+                    [inclEx,setInclEx,"Include example","Add a one-shot example of expected shape."],
+                    [inclCit,setInclCit,"Require citations","Force source citations on factual claims."],
+                    [inclCoT,setInclCoT,"Reasoning first","Ask model to outline approach before answering."],
+                    [inclSelf,setInclSelf,"Self-check","Add a checklist the model runs against itself."],
+                    [inclXml,setInclXml,"XML wrap (Claude)","Wrap each section in XML tags for Claude."],
+                  ].map(([v,setter,label,info])=>(
+                    <button key={label} aria-pressed={!!v} className={`tog${v?" on":""}`} onClick={()=>{safeSet(setter)(!v);}} title={info}>
+                      <span>{label}</span>
+                      <span className="tog-mark">{v?"✓":""}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{marginTop:18}}>
+                <label className="lbl" htmlFor="extra">Extra context</label>
+                <textarea id="extra" className="ta" rows={3} maxLength={MAX_EXTRA} placeholder="Stack, audience, constraints, anti-references, files, exclusions…" value={extra} onChange={e=>{if(dirty)return confirmDiscard();setExtra(e.target.value);}}/>
+                <div className="between" style={{marginTop:6}}>
+                  <span className="mono muted" style={{fontSize:10}}>{extra.length}/{MAX_EXTRA}</span>
+                  <button className="btn btn-d" onClick={handleClearAll} style={{padding:"4px 10px",fontSize:10}}>Clear all</button>
+                </div>
+              </div>
+
+              <div className="alert alert-info" style={{marginTop:14}}>
+                <span className="alert-ic">i</span>
+                <span>Drafts autosave to your browser. Don't paste API keys or secrets — use {`{{ENV_VAR}}`} placeholders.</span>
+              </div>
+            </div>
+
+            {/* RIGHT — output + score */}
+            <div style={{display:"flex",flexDirection:"column",gap:12}}>
+              <div className="card" style={{padding:18}}>
+                <div className="between" style={{marginBottom:12,gap:8,flexWrap:"wrap"}}>
+                  <div>
+                    <div style={{fontWeight:900,fontSize:14}}>Live output {dirty&&<span style={{fontSize:10,color:"var(--am)",marginLeft:6,fontWeight:700}}>· edited</span>}</div>
+                    <div className="muted mono" style={{fontSize:10,marginTop:3}}>~{tok} tok · {wc} words</div>
+                  </div>
+                  <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+                    <button className="btn btn-g" onClick={()=>setPv(p=>p==="preview"?"edit":"preview")} aria-label={`Switch to ${pv==="preview"?"edit":"preview"} mode`}>{pv==="preview"?"Edit":"Preview"}</button>
+                    <button className="btn btn-e" onClick={handleImprove} title="Add a quality-lock self-verification block (idempotent)">Improve</button>
+                    <button className="btn btn-g" onClick={handleSimplify} title="Strip self-check, reasoning, ambiguity sections">Simplify</button>
+                    <button className="btn btn-c" onClick={handleRegenerate} title="Discard edits and regenerate from config">Regenerate</button>
+                  </div>
+                </div>
+
+                {built.warns.length>0&&built.warns.map(w=>(
+                  <div key={w} className="alert alert-am">
+                    <span className="alert-ic">!</span><span>{w}</span>
+                  </div>
+                ))}
+
+                {pv==="edit"
+                  ?<textarea className="ta ta-mono" style={{minHeight:380}} value={manual} onChange={e=>{setManual(e.target.value);setDirty(true);}}/>
+                  :<pre className="pre">{generated}</pre>
+                }
+
+                <div style={{display:"flex",flexWrap:"wrap",gap:6,marginTop:12}}>
+                  <button className={`btn ${copyState.ok===false?"btn-d":"btn-w"}`} onClick={handleCopy}>{copyState.label}</button>
+                  <button className="btn btn-v" onClick={handleExport}>Export .md</button>
+                </div>
+              </div>
+
+              {/* Stats */}
+              <div className="g4c" style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>
+                <div className="stat"><div className="stat-k">Quality</div><div className="stat-v gradtxt">{sc.score}<span style={{fontSize:11,opacity:0.5}}>/100</span></div></div>
+                <div className="stat"><div className="stat-k">Mode</div><div className="stat-v" style={{fontSize:13}}>{MODES.find(m=>m.id===built.mode)?.lbl||built.mode}</div></div>
+                <div className="stat"><div className="stat-k">Platforms</div><div className="stat-v" style={{fontSize:13}}>{platforms.length||"None"}</div></div>
+                <div className="stat"><div className="stat-k">Tokens</div><div className="stat-v" style={{fontSize:13}}>~{tok}</div></div>
+              </div>
+
+              {/* Score breakdown */}
+              <div className="card" style={{padding:16}}>
+                <div className="between" style={{marginBottom:12}}>
+                  <div style={{fontWeight:900,fontSize:13}}>Quality breakdown</div>
+                  <div className="muted mono" style={{fontSize:10}}>content-based · 9 checks</div>
+                </div>
+                <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                  {sc.checks.map(c=>(
+                    <div key={c.k}>
+                      <div className="between" style={{fontSize:10.5,marginBottom:3}}>
+                        <span style={{color:c.hit?"var(--em)":"var(--mut)"}}>{c.hit?"✓":"○"} {c.lbl}</span>
+                        <span className="mono muted">{c.hit?c.max:0}/{c.max}</span>
+                      </div>
+                      <div className="bar"><div className={`barf ${c.hit?"barf-em":""}`} style={{width:`${(c.hit?c.max:0)/c.max*100}%`}}/></div>
+                    </div>
+                  ))}
+                </div>
+                {sc.recs.length>0&&(
+                  <div className="card-2" style={{marginTop:12,padding:"10px 12px"}}>
+                    <div style={{fontSize:10,fontWeight:800,color:"var(--mut)",letterSpacing:".06em",textTransform:"uppercase",marginBottom:6}}>To improve · {sc.recs.length}</div>
+                    {sc.recs.map(r=>(
+                      <div key={r.k} style={{fontSize:11,marginBottom:5,lineHeight:1.45}}>
+                        <span style={{color:"var(--am)"}}>›</span> <span style={{color:"var(--txt)"}}>{r.lbl}.</span> <span className="muted">{r.fix}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {tab==="lint"&&(
+          <div className="grid2" style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) minmax(0,1fr)",gap:14,alignItems:"start"}}>
+            <div className="card" style={{padding:18}}>
+              <label className="lbl" htmlFor="lintInput">Paste any prompt</label>
+              <textarea id="lintInput" className="ta ta-mono" rows={20} maxLength={MAX_LINT} placeholder="Paste a prompt here. Lint scans for secrets, vague verbs, hedges, missing structure, and length issues." value={lintInput} onChange={e=>setLintInput(e.target.value)}/>
+              <div className="between" style={{marginTop:8}}>
+                <span className="mono muted" style={{fontSize:10}}>{lintInput.length}/{MAX_LINT} · ~{tokenEstimate(lintInput)} tok · {wordCount(lintInput)} words</span>
+                <button className="btn btn-g" onClick={()=>setLintInput("")}>Clear</button>
+              </div>
+              <div className="alert alert-info" style={{marginTop:12}}>
+                <span className="alert-ic">i</span>
+                <span>Lint runs entirely in your browser. Pasted prompts aren't sent anywhere. Still — don't paste real secrets to test the secret detector.</span>
+              </div>
+            </div>
+
+            <div className="card" style={{padding:18}}>
+              <div className="between" style={{marginBottom:14}}>
+                <div style={{fontWeight:900,fontSize:14}}>Lint report</div>
+                <div style={{display:"flex",gap:6}}>
+                  <span className="mono" style={{fontSize:10,padding:"3px 8px",borderRadius:5,background:"rgba(244,63,94,0.1)",color:"#fb7185",border:"1px solid rgba(244,63,94,0.2)"}}>{lint.summary.error||0} err</span>
+                  <span className="mono" style={{fontSize:10,padding:"3px 8px",borderRadius:5,background:"rgba(245,158,11,0.1)",color:"#fbbf24",border:"1px solid rgba(245,158,11,0.2)"}}>{lint.summary.warn||0} warn</span>
+                  <span className="mono" style={{fontSize:10,padding:"3px 8px",borderRadius:5,background:"rgba(34,211,238,0.08)",color:"#67e8f9",border:"1px solid rgba(34,211,238,0.2)"}}>{lint.summary.info||0} info</span>
+                </div>
+              </div>
+              <div style={{display:"flex",flexDirection:"column",gap:7,maxHeight:560,overflow:"auto"}}>
+                {lint.issues.map((i,idx)=>(
+                  <div key={idx} className={`alert ${i.sev==="error"?"alert-rose":i.sev==="warn"?"alert-am":"alert-info"}`} style={{marginBottom:0}}>
+                    <span className="alert-ic">{i.sev==="error"?"X":i.sev==="warn"?"!":"i"}</span>
+                    <div>
+                      <div style={{fontWeight:700,marginBottom:i.fix?3:0}}>{i.msg}</div>
+                      {i.fix&&<div style={{fontSize:11,opacity:0.85,fontWeight:500}}>→ {i.fix}</div>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        <footer style={{marginTop:24,paddingTop:14,borderTop:"1px solid var(--brd)",display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
+          <div className="mono muted" style={{fontSize:10}}>prompt-forge v3 · {hydrated?"hydrated":"loading"} · {storageOk?"storage ok":"storage blocked"}</div>
+          <div className="mono muted" style={{fontSize:10}}>built for kyle · runs locally · no telemetry</div>
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+</script>
+</body>
+</html>

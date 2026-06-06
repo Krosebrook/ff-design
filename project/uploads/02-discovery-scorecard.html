@@ -1,0 +1,121 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<title>FF — Discovery Call Scorecard</title><style>*{box-sizing:border-box;margin:0;padding:0}
+body{background:#09090f;color:#f1f5f9;font-family:system-ui,sans-serif;padding:2rem 1rem}
+.w{max-width:800px;margin:0 auto}
+.brand{font-size:12px;color:#7c3aed;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem}
+h1{font-size:24px;font-weight:600;margin-bottom:.4rem}
+.sub{font-size:14px;color:#94a3b8;margin-bottom:1.75rem}
+.card{background:#12121e;border:1px solid rgba(124,58,237,.25);border-radius:12px;padding:1.5rem;margin-bottom:1rem}
+.ct{font-size:11px;color:#7c3aed;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:1rem}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem}
+.field{margin-bottom:.75rem}
+label{font-size:12px;color:#94a3b8;display:block;margin-bottom:.4rem}
+input,select,textarea{width:100%;background:#0d0a1a;border:1px solid rgba(124,58,237,.3);border-radius:6px;color:#f1f5f9;padding:.5rem .75rem;font-size:13px;font-family:system-ui}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#7c3aed}
+.btn{padding:.75rem 1.5rem;background:#7c3aed;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer}
+.btn:hover{background:#6d28d9}
+.btn-ghost{background:transparent;border:1px solid rgba(124,58,237,.4);color:#a78bfa}
+.badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:500}
+.badge-purple{background:rgba(124,58,237,.2);color:#a78bfa;border:1px solid rgba(124,58,237,.3)}
+.badge-green{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.25)}
+.badge-amber{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.25)}
+.badge-red{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.25)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.06em;padding:.5rem .75rem;border-bottom:1px solid rgba(124,58,237,.15)}
+td{padding:.6rem .75rem;border-bottom:1px solid rgba(255,255,255,.05);color:#cbd5e1}
+tr:hover td{background:rgba(124,58,237,.05)}
+.score-ring{display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;border:3px solid;font-size:16px;font-weight:700}
+.score-area{background:#0d0a1a;border:1px solid rgba(124,58,237,.4);border-radius:12px;padding:1.5rem;margin-top:1rem}
+.criterion{margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid rgba(255,255,255,.06)}
+.criterion:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.crit-name{font-size:14px;font-weight:500;color:#e2e8f0;margin-bottom:.4rem}
+.crit-desc{font-size:12px;color:#64748b;margin-bottom:.75rem}
+.stars{display:flex;gap:.4rem}
+.star{width:32px;height:32px;border-radius:6px;border:1px solid rgba(124,58,237,.3);background:transparent;color:#475569;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.star.on{background:rgba(124,58,237,.25);border-color:#7c3aed;color:#a78bfa}
+.total-card{background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.4);border-radius:10px;padding:1.25rem;text-align:center;margin-bottom:1rem}
+.total-num{font-size:48px;font-weight:700;color:#a78bfa}
+.verdict{font-size:16px;font-weight:600;margin-top:.25rem}
+.note-area{margin-top:1rem}
+</style></head><body><div class="w">
+<div class="brand">FlashFusion AI Enablement</div>
+<h1>Discovery Call Scorecard</h1>
+<p class="sub">Score each dimension live during the call. Qualification threshold: 18/25.</p>
+<div class="card"><div class="ct">Prospect Info</div>
+<div class="g2">
+<div class="field"><label>Company</label><input id="co" placeholder="Acme Corp"></div>
+<div class="field"><label>Contact</label><input id="ct" placeholder="Jane Smith, VP Eng"></div>
+</div>
+<div class="g2">
+<div class="field"><label>Date</label><input id="dt" type="date"></div>
+<div class="field"><label>Current AI tools</label><input id="tools" placeholder="Copilot, ChatGPT..."></div>
+</div>
+</div>
+<div class="score-area">
+<div style="font-size:13px;font-weight:600;color:#c4b5fd;margin-bottom:1.25rem">Score 1–5 per dimension</div>
+<div id="criteria"></div>
+</div>
+<div class="total-card" style="margin-top:1rem">
+<div style="font-size:12px;color:#94a3b8;margin-bottom:.25rem">Total Score</div>
+<div class="total-num" id="total">0</div><div style="font-size:12px;color:#64748b">/ 25</div>
+<div class="verdict" id="verdict" style="color:#64748b">Score the dimensions above</div>
+</div>
+<div class="card"><div class="ct">Notes and Next Steps</div>
+<div class="field"><label>Pain points (their words)</label><textarea id="pain" rows="3" placeholder="What specific problem did they describe?"></textarea></div>
+<div class="field"><label>Timeline and urgency</label><textarea id="timeline" rows="2" placeholder="Any deadlines, board pressure, audit dates?"></textarea></div>
+<div class="field"><label>Recommended entry product</label>
+<select id="prod"><option value="">Select...</option><option>AI Setup Audit — $4,500</option><option>Enablement Sprint — $5,000</option><option>Free Scorecard (nurture)</option><option>Not a fit — disqualify</option></select>
+</div>
+<div class="field"><label>Next action</label><input id="next" placeholder="e.g. Send proposal by Friday, schedule technical call"></div>
+<button class="btn" style="width:100%;margin-top:.5rem" onclick="exportScore()">Export Scorecard Summary</button>
+</div>
+</div>
+<script>
+var criteria=[
+{id:"pain",name:"Pain clarity",desc:"Can they articulate a specific AI governance or productivity problem?"},
+{id:"budget",name:"Budget signal",desc:"Do they have budget allocated or authority to approve?"},
+{id:"timeline",name:"Timeline urgency",desc:"Is there a deadline — audit, board review, compliance cycle?"},
+{id:"authority",name:"Decision authority",desc:"Are we talking to someone who can actually say yes?"},
+{id:"fit",name:"ICP fit",desc:"200-2000 employees, compliance-sensitive, actively evaluating AI?"}
+];
+var scores={};
+var el=document.getElementById("criteria");
+criteria.forEach(function(c){
+scores[c.id]=0;
+var d=document.createElement("div");d.className="criterion";
+var stars="";for(var i=1;i<=5;i++) stars+='<div class="star" data-id="'+c.id+'" data-v="'+i+'" onclick="score(this)">'+i+'</div>';
+d.innerHTML='<div class="crit-name">'+c.name+'</div><div class="crit-desc">'+c.desc+'</div><div class="stars">'+stars+'</div>';
+el.appendChild(d);
+});
+function score(el){
+var id=el.dataset.id,v=+el.dataset.v;
+scores[id]=v;
+document.querySelectorAll('.star[data-id="'+id+'"]').forEach(function(s){
+s.classList.toggle("on",+s.dataset.v<=v);
+});
+updateTotal();
+}
+function updateTotal(){
+var t=Object.values(scores).reduce(function(a,b){return a+b},0);
+document.getElementById("total").textContent=t;
+var v=document.getElementById("verdict");
+if(t>=20){v.textContent="Strong fit — move to proposal";v.style.color="#34d399"}
+else if(t>=15){v.textContent="Qualified — dig deeper on weak dimensions";v.style.color="#fbbf24"}
+else if(t>=10){v.textContent="Marginal — nurture, revisit in 90 days";v.style.color="#fb923c"}
+else{v.textContent="Not a fit — disqualify now";v.style.color="#f87171"}
+}
+function exportScore(){
+var t=Object.values(scores).reduce(function(a,b){return a+b},0);
+var lines=["FLASHFUSION DISCOVERY SCORECARD","========================","","Company: "+co.value,"Contact: "+ct.value,"Date: "+dt.value,"Current tools: "+tools.value,"","SCORES:"];
+criteria.forEach(function(c){lines.push(c.name+": "+scores[c.id]+"/5")});
+lines.push("","TOTAL: "+t+"/25");
+lines.push("Recommended product: "+prod.value);
+lines.push("Pain points: "+pain.value);
+lines.push("Timeline: "+timeline.value);
+lines.push("Next action: "+next.value);
+var blob=new Blob([lines.join("\n")],{type:"text/plain"});
+var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="discovery-scorecard.txt";a.click();
+}
+document.getElementById("dt").value=new Date().toISOString().split("T")[0];
+</script></body></html>

@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prompt Engineering Guide — FlashFusion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#000;--s1:#0B0B14;--s2:#13131F;
+  --v:#8B5CF6;--vh:#A855F7;--mg:#EC4899;--cy:#22D3EE;
+  --bd:rgba(139,92,246,.12);--bds:rgba(139,92,246,.35);
+  --t1:#FFF;--t2:#C7C7D1;--t3:#8A8A96;--t4:#5A5A64;
+  --grad:linear-gradient(135deg,#A855F7,#EC4899,#22D3EE);
+  --glass:rgba(11,11,20,.7);--blur:blur(16px);
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'Geist',-apple-system,sans-serif;
+  --mono:'Geist Mono','SF Mono',monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:var(--sans);color:var(--t2);background:var(--void);overflow-x:hidden;-webkit-font-smoothing:antialiased;line-height:1.5;min-height:100vh}
+::selection{background:rgba(168,85,247,.4);color:var(--t1)}
+:focus-visible{outline:2px solid var(--cy);outline-offset:2px;border-radius:4px}
+:focus:not(:focus-visible){outline:none}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}}
+
+/* ── Parallax Star Field ── */
+.stars{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.stars::before,.stars::after,.stars .layer{position:absolute;inset:0;border-radius:50%}
+.stars::before{content:'';background:radial-gradient(1px 1px at 20% 30%,rgba(255,255,255,.6),transparent),radial-gradient(1px 1px at 80% 10%,rgba(255,255,255,.5),transparent),radial-gradient(1px 1px at 50% 60%,rgba(255,255,255,.4),transparent),radial-gradient(1px 1px at 10% 80%,rgba(255,255,255,.3),transparent),radial-gradient(1px 1px at 70% 50%,rgba(255,255,255,.5),transparent),radial-gradient(1px 1px at 40% 20%,rgba(255,255,255,.4),transparent),radial-gradient(1px 1px at 90% 70%,rgba(255,255,255,.3),transparent),radial-gradient(1px 1px at 30% 90%,rgba(255,255,255,.5),transparent);background-size:200% 200%;animation:drift 60s linear infinite}
+.stars::after{content:'';background:radial-gradient(1.5px 1.5px at 15% 45%,rgba(168,85,247,.4),transparent),radial-gradient(1.5px 1.5px at 65% 25%,rgba(236,72,153,.3),transparent),radial-gradient(1.5px 1.5px at 45% 75%,rgba(34,211,238,.3),transparent),radial-gradient(1.5px 1.5px at 85% 55%,rgba(168,85,247,.3),transparent);background-size:300% 300%;animation:drift 90s linear infinite reverse}
+@keyframes drift{0%{background-position:0 0}100%{background-position:100% 100%}}
+
+/* Noise overlay */
+body::after{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* ── Layout ── */
+#app{position:relative;z-index:2;display:flex;flex-direction:column;min-height:100vh}
+header{padding:16px 24px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur)}
+h1{font-family:var(--serif);font-weight:400;font-size:28px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.2}
+h1 span{font-family:var(--sans);font-size:11px;font-weight:500;-webkit-text-fill-color:var(--t4);margin-left:10px}
+.hdr-r{display:flex;gap:8px;align-items:center}
+
+/* Mode toggle */
+.mode{display:flex;border-radius:100px;overflow:hidden;border:1px solid var(--bd)}
+.mode button{padding:6px 14px;font-size:11px;font-weight:600;font-family:var(--mono);letter-spacing:.5px;text-transform:uppercase;transition:all .2s}
+.mode button.on{background:var(--v);color:var(--void)}
+.mode button:not(.on){color:var(--t3)}
+.hdr-btn{padding:8px 14px;border-radius:100px;border:1px solid var(--bd);background:transparent;color:var(--t3);font-family:var(--mono);font-size:11px;cursor:pointer;transition:all .2s;min-height:44px;display:flex;align-items:center;gap:6px}
+.hdr-btn:hover{border-color:var(--bds);color:var(--t1)}
+
+/* ── Tab Bar ── */
+.tab-wrap{position:sticky;top:0;z-index:20;background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-bottom:1px solid var(--bd)}
+.tab-scroll{position:relative;overflow:hidden}
+.tab-scroll::before,.tab-scroll::after{content:'';position:absolute;top:0;bottom:0;width:32px;z-index:2;pointer-events:none}
+.tab-scroll::before{left:0;background:linear-gradient(to right,var(--s1),transparent)}
+.tab-scroll::after{right:0;background:linear-gradient(to left,var(--s1),transparent)}
+.tabs{display:flex;gap:4px;overflow-x:auto;padding:10px 16px;scrollbar-width:none;scroll-snap-type:x proximity;scroll-behavior:smooth;align-items:center}
+.tabs::-webkit-scrollbar{display:none}
+.tab{scroll-snap-align:center;padding:8px 16px;border-radius:100px;border:1px solid transparent;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.3px;cursor:pointer;transition:all .25s var(--ease);display:flex;align-items:center;gap:8px;white-space:nowrap;color:var(--t4);opacity:.5}
+.tab:hover{opacity:.85;color:var(--t3)}
+.tab.on{opacity:1;color:var(--t1);border-color:var(--bds);background:rgba(139,92,246,.08);box-shadow:0 0 20px rgba(139,92,246,.15)}
+.tab .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.tab .cnt{font-size:9px;padding:1px 7px;border-radius:100px;font-weight:700}
+.tab.on .cnt{background:rgba(139,92,246,.2);color:var(--vh)}
+.tab:not(.on) .cnt{background:rgba(128,128,128,.1);color:var(--t4)}
+.tsep{width:1px;height:20px;background:var(--bd);margin:0 8px;flex-shrink:0;opacity:.5}
+
+/* Crumb */
+.crumb{padding:6px 20px;font-size:11px;font-family:var(--mono);color:var(--t4);border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:6px;overflow:hidden;white-space:nowrap}
+.crumb .accent{color:var(--vh);font-weight:600}
+
+/* ── Pro Strip ── */
+.pro-strip{padding:10px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:rgba(236,72,153,.03)}
+.pro-label{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;white-space:nowrap}
+.chip{padding:4px 12px;border-radius:100px;border:1px solid rgba(236,72,153,.2);font-family:var(--mono);font-size:10px;font-weight:600;color:var(--t3);cursor:pointer;transition:all .2s}
+.chip:hover{border-color:rgba(236,72,153,.5);color:var(--t1);background:rgba(236,72,153,.08)}
+
+/* ── Welcome ── */
+.welcome{margin:20px;padding:24px;border-radius:16px;background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--bd)}
+.welcome h2{font-family:var(--serif);font-size:24px;color:var(--t1);font-weight:400;margin-bottom:8px}
+.welcome p{font-size:13px;color:var(--t3);line-height:1.6}
+.welcome .dots{display:flex;flex-direction:column;gap:8px;margin:16px 0}
+.welcome .dots div{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--t3)}
+.welcome .cta{padding:10px 24px;border-radius:100px;border:none;background:var(--grad);color:var(--void);font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.5px;cursor:pointer;text-transform:uppercase}
+
+/* ── Content ── */
+main{flex:1;overflow-y:auto;padding:24px 24px 80px}
+.container{max-width:860px;margin:0 auto}
+.cat-head{display:flex;align-items:flex-start;gap:16px;margin-bottom:24px}
+.cat-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.cat-title{font-family:var(--serif);font-size:28px;color:var(--t1);font-weight:400;line-height:1.2}
+.cat-sub{font-size:13px;color:var(--t3);margin-top:4px}
+.lvl-pill{font-family:var(--mono);font-size:10px;font-weight:600;padding:2px 10px;border-radius:100px;margin-left:10px;vertical-align:middle}
+
+/* Toolbar */
+.toolbar{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+.toolbar button{padding:6px 16px;border-radius:100px;border:1px solid var(--bd);background:transparent;color:var(--t3);font-family:var(--mono);font-size:11px;cursor:pointer;transition:all .2s}
+.toolbar button:hover{border-color:var(--bds);color:var(--t1)}
+.toolbar .counter{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--t4)}
+
+/* ── Cards ── */
+.card{margin-bottom:20px;border-radius:14px;border:1px solid var(--bd);background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);overflow:visible;transition:border-color .3s}
+.card:hover{border-color:var(--bds)}
+.card.connected{border-radius:14px 14px 0 0;margin-bottom:0;border-bottom:none}
+.card-head{width:100%;text-align:left;padding:16px 20px;display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:transparent;border:none;cursor:pointer;color:var(--t1);transition:background .15s;border-radius:14px}
+.card-head:hover{background:rgba(255,255,255,.02)}
+.card-head h3{margin:0;font-family:var(--sans);font-size:15px;font-weight:600;flex:1;min-width:120px}
+.chev{transition:transform .2s;display:inline-flex;flex-shrink:0;color:var(--t4)}
+.chev.open{transform:rotate(90deg)}
+.ev{padding:2px 8px;border-radius:100px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.5px;cursor:help;text-transform:uppercase}
+.tk{padding:2px 8px;border-radius:100px;font-family:var(--mono);font-size:9px;font-weight:600;background:rgba(128,128,128,.1);color:var(--t3);cursor:help}
+.card-body{overflow:hidden;transition:max-height .3s var(--ease),opacity .2s}
+.card-body.shut{max-height:0;opacity:0;pointer-events:none}
+.card-body.open{max-height:9999px;opacity:1}
+.card-body p{padding:12px 20px 4px;color:var(--t3);font-size:13px;line-height:1.6}
+.code-wrap{position:relative;margin:10px 14px}
+pre.code{background:var(--void);border-radius:10px;padding:18px 22px;overflow-x:auto;font-family:var(--mono);font-size:12px;line-height:1.7;color:var(--t2);border:1px solid rgba(139,92,246,.06);max-height:500px;overflow-y:auto}
+.copy-btn{position:absolute;top:10px;right:10px;padding:8px 14px;border-radius:100px;border:1px solid var(--bd);background:rgba(11,11,20,.8);color:var(--t3);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;min-height:36px}
+.copy-btn:hover{border-color:var(--bds);color:var(--t1)}
+.tip-bar{margin:8px 14px 14px;padding:12px 16px;background:rgba(139,92,246,.04);border-left:3px solid var(--v);border-radius:0 8px 8px 0;font-size:12px;color:var(--t2);line-height:1.6}
+.tip-bar span{font-weight:700;color:var(--vh);margin-right:4px}
+.hint{animation:pulse 2s ease-in-out 3;font-family:var(--mono);font-size:10px;color:var(--t4);margin-left:8px}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+
+/* Next */
+.nxt{display:flex;align-items:center;gap:8px;width:100%;padding:14px 20px;background:rgba(139,92,246,.03);border:1px solid var(--bd);border-top:none;border-radius:0 0 14px 14px;cursor:pointer;color:var(--t3);font-family:var(--mono);font-size:11px;transition:all .2s;margin-bottom:20px}
+.nxt:hover{background:rgba(139,92,246,.06);color:var(--t1)}
+.nxt strong{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Search overlay */
+.search-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:flex;justify-content:center;padding-top:80px}
+.search-box{width:100%;max-width:560px;max-height:55vh;background:var(--s2);border-radius:16px;border:1px solid var(--bd);overflow:hidden;display:flex;flex-direction:column;margin:0 12px}
+.search-input{display:flex;align-items:center;padding:14px 18px;border-bottom:1px solid var(--bd);gap:10px}
+.search-input input{flex:1;background:transparent;border:none;outline:none;color:var(--t1);font-family:var(--sans);font-size:15px}
+.search-results{flex:1;overflow-y:auto;padding:8px}
+.search-item{width:100%;text-align:left;padding:12px 14px;border:none;border-radius:8px;cursor:pointer;color:var(--t1);display:block;background:transparent;transition:background .15s}
+.search-item:hover{background:rgba(255,255,255,.03)}
+.search-item .cat{font-size:11px;color:var(--vh);margin-left:4px}
+.search-item p{margin:2px 0 0;font-size:11px;color:var(--t4);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Keys modal */
+.keys-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:center;justify-content:center}
+.keys-box{background:var(--s2);border-radius:16px;border:1px solid var(--bd);padding:28px;max-width:420px;width:90%}
+.keys-box h2{font-family:var(--serif);font-size:20px;color:var(--t1);font-weight:400;margin-bottom:16px}
+.keys-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bd)}
+.keys-row kbd{font-family:var(--mono);font-size:12px;padding:3px 10px;border-radius:6px;background:rgba(139,92,246,.08);color:var(--t1)}
+.keys-row span{font-size:13px;color:var(--t3)}
+
+/* Scroll top */
+.scroll-top{position:fixed;bottom:24px;right:24px;width:48px;height:48px;border-radius:14px;background:var(--s2);border:1px solid var(--bd);display:none;align-items:center;justify-content:center;cursor:pointer;color:var(--t3);z-index:50;box-shadow:0 8px 24px rgba(0,0,0,.4);font-size:18px;transition:all .2s}
+.scroll-top:hover{border-color:var(--bds);color:var(--t1)}
+.scroll-top.show{display:flex}
+
+/* ── Responsive ── */
+@media(max-width:640px){
+  h1{font-size:22px}h1 span{display:none}
+  .hdr-sub{display:none}
+  main{padding:12px 10px 64px}
+  .chead{padding:12px 14px}
+  pre.code{font-size:11px;padding:12px 10px;max-height:300px}
+  .cat-title{font-size:22px}
+  .tab-l{display:none}.tab{padding:8px 10px}
+  .tsep{display:none}
+  .nxt{font-size:10px;padding:10px 14px}
+  .welcome{margin:10px;padding:16px}
+}
+@media(min-width:641px){.tab-l{display:inline}}
+
+@media print{
+  .tab-wrap,.pro-strip,.welcome,.crumb,.nxt,.scroll-top,.search-bg,.keys-bg,.stars,.toolbar{display:none!important}
+  body::after{display:none!important}
+  .card-body.shut{max-height:9999px!important;opacity:1!important;pointer-events:auto!important}
+  .chev,.hint{display:none!important}
+  body{background:#fff;color:#333}
+  .card{background:#fff;border:1px solid #ddd}
+  pre.code{background:#f5f5f5;color:#333;max-height:none;white-space:pre-wrap}
+  .copy-btn{display:none!important}
+  @page{margin:1.5cm}
+}
+</style>
+</head>
+<body>
+<div class="stars"></div>
+<div id="app"></div>
+<script>
+// ── Data ──
+const EV={H:"Research-Backed",M:"Documented",L:"Anecdotal"};
+const TK={L:"1×",M:"1.5–2×",H:"2–4×",V:"3–5×"};
+const LV={B:{l:"Beginner",d:"#22c55e",t:"For everyone"},I:{l:"Intermediate",d:"#eab308",t:"Regular AI users"},A:{l:"Advanced",d:"#ef4444",t:"Engineers"}};
+const EVC={[EV.H]:{c:"#4ade80",bg:"rgba(34,197,94,.15)",t:"Supported by peer-reviewed research"},[EV.M]:{c:"#fde047",bg:"rgba(250,204,21,.15)",t:"Widely used in production, not formally studied"},[EV.L]:{c:"#fca5a5",bg:"rgba(248,113,113,.15)",t:"Based on practitioner experience"}};
+
+const CATS=[
+{id:"start",lvl:"B",title:"Start Here",sub:"You don't need to master prompting. Here's the shortcut.",icon:"🚀",accent:"#22D3EE",sections:[
+{name:"The One-Sentence Trick",ev:EV.H,tk:TK.L,desc:"Write a bad prompt. Ask the AI to make it good. This closes 80% of the gap between a novice and an expert.",
+ex:`# Step 1: Write what you want in plain language.
+"I need help writing a cover letter for a marketing job"
+
+# Step 2: Ask the AI to improve your prompt.
+"Before answering, critique my request above.
+What's missing? What's ambiguous? Rewrite it as
+a detailed, specific prompt, then answer THAT."
+
+# Step 3: The AI rebuilds your prompt AND answers it.
+
+# Even simpler (one line):
+"Help me write a cover letter. Before answering,
+ask me any questions you need for a great result."`,tip:"This single technique closes 80% of the gap between novice and expert. Teach this to your team before anything else."},
+{name:"Set It Once: Personal Instructions",ev:EV.H,tk:TK.L,desc:"Most pro moves can be set ONCE in your AI tool's settings instead of typed every time. This is the highest-ROI action in the entire guide.",
+ex:`# Claude: Settings → Profile → Custom Instructions
+# ChatGPT: Settings → Personalization → Custom Instructions
+# Gemini: AI Studio → System Instructions
+# GitHub Copilot: .github/copilot-instructions.md
+
+# Paste this into your personal instructions:
+"For every substantive response:
+- Ask clarifying questions if critical info is missing
+- Label claims [SOURCED] or [GENERATED]
+- End with: GAPS / BLINDSPOTS section
+- If uncertain, say 'I cannot verify this'
+- Be concise. No filler."`,tip:"10 minutes setting up personal instructions saves you from typing the same constraints in every conversation for the rest of the year."},
+{name:"Skill Levels: When to Stop",ev:EV.M,tk:TK.L,desc:"Level 1: ask AI to improve your question. Level 2: specify format + context + constraints. Level 3: add pro moves. Level 4: technique stacking and pipelines. Most people only need Levels 1-2.",
+ex:`# Level 1 (Day 1): "Before answering, ask me questions."
+# Level 2 (Week 1): Add format + context + constraints
+# Level 3 (Month 1): Add adversarial critic + self-eval
+# Level 4 (Ongoing): Stacking + chaining + cost optimization
+
+# When to STOP: If output is good enough, stop.
+# Level 2 covers 80% of use cases.
+# Level 3 covers 95%.
+# Level 4 is for production systems only.`,tip:"Don't teach your team Level 4. Teach Level 1 on day one, Level 2 by end of week one. That covers 95% of their needs."}
+]},
+{id:"techniques",lvl:"B",title:"Techniques",sub:"The actual moves you make inside a prompt.",icon:"🔧",accent:"#8B5CF6",sections:[
+{name:"Constraint-Driven Framing",ev:EV.M,tk:TK.L,desc:"Define what the output must satisfy, not who the AI pretends to be. Outperforms persona prompting on current models.",
+ex:`# Instead of: "You are a senior security engineer"
+# Use constraints:
+Apply these rules to the code review:
+- Check against OWASP Top 10 (2021)
+- Flag any SQL without parameterized queries
+- Flag secrets in source (/sk-[a-zA-Z0-9]+/)
+- Output: severity | file:line | finding | fix
+- If uncertain: say so`,tip:"If you can't write a test for it, it's not a constraint — it's a vibe."},
+{name:"Positive Over Negative",ev:EV.H,tk:TK.L,desc:"Tell the model what TO DO, not what NOT to do. Positive instructions are followed ~2x more reliably.",
+ex:`# BAD:                          # GOOD:
+"Don't use jargon"       →  "Use plain English"
+"Don't be verbose"       →  "Respond in 2-3 sentences"
+"Don't hallucinate"      →  "Say 'I cannot verify' if unsure"
+"Don't assume"           →  "State each assumption explicitly"
+"Avoid repetition"       →  "Each paragraph: one new idea"`,tip:"Quick test: count the 'don'ts' in your prompt. Rewrite each as a 'do.' Success rate will improve."},
+{name:"Scope Bounding & Grounding",ev:EV.H,tk:TK.L,desc:"Without scope bounds, models fill gaps with confident fabrication. Force the model to label its confidence.",
+ex:`# Level 1: Source Restriction
+"Answer ONLY from the provided document."
+
+# Level 2: Knowledge Boundary
+"For anything after your cutoff, say so."
+
+# Level 3: Confidence Gating
+"Prefix uncertain claims with 'Likely:' or 'Unverified:'"
+
+# Level 4: Citation Discipline
+"Label every claim [SOURCED] or [GENERATED]"
+
+# Use all 4 together for maximum anti-hallucination.`,tip:"The #1 hallucination prevention move: force the model to label its confidence on every claim."},
+{name:"Self-Healing Prompts",ev:EV.M,tk:TK.M,desc:"Make the model detect and fix its own errors before you see them.",
+ex:`# For structured output:
+"After generating JSON, verify:
+- Is it valid JSON?
+- Does every field match the schema?
+If ANY check fails, fix and show ONLY corrected version."
+
+# For code:
+"After writing the function, trace with sample input.
+If the trace reveals a bug, fix it.
+Show ONLY the corrected version."`,tip:"Self-healing is the difference between 'AI that needs babysitting' and 'AI that ships clean output.'"},
+{name:"Clarification Questions",ev:EV.H,tk:TK.L,desc:"Instead of guessing what you meant, the AI asks. Prevents more bad output than any other technique.",
+ex:`# Basic: "If you need more info, ask up to 3 questions."
+
+# With fallback (recommended):
+"If critical info is missing → ask up to 3 questions.
+If non-critical → state assumptions: 'Assuming X because Y'"
+
+# Anti-pattern:
+"Ask me everything" → 15 questions, user gives up.
+"Ask UP TO 3" → bounded, focused.`,tip:"Add the 'with fallback' version to your personal instructions. Best balance of thoroughness and speed."},
+{name:"Modular Chaining",ev:EV.H,tk:TK.M,desc:"Break one complex prompt into 3-4 focused prompts. Each does one thing well.",
+ex:`# Prompt 1: Research → extract claims as JSON
+# Prompt 2: Analyze → rate confidence HIGH/MED/LOW
+# Prompt 3: Write → use only HIGH-confidence claims
+
+# Why chains beat single prompts:
+# 1. Each step is independently testable
+# 2. Failures are isolated
+# 3. Different models per step (Haiku for extraction, Opus for analysis)
+# 4. Often CHEAPER (focused context)`,tip:"Chains outperform overloaded single prompts. Keep each link focused and testable."}
+]},
+{id:"pro",lvl:"B",title:"Pro Moves",sub:"Tiered by frequency: Always → Usually → Sometimes.",icon:"🏆",accent:"#F59E0B",sections:[
+{name:"Always: The Non-Negotiables",ev:EV.M,tk:TK.M,desc:"Use these on every non-trivial prompt.",
+ex:`# 1. Adversarial Critic
+"Identify the 3 weakest points in your response."
+
+# 2. Gap Check
+"End with: GAPS / BLINDSPOTS / UNKNOWN-UNKNOWNS"
+
+# 3. Output Format
+"Format: [exact structure, not 'clear and readable']"
+
+# 4. Anti-Hallucination
+"Label claims [SOURCED] or [GENERATED]."
+
+# 5. Clarifiers
+"If critical info missing, ask up to 3 questions."
+
+# Template (copy-paste after any prompt):
+After responding:
+- Identify 3 weakest points
+- List GAPS / BLINDSPOTS / UNKNOWN-UNKNOWNS`,tip:"Copy the template. Paste after every serious prompt. ~100 tokens, prevents the most common failures."},
+{name:"Usually: Self-Healing & Detection",ev:EV.M,tk:TK.H,desc:"Use on most production prompts.",
+ex:`# 1. Self-Healing
+"If output doesn't match format, fix and re-output."
+
+# 2. Bottleneck ID
+"Before proposing: what's the bottleneck? Single point of failure?"
+
+# 3. Evidence Labeling
+"[SOURCED: <ref>] or [GENERATED: based on <reasoning>]"
+
+# 4. Assumption Surfacing
+"List all assumptions about: scale, timeline, budget, tech."`,tip:"Self-healing is highest-ROI here. Costs a few tokens, prevents round-trips."},
+{name:"Sometimes: Deep Analysis",ev:EV.M,tk:TK.V,desc:"Reserve for high-stakes decisions.",
+ex:`# 1. Tree of Thought (3-5× tokens)
+"Propose 3 approaches. Pros, cons, risks for each. Select best."
+
+# 2. Pre-Mortem
+"Assume this failed in 6 months. What went wrong? Top 5 failure modes."
+
+# 3. Meta-Prompting
+"Before answering, improve this prompt. What's ambiguous?"
+
+# 4. CLAIMS Footer
+"CLAIMS: [list with SOURCED/GENERATED]
+COUNTEREXAMPLES: [cases that challenge your claims]"`,tip:"Pre-mortem is the most underused move. Easier to explain failure than predict success."}
+]},
+{id:"anti",lvl:"B",title:"Anti-Patterns",sub:"What breaks and why — from production failures.",icon:"⚠️",accent:"#F97316",sections:[
+{name:"The Failure Catalog",ev:EV.H,tk:TK.L,desc:"These waste tokens and degrade output quality.",
+ex:`# 1. Over-Constraining: contradictory rules
+# 2. Vague Rubrics: "make it better" (no criteria)
+# 3. Prompt as Personality: "sarcastic pirate" (degrades output)
+# 4. Negative-Only: "don't do X" (model guesses what TO do)
+# 5. Assuming Memory: "remember what I said" (no memory)
+# 6. Fabricated Citations: "cite sources" (invents papers)
+# 7. Stacking 6+ techniques (diminishing returns after 3-4)
+
+# Most common failure:
+# Over-specifying INPUTS while under-specifying OUTPUTS.
+# Flip it. Be loose on how. Be precise on what.`,tip:"The most common failure: over-specifying inputs while under-specifying outputs. Flip it."}
+]},
+{id:"api",lvl:"A",title:"API Controls",sub:"Temperature, caching, limits, streaming.",icon:"⚙️",accent:"#F43F5E",sections:[
+{name:"Temperature & Sampling",ev:EV.H,tk:TK.L,desc:"temp=0 → deterministic (code, math). temp=0.7+ → creative (writing, brainstorm).",
+ex:`# Deterministic (temp 0-0.2): code, SQL, classification
+# Balanced (temp 0.3-0.7): docs, summarization, Q&A
+# Creative (temp 0.7-1.2): brainstorming, writing
+
+# Rule: use temp OR top_p. Not both.
+# Per-model defaults (if you set nothing):
+# Claude: 1.0 | GPT-4o: 1.0 | Gemini: 1.0`,tip:"Set temperature to 0 for any task where different answers to the same question would annoy you."},
+{name:"Prompt Caching",ev:EV.H,tk:TK.L,desc:"Reuse cached system prompts for 50-90% cost reduction.",
+ex:`# Anthropic: cache_control {"type":"ephemeral"} on system message
+# → 90% savings on cached reads. Break-even: 2+ requests.
+# OpenAI: automatic for prompts >1024 tokens with same prefix
+# → 50% discount. No code changes needed.
+
+# What to cache: system prompts, few-shot blocks, tool defs
+# What NOT to cache: user messages, dynamic context`,tip:"If your system prompt is >1024 tokens and you make >2 requests, enable caching. Single highest-ROI optimization."},
+{name:"Token Limits & Spend",ev:EV.M,tk:TK.L,desc:"Set max_tokens, budget caps, and stop sequences to prevent runaway costs.",
+ex:`# Per-request: max_tokens: 4096, stop: ["---END---"]
+# Per-user: daily input/output token caps
+# Global: daily spend kill switch ($500)
+# Alert: warn at 80% of kill switch
+
+# 1000 tokens ≈ 750 words. Most tasks need <2000.`,tip:"Set a global daily spend kill switch BEFORE launching any LLM feature."}
+]},
+{id:"models",lvl:"I",title:"Model Literacy",sub:"Why the same prompt behaves differently across models.",icon:"🧠",accent:"#06B6D4",sections:[
+{name:"Training & Safety Differences",ev:EV.M,tk:TK.L,desc:"Each provider's training creates distinct behavioral fingerprints.",
+ex:`# Claude (Anthropic): Constitutional AI. Cautious refusals.
+#   → Add "be concise" or word limits.
+# GPT-4o (OpenAI): RLHF. Confident hallucinations.
+#   → Always add "If unsure, say so."
+# Gemini (Google): Multimodal-native. Aggressive filters.
+#   → Break complex tasks into modules.
+# Microsoft Copilot: GPT underneath. Surface matters:
+#   Azure OpenAI = full control. M365 Copilot = none.
+# Grok (xAI): Less filtered. Direct. X/Twitter data.`,tip:"The biggest factor isn't your prompt — it's the model's safety training. Design for the model you're using."},
+{name:"Harness & Architecture",ev:EV.M,tk:TK.L,desc:"Each model has an invisible 'harness' wrapping your prompt.",
+ex:`# Claude: XML tags (<context>, <task>). Extended thinking.
+# GPT: Markdown headers (### Context). JSON mode.
+# Gemini: Explicit step numbering. Grounding API.
+# Microsoft: Azure = same as GPT. M365 = no prompt control.
+# GitHub Copilot: code IS the prompt (file context).
+
+# Cross-model portable syntax:
+# - Plain numbered lists (works everywhere)
+# - Avoid model-specific features
+# - Test on each target model`,tip:"The most important question: which SURFACE are you on? API = full control. Consumer chat = limited."}
+]},
+{id:"foundation",lvl:"I",title:"Patterns",sub:"Structural frameworks: RTF, CoT, Few-Shot.",icon:"📐",accent:"#6366F1",sections:[
+{name:"RTF (Role + Task + Format)",ev:EV.H,tk:TK.L,desc:"The baseline scaffold. Answers: WHO, WHAT, HOW.",
+ex:`Role: Senior backend engineer (Node.js, PostgreSQL)
+Task: Design rate-limiting middleware that:
+  - Uses sliding window algorithm
+  - Stores counters in Redis
+  - Returns 429 with Retry-After header
+Format: TypeScript with Zod validation
+  - Include happy-path + limit-exceeded test
+Constraints: No external libraries. Handle Redis failure.`,tip:"RTF is your minimum viable prompt for any production task."},
+{name:"Chain of Thought (CoT)",ev:EV.H,tk:TK.H,desc:"Force step-by-step reasoning. 10-30% accuracy gain on logic tasks (Wei et al. 2022). Costs 2-3× tokens.",
+ex:`# Add "Verify:" after each step:
+Step 1: Calculate speed = 120mi / 2hr = 60mph
+Verify: 60 × 2 = 120 ✓
+
+Step 2: New speed = 60 + 20 = 80mph
+Verify: 80 > 60 ✓
+
+# When to SKIP CoT:
+# - Simple factual lookups
+# - Creative writing (adds rigidity)
+# - Classification tasks`,tip:"CoT's power move: add 'Verify:' after each step. Model catches its own errors mid-reasoning."},
+{name:"Few-Shot Learning",ev:EV.H,tk:TK.M,desc:"3-5 examples establish the pattern. Always include one failure case.",
+ex:`# Common case:
+Input: "John Doe, 30, NYC"
+Output: {"name":"John Doe","age":30,"city":"NYC"}
+
+# Edge case (missing data):
+Input: "Jane Smith, lives in LA"
+Output: {"name":"Jane Smith","age":null,"city":"LA"}
+
+# Failure case:
+Input: "The weather is nice today"
+Output: {"error":"No person data found"}`,tip:"The failure-case example is the most valuable. It teaches when NOT to produce output."}
+]},
+{id:"stacking",lvl:"I",title:"Stacking",sub:"Proven combos and token cost analysis.",icon:"🧱",accent:"#10B981",sections:[
+{name:"Tested Stacks",ev:EV.M,tk:TK.H,desc:"3 techniques = sweet spot. Diminishing returns after 5.",
+ex:`# Stack 1: API Design (2.5×) — RTF + Schema + Self-Eval
+# Stack 2: Research (3×) — CoT + Grounding + Citations
+# Stack 3: Content (2×) — Chain + Transform + Tone
+# Stack 4: Security (3.5×) — Constraints + Risk + Self-Eval
+# Stack 5: Debug (3×) — CoT + Debug Mode + Test Cases
+
+# Cost/Quality Matrix:
+# Basic: 1× tokens, base quality
+# Few-Shot: 1.5-2×, consistency gain
+# CoT: 2-3×, reasoning gain
+# Self-Eval: 2×, quality gate
+# Tree of Thought: 3-5×, critical decisions only`,tip:"Track which stacks work for YOUR tasks. Generic recommendations are starting points."}
+]},
+{id:"context",lvl:"A",title:"Context Engineering",sub:"Token budgets, compression, window management.",icon:"📦",accent:"#0EA5E9",sections:[
+{name:"Token Budget: 20/60/20",ev:EV.M,tk:TK.L,desc:"20% system instructions, 60% user context, 20% response buffer.",
+ex:`# System: 20% (fixed overhead)
+# Context: 60% (conversation + RAG)
+# Response: 20% (generation headroom)
+
+# Compress at 80% capacity.
+# Keep last 3-5 turns raw. Summarize everything else.
+# Tag critical info: [DECISION], [CONSTRAINT]
+# These markers survive compression.`,tip:"Gemini's 2M window is marketing — quality degrades past ~200K. Budget for 200K on all models."}
+]},
+{id:"security",lvl:"A",title:"Injection Defense",sub:"The 5-wall model: validate → isolate → filter → monitor → human.",icon:"🛡️",accent:"#EF4444",sections:[
+{name:"The 5-Wall Model",ev:EV.H,tk:TK.L,desc:"One wall fails eventually. You need all 5.",
+ex:`# Wall 1: Input Validation (length, patterns, whitelist)
+# Wall 2: Prompt Structure (delimiters isolate user data)
+# Wall 3: Output Filtering (strip secrets, PII, stack traces)
+# Wall 4: External Monitoring (log, detect anomalies)
+# Wall 5: Human Oversight (approve high-risk operations)
+
+# Think castle defense:
+# guards → walls → moat → watchers → judgment`,tip:"Wall 2 (instruction isolation) is the most commonly skipped. If user input enters a prompt without delimiters, you have no defense."}
+]},
+{id:"eval",lvl:"A",title:"Evaluation",sub:"Benchmarks, testing, quality scoring.",icon:"📊",accent:"#EC4899",sections:[
+{name:"Golden Test Suite",ev:EV.H,tk:TK.M,desc:"50-100 known-good input/output pairs. Run weekly. Every bug becomes a test case.",
+ex:`# Structure: golden/sentiment_basic.yaml, extraction_edge.yaml
+# Cadence: every PR + weekly + after model updates
+# Growth rule: every bug → new test case
+# Alert: accuracy drop >5% → investigate immediately
+
+# 6 months → 100+ cases → near-zero regressions.`,tip:"Start with 20 test cases. Add every bug. This is the single most valuable LLM quality investment."}
+]},
+{id:"convo",lvl:"A",title:"Multi-Turn",sub:"State persistence, context switching.",icon:"💬",accent:"#14B8A6",sections:[
+{name:"State Persistence",ev:EV.M,tk:TK.M,desc:"Models have no memory across sessions. Store state externally.",
+ex:`# Store in Redis (fast, 24h TTL) or Supabase (persistent)
+# Schema: { sessionId, currentGoal, decisions[], constraints[], stack[] }
+# On resume: inject state into system prompt
+# On expire: "Session expired. Give me a 2-sentence recap."`,tip:"Don't rely on model memory for production. Store state explicitly. Inject on every session."}
+]}
+];
+
+const GROUPS=[
+{label:"Getting Started",tabs:["start"]},
+{label:"Core",tabs:["api","models","techniques"]},
+{label:"Advanced",tabs:["pro","foundation","context","stacking"]},
+{label:"Reference",tabs:["security","anti","eval","convo"]}
+];
+const PRO_CHIPS=[
+{l:"Adversarial Critic",t:"Find 3 weakest points in AI's answer"},
+{l:"Gap Check",t:"End with GAPS/BLINDSPOTS/UNKNOWN-UNKNOWNS"},
+{l:"Clarifiers",t:"Ask up to 3 questions before proceeding"},
+{l:"Self-Healing",t:"Fix errors and show only corrected version"},
+{l:"Evidence Labels",t:"Label claims [SOURCED] or [GENERATED]"}
+];
+// ── State ──
+let state={tab:"start",exp:{0:true},fi:-1,ess:true,welcomed:false,search:false,keys:false,q:""};
+const $=id=>document.getElementById(id);
+const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+function getCat(id){return CATS.find(c=>c.id===id)}
+function visTabs(){return state.ess?CATS.filter(c=>c.lvl==="B"):CATS}
+function act(){return getCat(state.tab)||visTabs()[0]}
+
+// ── Render ──
+function render(){
+  const a=act();if(!a)return;
+  const vis=visTabs();
+  const tks=vis.map(c=>c.id);
+  const ti=tks.indexOf(state.tab);
+  const oc=Object.values(state.exp).filter(Boolean).length;
+  const crumb=state.fi>=0&&a.sections[state.fi]?a.sections[state.fi].name:a.sections[0]?.name||"";
+  const lv=LV[a.lvl]||LV.B;
+
+  let h=`
+  <header>
+    <div><h1>Prompt Engineering Guide<span>v4</span></h1><p class="hdr-sub" style="margin:2px 0 0;font-size:12px;color:var(--t3)">FlashFusion · Patterns · Techniques · Models · Pro Moves</p></div>
+    <div class="hdr-r">
+      <div class="mode" title="${state.ess?"Showing beginner tabs. Switch to Full for all.":"Showing all categories."}">
+        <button class="${state.ess?"on":""}" onclick="state.ess=true;fixTab();render()">Essentials</button>
+        <button class="${!state.ess?"on":""}" onclick="state.ess=false;render()">Full Guide</button>
+      </div>
+      <button class="hdr-btn" onclick="toggleSearch()" title="Search all techniques (⌘K)">🔍<span class="tab-l">Search</span></button>
+      <button class="hdr-btn" onclick="state.keys=true;render()" title="Keyboard shortcuts">?</button>
+    </div>
+  </header>`;
+
+  // Tabs
+  h+=`<nav class="tab-wrap"><div class="tab-scroll"><div class="tabs" id="tabbar">`;
+  if(state.ess){
+    vis.forEach(c=>{const on=state.tab===c.id;const lv2=LV[c.lvl]||LV.B;
+      h+=`<button class="tab${on?" on":""}" data-id="${c.id}" title="${lv2.l} · ${c.sub}" onclick="switchTab('${c.id}')"><span class="dot" style="background:${lv2.d}"></span><span style="color:${on?c.accent:'currentColor'};font-size:14px">${c.icon}</span><span class="tab-l">${c.title}</span><span class="cnt">${c.sections.length}</span></button>`;
+    });
+  }else{
+    GROUPS.forEach((g,gi)=>{
+      g.tabs.forEach(id=>{const c=getCat(id);if(!c)return;const on=state.tab===id;const lv2=LV[c.lvl]||LV.B;
+        h+=`<button class="tab${on?" on":""}" data-id="${id}" title="${lv2.l} · ${c.sub}" onclick="switchTab('${id}')"><span class="dot" style="background:${lv2.d}"></span><span style="color:${on?c.accent:'currentColor'};font-size:14px">${c.icon}</span><span class="tab-l">${c.title}</span><span class="cnt">${c.sections.length}</span></button>`;
+      });
+      if(gi<GROUPS.length-1)h+=`<div class="tsep"></div>`;
+    });
+  }
+  h+=`</div></div>`;
+  h+=`<div class="crumb"><span class="dot" style="background:${lv.d}"></span><span class="accent">${a.title}</span><span style="color:var(--t4)">›</span><span>${crumb}</span></div></nav>`;
+
+  // Pro strip
+  h+=`<div class="pro-strip"><span class="pro-label" title="5 techniques for every serious prompt">⚡ PRO MOVES</span>`;
+  PRO_CHIPS.forEach(m=>{h+=`<button class="chip" title="${m.t}" onclick="switchTab('pro')">${m.l}</button>`;});
+  h+=`</div>`;
+
+  // Welcome
+  if(!state.welcomed){
+    h+=`<div class="welcome"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px"><div><h2>👋 Welcome</h2><p>This guide helps you get better results from AI tools — ChatGPT, Claude, Gemini, Copilot.</p><div class="dots"><div><span class="dot" style="background:#22c55e"></span>Green = for everyone (start here)</div><div><span class="dot" style="background:#eab308"></span>Yellow = deeper techniques</div><div><span class="dot" style="background:#ef4444"></span>Red = for engineers</div></div><p style="font-size:11px;color:var(--t4);margin-top:8px">Click sections to expand · Hover badges for info · Follow "Continue →"</p></div><button class="cta" onclick="state.welcomed=true;render()">Got it</button></div></div>`;
+  }
+
+  // Content
+  h+=`<main id="main"><div class="container">`;
+  h+=`<div class="cat-head"><div class="cat-icon" style="background:${a.accent}14;border:1px solid ${a.accent}28">${a.icon}</div><div><div style="display:flex;align-items:center;gap:10px"><span class="cat-title">${a.title}</span><span class="lvl-pill" style="background:${lv.d}20;color:${lv.d}" title="${lv.t}">${lv.l}</span></div><p class="cat-sub">${a.sub}</p></div></div>`;
+
+  // Toolbar
+  h+=`<div class="toolbar"><button onclick="expandAll()" title="Expand all sections">Expand all <kbd>E</kbd></button><button onclick="collapseAll()" title="Collapse all">Collapse all <kbd>C</kbd></button><button onclick="exportMd()" title="Download as markdown">↓ Export .md</button><span class="counter">${oc}/${a.sections.length} open</span></div>`;
+
+  // Cards
+  a.sections.forEach((s,i)=>{
+    const open=!!state.exp[i];
+    const evc=EVC[s.ev]||EVC[EV.M];
+    const hasNext=i<a.sections.length-1||ti<tks.length-1;
+    const nextName=i<a.sections.length-1?a.sections[i+1].name:(ti<tks.length-1?"Next: "+getCat(tks[ti+1])?.title:"");
+    const connected=open&&hasNext;
+
+    h+=`<div id="sec-${i}" tabindex="-1" style="margin-bottom:${connected?0:20}px">`;
+    h+=`<div class="card${connected?" connected":""}">`;
+    h+=`<button class="card-head" onclick="toggleSec(${i})" aria-expanded="${open}" title="${open?"":"Click to expand this technique"}">`;
+    h+=`<span class="chev${open?" open":""}">▸</span>`;
+    h+=`<h3>${s.name}</h3>`;
+    h+=`<span class="ev" style="background:${evc.bg};color:${evc.c}" title="${evc.t}">${s.ev}</span>`;
+    h+=`<span class="tk" title="Token cost: ${s.tk} vs baseline">${s.tk} tokens</span>`;
+    if(!open&&i===0&&oc===0)h+=`<span class="hint">click to expand</span>`;
+    h+=`</button>`;
+    h+=`<div class="card-body ${open?"open":"shut"}">`;
+    h+=`<p>${s.desc}</p>`;
+    h+=`<div class="code-wrap"><pre class="code" tabindex="0" role="region" aria-label="Code: ${esc(s.name)}">${esc(s.ex)}</pre><button class="copy-btn" onclick="copyCode(this,${i})" title="Copy to clipboard">Copy</button></div>`;
+    h+=`<div class="tip-bar"><span>→</span>${s.tip}</div>`;
+    h+=`</div></div>`;
+    if(connected){
+      h+=`<button class="nxt" onclick="goNext(${i})" title="Opens: ${esc(nextName)}">Continue ›<strong>${nextName}</strong></button>`;
+    }
+    h+=`</div>`;
+  });
+
+  h+=`</div></main>`;
+
+  // Scroll top
+  h+=`<button class="scroll-top" id="scrollTop" onclick="document.getElementById('main').scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>`;
+
+  $("app").innerHTML=h;
+
+  // Scroll listener
+  const main=$("main");
+  if(main){main.onscroll=()=>{const st=$("scrollTop");if(st)st.classList.toggle("show",main.scrollTop>300)}}
+
+  // Wheel on tabs
+  const tb=$("tabbar");
+  if(tb){tb.onwheel=e=>{if(Math.abs(e.deltaY)>0){e.preventDefault();tb.scrollBy({left:e.deltaY>0?120:-120,behavior:"smooth"})}}}
+
+  // Auto-scroll active tab
+  const at=document.querySelector('.tab.on');
+  if(at&&tb){const bR=tb.getBoundingClientRect(),tR=at.getBoundingClientRect();tb.scrollBy({left:tR.left-bR.left-bR.width/2+tR.width/2,behavior:"smooth"})}
+
+  renderOverlays();
+}
+
+function renderOverlays(){
+  let o="";
+  if(state.search){
+    const res=state.q.trim()?searchAll(state.q):[];
+    o+=`<div class="search-bg" onclick="if(event.target===this){state.search=false;state.q='';renderOverlays()}"><div class="search-box"><div class="search-input"><span style="color:var(--t3)">🔍</span><input id="searchInput" value="${esc(state.q)}" oninput="state.q=this.value;renderOverlays()" placeholder="Search techniques, patterns..." autofocus><button onclick="state.search=false;state.q='';renderOverlays()" style="background:none;border:none;color:var(--t3);cursor:pointer;padding:10px;min-width:44px;min-height:44px">✕</button></div><div class="search-results">`;
+    if(state.q.trim()&&res.length===0)o+=`<p style="text-align:center;color:var(--t3);padding:20px">No results</p>`;
+    res.forEach(r=>{
+      o+=`<button class="search-item" onclick="switchTab('${r.catId}');state.search=false;state.q='';render()"><span style="font-weight:600">${r.name}</span><span class="cat">${r.catTitle}</span><p>${esc(r.desc.slice(0,80))}…</p></button>`;
+    });
+    if(!state.q.trim())o+=`<p style="text-align:center;color:var(--t4);padding:20px;font-size:12px">Search all ${CATS.reduce((s,c)=>s+c.sections.length,0)} sections</p>`;
+    o+=`</div></div></div>`;
+  }
+  if(state.keys){
+    o+=`<div class="keys-bg" onclick="if(event.target===this){state.keys=false;renderOverlays()}"><div class="keys-box"><h2>Keyboard Shortcuts</h2>`;
+    [["⌘K","Search"],["← →","Switch tabs"],["J / K","Navigate sections"],["Enter","Toggle section"],["E / C","Expand / collapse all"],["?","This help"],["Esc","Close"]].forEach(([k,d])=>{
+      o+=`<div class="keys-row"><kbd>${k}</kbd><span>${d}</span></div>`;
+    });
+    o+=`<div style="margin-top:16px;text-align:right"><button onclick="state.keys=false;renderOverlays()" style="padding:8px 20px;border-radius:100px;border:1px solid var(--bd);color:var(--t2);cursor:pointer;font-family:var(--mono);font-size:11px">Close</button></div></div></div>`;
+  }
+  let ov=document.getElementById("overlays");
+  if(!ov){ov=document.createElement("div");ov.id="overlays";ov.style.cssText="position:relative;z-index:100";document.body.appendChild(ov)}
+  ov.innerHTML=o;
+  if(state.search){const inp=document.getElementById("searchInput");if(inp)inp.focus()}
+}
+
+// ── Actions ──
+function switchTab(id){
+  const c=getCat(id);
+  if(c&&c.lvl!=="B"&&state.ess)state.ess=false;
+  state.tab=id;state.exp={0:true};state.fi=-1;
+  render();
+  const main=$("main");if(main)main.scrollTo({top:0});
+}
+function fixTab(){const vis=visTabs();if(!vis.find(c=>c.id===state.tab)&&vis[0])state.tab=vis[0].id}
+function toggleSec(i){state.exp[i]=!state.exp[i];state.fi=i;render()}
+function goNext(i){const a=act();const vis=visTabs();const tks=vis.map(c=>c.id);const ti=tks.indexOf(state.tab);
+  if(i<a.sections.length-1){state.exp[i+1]=true;state.fi=i+1;render();const el=document.getElementById("sec-"+(i+1));if(el)el.scrollIntoView({behavior:"smooth",block:"start"})}
+  else if(ti<tks.length-1){switchTab(tks[ti+1])}
+}
+function expandAll(){const a=act();const e={};a.sections.forEach((_,i)=>e[i]=true);state.exp=e;render()}
+function collapseAll(){state.exp={};render()}
+function toggleSearch(){state.search=!state.search;state.q="";render();renderOverlays()}
+function searchAll(q){const lq=q.toLowerCase();const r=[];CATS.forEach(c=>{c.sections.forEach(s=>{if([s.name,s.desc,s.ex,s.tip].some(t=>t.toLowerCase().includes(lq)))r.push({catId:c.id,catTitle:c.title,name:s.name,desc:s.desc})})});return r}
+function copyCode(btn,i){const a=act();const s=a.sections[i];if(!s)return;const t=s.ex;try{navigator.clipboard.writeText(t)}catch(e){const ta=document.createElement("textarea");ta.value=t;ta.style.cssText="position:fixed;opacity:0";document.body.appendChild(ta);ta.select();document.execCommand("copy");document.body.removeChild(ta)}btn.textContent="Copied!";setTimeout(()=>{btn.textContent="Copy"},1500)}
+function exportMd(){const a=act();let m="# "+a.title+"\n\n"+a.sub+"\n\n";a.sections.forEach(s=>{m+="## "+s.name+"\n\n**Evidence:** "+s.ev+" · **Cost:** "+s.tk+"\n\n"+s.desc+"\n\n```\n"+s.ex+"\n```\n\n> "+s.tip+"\n\n---\n\n"});const b=new Blob([m],{type:"text/markdown"});const u=URL.createObjectURL(b);const el=document.createElement("a");el.href=u;el.download=a.title.toLowerCase().replace(/\s+/g,"-")+".md";el.click();URL.revokeObjectURL(u)}
+
+// ── Keyboard ──
+document.addEventListener("keydown",e=>{
+  if(e.target.tagName==="INPUT"){if(e.key==="Escape"){state.search=false;state.q="";render();renderOverlays()}return}
+  if((e.metaKey||e.ctrlKey)&&e.key==="k"){e.preventDefault();toggleSearch();return}
+  if(e.key==="Escape"){state.search=false;state.keys=false;state.q="";render();renderOverlays();return}
+  if(state.search||state.keys)return;
+  const vis=visTabs();const tks=vis.map(c=>c.id);const ti=tks.indexOf(state.tab);const a=act();
+  if(e.key==="ArrowLeft"&&ti>0){e.preventDefault();switchTab(tks[ti-1])}
+  if(e.key==="ArrowRight"&&ti<tks.length-1){e.preventDefault();switchTab(tks[ti+1])}
+  if(e.key==="j"||e.key==="J"){e.preventDefault();const n=Math.min(state.fi+1,a.sections.length-1);state.exp[n]=true;state.fi=n;render();const el=document.getElementById("sec-"+n);if(el){el.scrollIntoView({behavior:"smooth",block:"start"});el.focus()}}
+  if(e.key==="k"||e.key==="K"){e.preventDefault();const p=Math.max(state.fi-1,0);state.exp[p]=true;state.fi=p;render();const el=document.getElementById("sec-"+p);if(el){el.scrollIntoView({behavior:"smooth",block:"start"});el.focus()}}
+  if(e.key==="Enter"&&state.fi>=0){e.preventDefault();toggleSec(state.fi)}
+  if(e.key==="e")expandAll();
+  if(e.key==="c")collapseAll();
+  if(e.key==="?"){e.preventDefault();state.keys=true;renderOverlays()}
+});
+
+// ── Init ──
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Claude Agent Builder</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.x/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#09090f;--s1:#0f0f1a;--s2:#131320;--s3:#181830;
+  --b1:#1e1e30;--b2:#28283c;--b3:#36365a;
+  --t1:#e2e8f0;--t2:#94a3b8;--t3:#475569;
+  --ac:#7c6fe0;--ac2:rgba(124,111,224,0.15);--ac3:rgba(124,111,224,0.08);
+  --gr:#22c55e;--gr2:rgba(34,197,94,0.12);
+  --rd:#ef4444;--rd2:rgba(239,68,68,0.12);
+  --yn:#f59e0b;
+  --mono:'JetBrains Mono','Fira Mono',monospace;
+  --r:8px;--r2:6px;
+}
+html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'Inter',system-ui,sans-serif;font-size:13px;line-height:1.5;overflow:hidden}
+
+/* TOP BAR */
+.bar{height:42px;background:var(--s1);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0}
+.bar-logo{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600}
+.bar-logo i{font-size:15px;color:var(--ac)}
+.badge{padding:2px 6px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.05em;background:var(--ac2);color:var(--ac);border:1px solid rgba(124,111,224,.3)}
+.bar-docs{margin-left:auto;font-size:11px;color:var(--t3);display:flex;align-items:center;gap:4px}
+
+/* LAYOUT */
+.app{display:flex;height:calc(100vh - 42px);overflow:hidden}
+
+/* LEFT PANEL */
+.left{width:248px;flex-shrink:0;display:flex;flex-direction:column;background:var(--s1);border-right:1px solid var(--b1)}
+.lh{padding:11px 12px 9px;border-bottom:1px solid var(--b1)}
+.lh-title{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--t3);margin-bottom:7px}
+.search{position:relative}
+.search i{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--t3)}
+.search input{width:100%;padding:6px 8px 6px 27px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);font-size:12px;color:var(--t1);outline:none;font-family:inherit}
+.search input:focus{border-color:var(--ac)}
+.search input::placeholder{color:var(--t3)}
+.cats{display:flex;flex-wrap:wrap;gap:3px;padding:8px 12px;border-bottom:1px solid var(--b1)}
+.cat{padding:2px 7px;border-radius:20px;font-size:10px;font-weight:500;cursor:pointer;border:1px solid var(--b1);color:var(--t3);transition:all .13s;user-select:none}
+.cat:hover{color:var(--t1);border-color:var(--b2)}
+.cat.on{background:var(--ac2);color:var(--ac);border-color:rgba(124,111,224,.3)}
+.lmeta{padding:4px 12px 3px;font-size:10px;color:var(--t3);border-bottom:1px solid var(--b1)}
+.list{flex:1;overflow-y:auto}
+.list::-webkit-scrollbar{width:3px}
+.list::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+.seed{padding:9px 12px;cursor:pointer;border-left:2px solid transparent;transition:background .1s}
+.seed:hover{background:var(--s2)}
+.seed.on{background:var(--s2);border-left-color:var(--ac)}
+.seed-name{font-size:12px;font-weight:500;color:var(--t1);margin-bottom:2px;line-height:1.3}
+.seed-hint{font-size:11px;color:var(--t2);line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:5px}
+.mcprow{display:flex;flex-wrap:wrap;gap:2px}
+.mct{padding:1px 5px;border-radius:3px;font-size:9px;font-weight:600;white-space:nowrap}
+
+/* CENTER */
+.center{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+.cscroll{flex:1;overflow-y:auto;padding:20px 24px}
+.cscroll::-webkit-scrollbar{width:3px}
+.cscroll::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+
+/* BUILDER AREA */
+.builder{margin-bottom:20px}
+.build-label{font-size:11px;color:var(--t3);margin-bottom:6px;letter-spacing:.02em}
+.build-label span{color:var(--t2);font-weight:500}
+.build-wrap{position:relative}
+.build-ta{width:100%;min-height:80px;padding:11px 13px;background:var(--s1);border:1px solid var(--b2);border-radius:var(--r);font-size:13px;color:var(--t1);resize:vertical;outline:none;font-family:inherit;line-height:1.55;transition:border .15s}
+.build-ta:focus{border-color:var(--ac)}
+.build-ta::placeholder{color:var(--t3)}
+.build-actions{display:flex;align-items:center;gap:8px;margin-top:8px}
+.gen-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;background:var(--ac);border:none;border-radius:var(--r2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:opacity .12s;font-family:inherit}
+.gen-btn:hover:not(:disabled){opacity:.88}
+.gen-btn:disabled{opacity:.4;cursor:default}
+.gen-btn i{font-size:14px}
+.clear-btn{padding:8px 12px;background:transparent;border:1px solid var(--b2);border-radius:var(--r2);font-size:12px;color:var(--t3);cursor:pointer;transition:all .12s;font-family:inherit}
+.clear-btn:hover{color:var(--t1);border-color:var(--b3)}
+.hint-text{font-size:11px;color:var(--t3);margin-left:auto}
+
+/* LOADING */
+.loading{padding:24px 0}
+.ld-inner{display:flex;flex-direction:column;align-items:center;gap:12px}
+.spinner{width:32px;height:32px;border:2px solid var(--b2);border-top-color:var(--ac);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ld-msg{font-size:12px;color:var(--t2);animation:fade 2.5s ease-in-out infinite}
+@keyframes fade{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* ERROR */
+.error-block{padding:14px 16px;background:var(--rd2);border:1px solid rgba(239,68,68,.3);border-radius:var(--r);margin-bottom:16px}
+.error-block .et{font-size:12px;font-weight:600;color:var(--rd);margin-bottom:3px;display:flex;align-items:center;gap:5px}
+.error-block .em{font-size:11px;color:var(--t2);line-height:1.5}
+
+/* RESULT */
+.result{animation:fadeUp .25s ease-out}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.res-head{margin-bottom:14px;padding-bottom:13px;border-bottom:1px solid var(--b1)}
+.res-name{font-size:17px;font-weight:700;color:var(--t1);margin-bottom:5px}
+.res-desc{font-size:13px;color:var(--t2);line-height:1.55;margin-bottom:10px}
+.res-meta{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.cpill{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.mpill{padding:3px 9px;border-radius:20px;font-size:11px;background:var(--s2);color:var(--t3);border:1px solid var(--b1)}
+.tabs{display:flex;border-bottom:1px solid var(--b1);margin-bottom:14px}
+.tab{padding:8px 13px;font-size:12px;cursor:pointer;color:var(--t3);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .12s;user-select:none}
+.tab.on{color:var(--ac);border-bottom-color:var(--ac)}
+.tab:hover:not(.on){color:var(--t1)}
+.slabel{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--t3);margin-bottom:8px}
+.row-item{display:flex;align-items:center;gap:10px;padding:9px 11px;background:var(--s1);border:1px solid var(--b1);border-radius:var(--r2);margin-bottom:6px}
+.rdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.rn{font-size:12px;font-weight:500;color:var(--t1)}
+.ru{font-size:10px;color:var(--t3);font-family:var(--mono);word-break:break-all}
+.badge-ok{font-size:10px;padding:2px 7px;border-radius:10px;background:var(--gr2);color:var(--gr);border:1px solid rgba(34,197,94,.25);margin-left:auto;flex-shrink:0;font-weight:700}
+.sys-block{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);padding:14px;font-family:var(--mono);font-size:11.5px;line-height:1.75;color:#a5b4fc;white-space:pre-wrap;word-break:break-word;max-height:380px;overflow-y:auto}
+.sys-block::-webkit-scrollbar{width:3px}
+.sys-block::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+.json-block{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);padding:14px;font-family:var(--mono);font-size:11px;line-height:1.65;color:#94a3b8;white-space:pre;overflow-x:auto;max-height:400px;overflow-y:auto}
+.json-block::-webkit-scrollbar{width:3px}
+.json-block::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+.jk{color:#7dd3fc}.jstr{color:#86efac}.jnum{color:#fda4af}.jbool{color:#f9a8d4}
+.copy-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 11px;border:1px solid var(--b2);border-radius:var(--r2);background:transparent;cursor:pointer;font-size:11px;color:var(--t3);margin-bottom:9px;transition:all .14s;font-family:inherit}
+.copy-btn:hover{background:var(--s1);color:var(--t1)}
+.copy-btn.ok{border-color:rgba(34,197,94,.4);color:var(--gr)}
+
+/* EMPTY */
+.empty-c{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;padding-top:40px;color:var(--t3)}
+.empty-c i{font-size:38px;opacity:.25}
+.empty-c .et{font-size:14px;font-weight:600;color:var(--t2);opacity:.7}
+.empty-c .es{font-size:12px;max-width:300px;text-align:center;line-height:1.65}
+.examples{display:flex;flex-direction:column;gap:6px;max-width:440px;margin-top:6px;width:100%}
+.eg{padding:9px 12px;background:var(--s1);border:1px solid var(--b1);border-radius:var(--r2);cursor:pointer;font-size:12px;color:var(--t2);line-height:1.45;transition:all .13s}
+.eg:hover{background:var(--s2);border-color:var(--b2);color:var(--t1)}
+.eg-label{font-size:10px;font-weight:700;color:var(--t3);margin-bottom:1px;text-transform:uppercase;letter-spacing:.05em}
+
+/* RIGHT */
+.right{width:228px;flex-shrink:0;display:flex;flex-direction:column;background:var(--s1);border-left:1px solid var(--b1)}
+.rh{padding:11px 13px;border-bottom:1px solid var(--b1)}
+.rh-title{font-size:12px;font-weight:600;color:var(--t1)}
+.rh-sub{font-size:11px;color:var(--t3);margin-top:1px}
+.rbody{flex:1;overflow-y:auto;padding:11px 13px;display:flex;flex-direction:column;gap:13px}
+.rbody::-webkit-scrollbar{width:3px}
+.rbody::-webkit-scrollbar-thumb{background:var(--b2)}
+.fl{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--t3);margin-bottom:4px}
+.fi{width:100%;padding:6px 8px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);font-size:12px;color:var(--t1);outline:none;font-family:inherit}
+.fi:focus{border-color:var(--ac)}
+.fi::placeholder{color:var(--t3)}
+.fsel{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);font-size:12px;cursor:pointer;color:var(--t3);transition:border .12s}
+.fsel:hover{border-color:var(--b2)}
+.fsel.v{color:var(--t1)}
+.ri{display:flex;align-items:center;gap:7px;padding:6px 8px;border:1px dashed var(--b2);border-radius:var(--r2);cursor:pointer;color:var(--t3);font-size:11px;transition:all .12s;user-select:none}
+.ri:hover{border-color:var(--b3);color:var(--t1)}
+.ri i{font-size:13px}
+.rfooter{padding:11px 13px;border-top:1px solid var(--b1);display:flex;flex-direction:column;gap:6px}
+.start-btn{width:100%;padding:9px;background:var(--ac);border:none;border-radius:var(--r2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:opacity .12s;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px}
+.start-btn:hover:not(:disabled){opacity:.88}
+.start-btn:disabled{opacity:.35;cursor:default}
+.dl-btn{width:100%;padding:7px;background:transparent;border:1px solid var(--b2);border-radius:var(--r2);color:var(--t3);font-size:11px;cursor:pointer;transition:all .12s;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px}
+.dl-btn:hover{border-color:var(--b3);color:var(--t1)}
+.sec-btn{font-size:10px;color:var(--ac);cursor:pointer;background:none;border:none;padding:0 0 0 5px;font-family:inherit}
+.sec-btn:hover{text-decoration:underline}
+
+/* MODALS */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;display:none;align-items:center;justify-content:center}
+.mo.show{display:flex}
+.md{background:var(--s1);border:1px solid var(--b2);border-radius:10px;width:390px;max-height:90vh;overflow-y:auto}
+.md::-webkit-scrollbar{width:3px}
+.md::-webkit-scrollbar-thumb{background:var(--b2)}
+.mh{padding:14px 18px 11px;border-bottom:1px solid var(--b1);display:flex;justify-content:space-between;align-items:center}
+.mh-title{font-size:14px;font-weight:600;color:var(--t1)}
+.mx{background:none;border:none;cursor:pointer;color:var(--t3);font-size:18px;line-height:1;font-family:inherit}
+.mx:hover{color:var(--t1)}
+.mb{padding:16px 18px}
+.mf{padding:11px 18px;border-top:1px solid var(--b1);display:flex;justify-content:flex-end;gap:7px}
+.mfs{padding:6px 13px;border:1px solid var(--b2);border-radius:var(--r2);background:transparent;font-size:12px;cursor:pointer;color:var(--t3);font-family:inherit}
+.mfs:hover{color:var(--t1)}
+.mfp{padding:6px 13px;border:none;border-radius:var(--r2);background:var(--ac);color:#fff;font-size:12px;cursor:pointer;font-family:inherit}
+.fg2{margin-bottom:11px}
+.fg2 label{display:block;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--t3);margin-bottom:4px}
+.fg2 input,.fg2 textarea{width:100%;padding:7px 9px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);font-size:12px;color:var(--t1);outline:none;font-family:inherit}
+.fg2 input:focus,.fg2 textarea:focus{border-color:var(--ac)}
+.fg2 textarea{min-height:64px;resize:vertical}
+.fg2 input::placeholder,.fg2 textarea::placeholder{color:var(--t3)}
+.fg2 p{font-size:11px;color:var(--t3);margin-top:4px;line-height:1.55}
+.rg{display:flex;gap:12px;margin-top:4px}
+.ro{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--t1);cursor:pointer}
+.ro input{accent-color:var(--ac)}
+.evg{display:flex;flex-direction:column;gap:4px;margin-top:4px}
+.eg2{border:1px solid var(--b1);border-radius:var(--r2);overflow:hidden}
+.egh{padding:7px 10px;background:var(--s2);font-size:11px;font-weight:600;color:var(--t1);display:flex;justify-content:space-between}
+.egh span:last-child{color:var(--t3);font-weight:400}
+.egi{padding:4px 10px 7px}
+.evitem{display:flex;align-items:center;gap:6px;padding:3px 0;font-size:11px;color:var(--t2);cursor:pointer}
+.evitem input[type=checkbox]{accent-color:var(--ac)}
+.notify{position:fixed;bottom:16px;right:16px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--t1);z-index:300;display:none;align-items:center;gap:7px;box-shadow:0 4px 16px rgba(0,0,0,.4);animation:slideUp .2s ease-out}
+@keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.notify i{font-size:15px;color:var(--gr)}
+
+/* SUGGEST DROPDOWN */
+.build-wrap{position:relative}
+.suggest-drop{position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--s1);border:1px solid var(--b2);border-radius:var(--r);z-index:50;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.5);display:none}
+.sugg-section{padding:4px 0}
+.sugg-hdr{padding:4px 11px 2px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t3)}
+.sugg-item{padding:8px 11px;cursor:pointer;display:flex;align-items:flex-start;gap:8px;transition:background .1s;border-top:1px solid var(--b1)}
+.sugg-item:first-child{border-top:none}
+.sugg-item:hover,.sugg-item.focused{background:var(--s2)}
+.sugg-ico{flex-shrink:0;font-size:13px;margin-top:1px}
+.sugg-ico.seed{color:var(--ac)}
+.sugg-ico.ai{color:var(--yn)}
+.sugg-body .sname{font-size:10px;font-weight:600;color:var(--t3);margin-bottom:1px}
+.sugg-body .stext{font-size:11px;color:var(--t2);line-height:1.4}
+.sugg-loading{padding:9px 11px;display:flex;align-items:center;gap:8px;font-size:11px;color:var(--t3)}
+.dot-pulse{display:inline-flex;gap:3px;align-items:center}
+.dot-pulse span{width:4px;height:4px;border-radius:50%;background:var(--t3);animation:dp 1.2s ease-in-out infinite}
+.dot-pulse span:nth-child(2){animation-delay:.2s}
+.dot-pulse span:nth-child(3){animation-delay:.4s}
+@keyframes dp{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+
+/* BUILDER TOOLS */
+.builder-tools{display:flex;gap:5px;margin-top:7px;margin-bottom:2px;flex-wrap:wrap}
+.tool-pill{display:flex;align-items:center;gap:4px;padding:4px 10px;border:1px solid var(--b2);border-radius:20px;font-size:11px;color:var(--t3);cursor:pointer;background:transparent;transition:all .13s;font-family:inherit;white-space:nowrap}
+.tool-pill:hover:not(:disabled){border-color:var(--ac);color:var(--ac);background:var(--ac3)}
+.tool-pill:disabled{opacity:.4;cursor:default}
+.tool-pill i{font-size:12px}
+.tool-pill.loading{border-color:var(--ac);color:var(--ac);background:var(--ac3)}
+
+/* VARIATION PANEL */
+.var-panel{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);padding:12px;margin-bottom:16px;animation:fadeUp .2s ease-out}
+.var-hdr{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--t3);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.var-hdr i{font-size:13px;color:var(--yn)}
+.var-item{padding:8px 10px;background:var(--s1);border:1px solid var(--b1);border-radius:var(--r2);font-size:12px;color:var(--t2);cursor:pointer;line-height:1.45;margin-bottom:5px;transition:all .12s}
+.var-item:last-child{margin-bottom:0}
+.var-item:hover{border-color:var(--ac);color:var(--t1);background:var(--s3)}
+
+/* INLINE EDIT */
+.edit-row{display:flex;align-items:flex-start;gap:6px}
+.edit-row .res-name,.edit-row .res-desc{flex:1}
+.edit-btn{background:none;border:none;cursor:pointer;color:var(--t3);font-size:13px;padding:3px;transition:color .12s;line-height:1;flex-shrink:0;margin-top:2px}
+.edit-btn:hover{color:var(--ac)}
+.inline-edit-input{width:100%;padding:7px 10px;background:var(--s2);border:1px solid var(--ac);border-radius:var(--r2);font-size:inherit;color:var(--t1);outline:none;font-family:inherit;margin-bottom:5px;line-height:1.5}
+.inline-edit-ta{width:100%;min-height:56px;padding:7px 10px;background:var(--s2);border:1px solid var(--ac);border-radius:var(--r2);font-size:13px;color:var(--t1);outline:none;font-family:inherit;margin-bottom:5px;resize:vertical;line-height:1.55}
+.ie-actions{display:flex;gap:5px;margin-bottom:12px}
+.ie-save{padding:5px 10px;background:var(--ac);border:none;border-radius:var(--r2);color:#fff;font-size:11px;cursor:pointer;font-family:inherit}
+.ie-ai{padding:5px 10px;border:1px solid var(--b2);border-radius:var(--r2);background:transparent;color:var(--t3);font-size:11px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;transition:all .12s}
+.ie-ai:hover{color:var(--ac);border-color:var(--ac)}
+.ie-ai i{font-size:11px}
+.ie-cancel{padding:5px 10px;border:1px solid var(--b2);border-radius:var(--r2);background:transparent;color:var(--t3);font-size:11px;cursor:pointer;font-family:inherit}
+
+/* IMPROVE / SUGGEST MORE */
+.improve-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 11px;border:1px solid var(--b2);border-radius:var(--r2);background:transparent;cursor:pointer;font-size:11px;color:var(--t3);margin-bottom:9px;transition:all .14s;font-family:inherit}
+.improve-btn:hover:not(:disabled){border-color:var(--ac);color:var(--ac);background:var(--ac3)}
+.improve-btn:disabled{opacity:.4;cursor:default}
+.improve-btn i{font-size:12px}
+.mcp-sugg-chips{margin-top:10px}
+.mcp-sugg-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--s2);border:1px dashed var(--b2);border-radius:var(--r2);margin-bottom:5px;font-size:11px;color:var(--t2);cursor:pointer;transition:all .12s}
+.mcp-sugg-item:hover{border-color:var(--ac);color:var(--t1)}
+.mcp-sugg-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.mcp-sugg-why{font-size:10px;color:var(--t3);margin-top:1px}
+.add-mcp-btn{display:flex;align-items:center;gap:4px;padding:2px 8px;border:none;border-radius:10px;background:var(--ac2);color:var(--ac);font-size:10px;font-weight:600;cursor:pointer;margin-left:auto;font-family:inherit;transition:background .12s}
+.add-mcp-btn:hover{background:var(--ac);color:#fff}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="bar-logo"><i class="ti ti-robot"></i>Claude Platform</div>
+  <div class="badge">MANAGED AGENTS</div>
+  <span style="color:var(--b2);font-size:16px">|</span>
+  <span style="font-size:11px;color:var(--t3)">beta · managed-agents-2026-04-01</span>
+  <div class="bar-docs"><i class="ti ti-book" style="font-size:12px"></i>Docs</div>
+</div>
+
+<div class="app">
+  <!-- LEFT: TEMPLATE SEEDS -->
+  <div class="left">
+    <div class="lh">
+      <div class="lh-title">40 Agent Templates</div>
+      <div class="search"><i class="ti ti-search"></i><input id="srch" placeholder="Search templates" oninput="renderSeeds()"></div>
+    </div>
+    <div class="cats" id="cat-chips"></div>
+    <div class="lmeta" id="seed-meta"></div>
+    <div class="list" id="seed-list"></div>
+  </div>
+
+  <!-- CENTER: BUILDER + RESULT -->
+  <div class="center">
+    <div class="cscroll" id="cscroll">
+      <!-- Builder -->
+      <div class="builder">
+        <div class="build-label">
+          <span>What do you want to build?</span> &nbsp;Describe your agent, or click a template.
+        </div>
+        <div class="build-wrap">
+          <textarea class="build-ta" id="desc" rows="3"
+            placeholder="E.g. 'Monitor our Shopify store for order anomalies and alert #ops in Slack with a diagnosis'&#10;E.g. 'Every Friday pull completed Linear issues and send a stakeholder status report to Slack and Gmail'&#10;E.g. 'When a Sentry error spikes, triage root cause and file a Linear bug with repro context'"
+            oninput="onDescInput()" onfocus="onDescFocus()"></textarea>
+          <div class="suggest-drop" id="suggest-drop"></div>
+        </div>
+        <div class="builder-tools">
+          <button class="tool-pill" id="tp-enhance" onclick="enhancePrompt(this)"><i class="ti ti-wand"></i>Enhance prompt</button>
+          <button class="tool-pill" id="tp-variations" onclick="showVariations(this)"><i class="ti ti-arrows-shuffle"></i>Variations</button>
+        </div>
+        <div class="build-actions">
+          <button class="gen-btn" id="gen-btn" onclick="generate()">
+            <i class="ti ti-sparkles"></i>Generate agent
+          </button>
+          <button class="clear-btn" onclick="clearResult()">Clear</button>
+          <span class="hint-text" id="hint-text">claude-sonnet-4-20250514 · Anthropic API</span>
+        </div>
+      </div>
+
+      <!-- Dynamic area -->
+      <div id="dynamic"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: SESSION CONFIG -->
+  <div class="right">
+    <div class="rh">
+      <div class="rh-title">Configure session</div>
+      <div class="rh-sub">Set up your agent run</div>
+    </div>
+    <div class="rbody">
+      <div>
+        <div class="fl">Title — optional</div>
+        <input class="fi" id="sess-title" placeholder="Name this run">
+      </div>
+      <div>
+        <div class="fl">Agent</div>
+        <div class="fsel" id="agent-sel"><span id="agt-text" style="color:var(--t3)">Select an agent</span><i class="ti ti-chevron-down" style="font-size:11px"></i></div>
+      </div>
+      <div>
+        <div class="fl">Environment <button class="sec-btn" onclick="showMo('mo-env')">+ add</button></div>
+        <div class="fsel" id="env-sel"><span id="env-text" style="color:var(--t3)">Select an environment</span><i class="ti ti-chevron-down" style="font-size:11px"></i></div>
+      </div>
+      <div>
+        <div class="fl">Resources</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div class="ri"><i class="ti ti-brand-github"></i>GitHub repository</div>
+          <div class="ri"><i class="ti ti-file"></i>Mount file</div>
+          <div class="ri" onclick="showMo('mo-mem')"><i class="ti ti-brain"></i>Memory store</div>
+        </div>
+      </div>
+      <div>
+        <div class="fl">Security</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div class="ri" onclick="showMo('mo-vault')"><i class="ti ti-lock"></i>Vault credentials</div>
+          <div class="ri" onclick="showMo('mo-wh')"><i class="ti ti-webhook"></i>Webhook endpoint</div>
+        </div>
+      </div>
+    </div>
+    <div class="rfooter">
+      <button class="start-btn" id="start-btn" disabled>
+        <i class="ti ti-player-play" style="font-size:13px"></i>Start session
+      </button>
+      <button class="dl-btn" onclick="downloadJson()">
+        <i class="ti ti-download" style="font-size:12px"></i>Export JSON
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="mo" id="mo-env">
+  <div class="md">
+    <div class="mh"><span class="mh-title">Add environment</span><button class="mx" onclick="hideMo('mo-env')">×</button></div>
+    <div class="mb">
+      <div class="fg2"><label>Name</label><input id="env-name" placeholder="E.g. My Environment" maxlength="50"></div>
+      <div class="fg2"><label>Hosting type</label><div class="rg"><label class="ro"><input type="radio" name="ht" checked>Cloud</label></div><p>Cloud environments run in managed infrastructure. Hosting type cannot be changed after creation.</p></div>
+      <div class="fg2"><label>Description (optional)</label><textarea placeholder="What this environment is used for..."></textarea></div>
+    </div>
+    <div class="mf"><button class="mfs" onclick="hideMo('mo-env')">Cancel</button><button class="mfp" onclick="createEnv()">Create environment</button></div>
+  </div>
+</div>
+
+<div class="mo" id="mo-vault">
+  <div class="md">
+    <div class="mh"><span class="mh-title">Create vault</span><button class="mx" onclick="hideMo('mo-vault')">×</button></div>
+    <div class="mb">
+      <p style="font-size:11px;color:var(--t3);line-height:1.6;margin-bottom:12px">Vaults are shared across this workspace. Credentials added to this vault are usable by anyone with API key access.</p>
+      <div class="fg2"><label>Name</label><input id="vault-n" value="Production MCP Vault" maxlength="50"></div>
+      <div class="fg2"><label>Description</label><textarea placeholder="What credentials this vault stores..."></textarea></div>
+    </div>
+    <div class="mf"><button class="mfs" onclick="hideMo('mo-vault')">Cancel</button><button class="mfp" onclick="hideMo('mo-vault')">Create vault</button></div>
+  </div>
+</div>
+
+<div class="mo" id="mo-mem">
+  <div class="md">
+    <div class="mh"><span class="mh-title">New memory store</span><button class="mx" onclick="hideMo('mo-mem')">×</button></div>
+    <div class="mb">
+      <div class="fg2"><label>Name</label><input id="mem-n" placeholder="E.g. My Memory Store" maxlength="50"></div>
+      <div class="fg2"><label>Description (optional)</label><textarea placeholder="What this store contains and how agents should use it..."></textarea><p>Name and description are rendered in the agent system prompt when this store is attached.</p></div>
+    </div>
+    <div class="mf"><button class="mfs" onclick="hideMo('mo-mem')">Cancel</button><button class="mfp" onclick="hideMo('mo-mem')">Create memory store</button></div>
+  </div>
+</div>
+
+<div class="mo" id="mo-wh">
+  <div class="md">
+    <div class="mh"><span class="mh-title">Create webhook endpoint</span><button class="mx" onclick="hideMo('mo-wh')">×</button></div>
+    <div class="mb">
+      <div class="fg2"><label>Endpoint URL</label><input type="url" placeholder="https://..."></div>
+      <div class="fg2"><label>Name</label><input maxlength="50"></div>
+      <div class="fg2"><label>Description</label><input></div>
+      <div class="fg2"><label>Events to subscribe</label><div class="evg" id="evg"></div></div>
+    </div>
+    <div class="mf"><button class="mfs" onclick="hideMo('mo-wh')">Cancel</button><button class="mfp" onclick="hideMo('mo-wh')">Create endpoint</button></div>
+  </div>
+</div>
+
+<div class="notify" id="notify"><i class="ti ti-check"></i><span id="notify-msg"></span></div>
+
+<script>
+// ── AI ASSIST STATE ──────────────────────────────────────────
+let suggestTimer=null;
+let suggestFocused=false;
+let suggestItems=[];
+let suggestIdx=-1;
+let editingField=null;
+let editingValue='';
+
+// ── AUTO-SUGGEST ─────────────────────────────────────────────
+function onDescFocus(){suggestFocused=true;onDescInput();}
+
+function onDescInput(){
+  const q=document.getElementById("desc").value.trim();
+  if(q.length<3){hideSuggestions();return;}
+
+  // Tier 1: instant seed matches
+  const seeds=SEEDS.filter(s=>s.name.toLowerCase().includes(q.toLowerCase())||s.hint.toLowerCase().includes(q.toLowerCase())||s.mcps.some(m=>m.includes(q.toLowerCase()))).slice(0,3);
+
+  // Show seeds + loading for AI
+  renderSuggestions(seeds.map(s=>({type:'seed',id:s.id,name:s.name,text:s.hint})),true);
+
+  clearTimeout(suggestTimer);
+  suggestTimer=setTimeout(()=>fetchAISuggestions(q,seeds),420);
+}
+
+async function fetchAISuggestions(q,seeds){
+  try{
+    const r=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",max_tokens:400,
+        messages:[{role:"user",content:`Suggest 4 specific Claude Managed Agent descriptions that match or extend: "${q}"
+
+Each suggestion must:
+- Be one action-oriented sentence (≤120 chars)
+- Reference a specific integration or data source
+- Be meaningfully different from the others
+
+Return JSON array of 4 strings only. No other text.`}]
+      })
+    });
+    const d=await r.json();
+    const txt=d.content?.find(b=>b.type==="text")?.text||"[]";
+    const match=txt.match(/\[[\s\S]*\]/);
+    const aiItems=match?JSON.parse(match[0]).slice(0,4):[];
+    renderSuggestions([
+      ...seeds.map(s=>({type:'seed',id:s.id,name:s.name,text:s.hint})),
+      ...aiItems.map(t=>({type:'ai',text:t}))
+    ],false);
+  }catch(e){
+    const seeds2=SEEDS.filter(s=>s.name.toLowerCase().includes(document.getElementById("desc").value.toLowerCase())||s.hint.toLowerCase().includes(document.getElementById("desc").value.toLowerCase())).slice(0,3);
+    renderSuggestions(seeds2.map(s=>({type:'seed',id:s.id,name:s.name,text:s.hint})),false);
+  }
+}
+
+function renderSuggestions(items,loading){
+  const el=document.getElementById("suggest-drop");
+  if(!items.length&&!loading){hideSuggestions();return;}
+  suggestItems=items;
+  const seedItems=items.filter(i=>i.type==='seed');
+  const aiItems=items.filter(i=>i.type==='ai');
+  let html='';
+  if(seedItems.length){
+    html+=`<div class="sugg-section"><div class="sugg-hdr">Templates</div>`;
+    html+=seedItems.map((s,i)=>`<div class="sugg-item" onmousedown="applySuggestion('${s.id}','${s.text.replace(/'/g,"\\'")}',true)"><i class="sugg-ico seed ti ti-layout-grid"></i><div class="sugg-body"><div class="sname">${s.name}</div><div class="stext">${s.text}</div></div></div>`).join("");
+    html+=`</div>`;
+  }
+  if(loading){
+    html+=`<div class="sugg-loading"><div class="dot-pulse"><span></span><span></span><span></span></div><span>AI suggestions loading…</span></div>`;
+  } else if(aiItems.length){
+    html+=`<div class="sugg-section"><div class="sugg-hdr">AI suggestions</div>`;
+    html+=aiItems.map(s=>`<div class="sugg-item" onmousedown="applySuggestion(null,'${s.text.replace(/'/g,"\\'")}',false)"><i class="sugg-ico ai ti ti-sparkles"></i><div class="sugg-body"><div class="stext">${s.text}</div></div></div>`).join("");
+    html+=`</div>`;
+  }
+  el.innerHTML=html;
+  el.style.display=html?'block':'none';
+}
+
+function hideSuggestions(){
+  const el=document.getElementById("suggest-drop");
+  if(el)el.style.display='none';
+  suggestItems=[];suggestIdx=-1;
+}
+
+function applySuggestion(seedId,text,isSeed){
+  document.getElementById("desc").value=text;
+  hideSuggestions();
+  if(isSeed&&seedId){selSeedId=seedId;renderSeeds();}
+  generate();
+}
+
+// Close suggest on outside click
+document.addEventListener("mousedown",e=>{
+  if(!e.target.closest(".build-wrap"))hideSuggestions();
+});
+
+// ── ENHANCE PROMPT ───────────────────────────────────────────
+async function enhancePrompt(btn){
+  const desc=document.getElementById("desc").value.trim();
+  if(!desc){return;}
+  setToolLoading(btn,true);
+  try{
+    const r=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",max_tokens:200,
+        messages:[{role:"user",content:`Rewrite this agent description to be more specific and production-ready:
+"${desc}"
+
+Make it specific about: (1) what triggers the agent, (2) what data/systems it touches, (3) what it outputs and where.
+Keep to 1–2 sentences. Do not add preamble. Return only the rewritten description.`}]
+      })
+    });
+    const d=await r.json();
+    const improved=d.content?.find(b=>b.type==="text")?.text||"";
+    if(improved){document.getElementById("desc").value=improved.trim();notify("Prompt enhanced");}
+  }catch(e){notify("Enhancement failed");}
+  setToolLoading(btn,false);
+}
+
+// ── VARIATIONS ───────────────────────────────────────────────
+async function showVariations(btn){
+  const desc=document.getElementById("desc").value.trim();
+  if(!desc&&!currentAgent){return;}
+  const source=desc||(currentAgent?.description||currentAgent?.name||"");
+  setToolLoading(btn,true);
+  try{
+    const r=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",max_tokens:400,
+        messages:[{role:"user",content:`Generate 4 distinct agent variations based on this idea: "${source}"
+
+Each variation should have a different angle: different trigger, different output destination, different scope, or different persona served.
+Return JSON array of 4 strings (each a complete one-sentence agent description). No other text.`}]
+      })
+    });
+    const d=await r.json();
+    const txt=d.content?.find(b=>b.type==="text")?.text||"[]";
+    const match=txt.match(/\[[\s\S]*\]/);
+    const vars=match?JSON.parse(match[0]).slice(0,4):[];
+    renderVariations(vars);
+  }catch(e){notify("Variations failed");}
+  setToolLoading(btn,false);
+}
+
+function renderVariations(vars){
+  if(!vars.length)return;
+  const dyn=document.getElementById("dynamic");
+  const existing=document.getElementById("var-panel");
+  if(existing)existing.remove();
+  const el=document.createElement("div");
+  el.id="var-panel";
+  el.className="var-panel";
+  el.innerHTML=`<div class="var-hdr"><i class="ti ti-arrows-shuffle"></i>Pick a variation</div>`
+    +vars.map(v=>`<div class="var-item" onclick="applyVariation('${v.replace(/'/g,"\\'")}')">${v}</div>`).join("");
+  dyn.insertBefore(el,dyn.firstChild);
+}
+
+function applyVariation(text){
+  document.getElementById("desc").value=text;
+  const p=document.getElementById("var-panel");
+  if(p)p.remove();
+  generate();
+}
+
+function setToolLoading(btn,on){
+  if(!btn)return;
+  if(on){btn.classList.add("loading");btn.disabled=true;btn.innerHTML='<div class="dot-pulse"><span></span><span></span><span></span></div>';}
+  else{
+    btn.classList.remove("loading");btn.disabled=false;
+    if(btn.id==="tp-enhance")btn.innerHTML='<i class="ti ti-wand"></i>Enhance prompt';
+    if(btn.id==="tp-variations")btn.innerHTML='<i class="ti ti-arrows-shuffle"></i>Variations';
+  }
+}
+
+// ── INLINE FIELD EDITING ─────────────────────────────────────
+function editField(field){
+  editingField=field;
+  editingValue=field==='name'?currentAgent.name:currentAgent.description;
+  showResult();
+  setTimeout(()=>{const el=document.getElementById("ie-val");if(el){el.focus();if(el.setSelectionRange)el.setSelectionRange(9999,9999);}},50);
+}
+
+function saveField(field){
+  const el=document.getElementById("ie-val");
+  if(!el)return;
+  const v=el.value.trim();
+  if(v){currentAgent[field]=v;}
+  editingField=null;editingValue='';
+  showResult();
+}
+
+function cancelEdit(){editingField=null;editingValue='';showResult();}
+
+async function aiRewriteField(field){
+  const el=document.getElementById("ie-val");
+  const current=el?el.value.trim():editingValue;
+  if(!el)return;
+  el.disabled=true;
+  const actions=document.getElementById("ie-actions");
+  if(actions)actions.style.opacity=".5";
+  try{
+    const prompt=field==='name'
+      ?`Suggest 4 short, action-oriented names (≤35 chars each) for an agent that: ${currentAgent.description||current}. Return JSON array of 4 strings only.`
+      :`Rewrite this agent description to be more specific: "${current}". Keep ≤140 chars, start with a verb. Return only the rewritten text.`;
+    const r=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:200,messages:[{role:"user",content:prompt}]})
+    });
+    const d=await r.json();
+    const txt=d.content?.find(b=>b.type==="text")?.text||"";
+    if(field==='name'){
+      const match=txt.match(/\[[\s\S]*\]/);
+      const names=match?JSON.parse(match[0]).slice(0,4):[];
+      if(names.length){
+        const nameEl=document.getElementById("ie-val");
+        if(nameEl)nameEl.value=names[0];
+        const after=document.getElementById("ie-name-suggs");
+        if(after){after.innerHTML=names.slice(1).map(n=>`<div class="var-item" style="font-size:11px;padding:5px 8px;margin-bottom:3px" onclick="document.getElementById('ie-val').value='${n.replace(/'/g,"\\'")}'">${n}</div>`).join("");}
+        else{
+          const chip=document.createElement("div");chip.id="ie-name-suggs";chip.style.marginBottom="6px";
+          chip.innerHTML=names.slice(1).map(n=>`<div class="var-item" style="font-size:11px;padding:5px 8px;margin-bottom:3px" onclick="document.getElementById('ie-val').value='${n.replace(/'/g,"\\'")}'">${n}</div>`).join("");
+          el.after(chip);
+        }
+      }
+    }else{
+      if(txt&&el)el.value=txt.trim();
+    }
+  }catch(e){notify("AI rewrite failed");}
+  if(el)el.disabled=false;
+  if(actions)actions.style.opacity="1";
+}
+
+// ── IMPROVE SYSTEM PROMPT ─────────────────────────────────────
+async function improveSystemPrompt(){
+  if(!currentAgent)return;
+  const btn=document.getElementById("improve-sys-btn");
+  if(btn){btn.disabled=true;btn.innerHTML='<div class="dot-pulse"><span></span><span></span><span></span></div>';}
+  try{
+    const r=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",max_tokens:1000,
+        messages:[{role:"user",content:`Improve this system prompt for a Claude Managed Agent named "${currentAgent.name}" using MCPs: ${(currentAgent.mcps||[]).join(", ")}.
+
+Current prompt:
+${currentAgent.system}
+
+Improvements to apply:
+1. Make each step reference the specific MCP server it uses by name
+2. Add explicit error handling ("If X fails, do Y")
+3. Add at least one safety rule ("Never do X without Y")
+4. Make steps more atomic — split any compound steps
+
+Return only the improved system prompt text. Maintain numbered format.`}]
+      })
+    });
+    const d=await r.json();
+    const improved=d.content?.find(b=>b.type==="text")?.text||"";
+    if(improved){currentAgent.system=improved.trim();notify("System prompt improved");showResult();}
+  }catch(e){notify("Improvement failed");}
+  if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-sparkles"></i>Improve system prompt';}
+}
+
+// ── SUGGEST MORE MCPs ────────────────────────────────────────
+async function suggestMoreMCPs(){
+  if(!currentAgent)return;
+  const btn=document.getElementById("suggest-mcp-btn");
+  if(btn){btn.disabled=true;btn.innerHTML='<div class="dot-pulse"><span></span><span></span><span></span></div>';}
+  const available=Object.keys(MU).filter(m=>!(currentAgent.mcps||[]).includes(m));
+  try{
+    const r=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",max_tokens:300,
+        messages:[{role:"user",content:`Agent: ${currentAgent.name}
+Purpose: ${currentAgent.description}
+Current MCPs: ${(currentAgent.mcps||[]).join(", ")}
+Available to add: ${available.join(", ")}
+
+Suggest 2–3 additional MCPs from "Available to add" that would genuinely enhance this agent's capabilities. Be selective — only suggest ones with a clear use case.
+
+Return JSON: [{"name":"slack","reason":"post alerts to team"}]. No other text.`}]
+      })
+    });
+    const d=await r.json();
+    const txt=d.content?.find(b=>b.type==="text")?.text||"[]";
+    const match=txt.match(/\[[\s\S]*\]/);
+    const suggs=match?JSON.parse(match[0]).slice(0,3):[];
+    renderMCPSuggestions(suggs);
+  }catch(e){notify("Suggestion failed");}
+  if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-plus"></i>Suggest more MCPs';}
+}
+
+function renderMCPSuggestions(suggs){
+  const el=document.getElementById("mcp-sugg-area");
+  if(!el||!suggs.length)return;
+  el.innerHTML=`<div class="slabel" style="margin-top:12px">Suggested additions</div>`
+    +suggs.map(s=>{
+      const c=MC[s.name]||"#888";
+      return `<div class="mcp-sugg-item">
+        <div class="mcp-sugg-dot" style="background:${c}"></div>
+        <div><div style="font-weight:500;color:var(--t1)">${s.name.replace(/_/g," ")}</div><div class="mcp-sugg-why">${s.reason}</div></div>
+        <button class="add-mcp-btn" onclick="addMCP('${s.name}',this)">+ Add</button>
+      </div>`;
+    }).join("");
+}
+
+function addMCP(name,btn){
+  if(!currentAgent.mcps)currentAgent.mcps=[];
+  if(!currentAgent.mcps.includes(name)){currentAgent.mcps.push(name);}
+  btn.textContent="Added ✓";btn.disabled=true;btn.style.background="var(--gr2)";btn.style.color="var(--gr)";
+  notify(`${name.replace(/_/g," ")} added`);
+}
+
+
+const CAT_META={
+  engineering:{c:"#60a5fa",bg:"rgba(96,165,250,.14)"},
+  sales:{c:"#fb923c",bg:"rgba(251,146,60,.14)"},
+  marketing:{c:"#f472b6",bg:"rgba(244,114,182,.14)"},
+  operations:{c:"#34d399",bg:"rgba(52,211,153,.14)"},
+  finance:{c:"#4ade80",bg:"rgba(74,222,128,.14)"},
+  hr:{c:"#a78bfa",bg:"rgba(167,139,250,.14)"},
+  "customer-success":{c:"#2dd4bf",bg:"rgba(45,212,191,.14)"},
+  security:{c:"#f87171",bg:"rgba(248,113,113,.14)"},
+  research:{c:"#fbbf24",bg:"rgba(251,191,36,.14)"}
+};
+
+const MC={slack:"#4A154B",notion:"#7c7c7c",linear:"#5E6AD2",gitlab:"#E24329",datadog:"#632CA6",vercel:"#aaa",supabase:"#3ECF8E",hubspot:"#FF7A59",gmail:"#EA4335",google_calendar:"#4285F4",google_drive:"#34A853",intercom:"#1F8DED",posthog:"#F54E00",sentry:"#7c3aed",airtable:"#FCB400",apollo:"#3BA9D9",close:"#5548FF",clay:"#6B47ED",otter:"#3B82F6",mailchimp:"#FFE01B",ahrefs:"#F97316",similarweb:"#0099C5",canva:"#00C4CC",gamma:"#6366F1",monday:"#F62B54",shopify:"#96BF48",clickup:"#7B68EE",figma:"#A259FF",zapier:"#FF4A00",calendly:"#006BFF",twilio:"#F22F46",netlify:"#00C7B7",cloudflare:"#F48120",postman:"#FF6C37",docuseal:"#2563EB",surveymonkey:"#00BF6F",tropic:"#0EA5E9",indeed:"#2164F3",scholar_gateway:"#8B5CF6"};
+
+const MU={slack:"https://mcp.slack.com/mcp",notion:"https://mcp.notion.com/mcp",linear:"https://mcp.linear.app/mcp",gitlab:"https://gitlab.com/api/v4/mcp",datadog:"https://mcp.datadoghq.com/api/unstable/mcp-server/mcp",vercel:"https://mcp.vercel.com",supabase:"https://mcp.supabase.com/mcp",hubspot:"https://mcp.hubspot.com/anthropic",gmail:"https://gmailmcp.googleapis.com/mcp/v1",google_calendar:"https://calendarmcp.googleapis.com/mcp/v1",google_drive:"https://drivemcp.googleapis.com/mcp/v1",intercom:"https://mcp.intercom.com/mcp",posthog:"https://mcp.posthog.com/mcp",sentry:"https://mcp.sentry.dev/mcp",airtable:"https://mcp.airtable.com/mcp",apollo:"https://mcp.apollo.io/mcp",close:"https://mcp.close.com/mcp",clay:"https://api.clay.com/v3/mcp",otter:"https://mcp.otter.ai/mcp",mailchimp:"https://ai-inc.mailchimp.com/claude/mcp/v2",ahrefs:"https://api.ahrefs.com/mcp/mcp",similarweb:"https://mcp.similarweb.com",canva:"https://mcp.canva.com/mcp",gamma:"https://mcp.gamma.app/mcp",monday:"https://mcp.monday.com/sse",shopify:"https://setup.shopify.com/mcp",clickup:"https://mcp.clickup.com/mcp",figma:"https://mcp.figma.com/mcp",zapier:"https://mcp.zapier.com/api/mcp/a/23243057/mcp",calendly:"https://mcp.calendly.com",twilio:"https://mcp.twilio.com/docs",netlify:"https://netlify-mcp.netlify.app/mcp",cloudflare:"https://bindings.mcp.cloudflare.com/mcp",postman:"https://mcp.postman.com/minimal",docuseal:"https://docuseal.com/mcp",surveymonkey:"https://mcp.surveymonkey.com/mcp",tropic:"https://app.tropicapp.io/mcp",indeed:"https://mcp.indeed.com/claude/mcp",scholar_gateway:"https://connector.scholargateway.ai/mcp"};
+
+const WE={"Session lifecycle":["Run started","Rescheduled","Idled","Terminated"],"Threads":["Created","Idled","Terminated"],"Outcomes":["Evaluation ended"],"Vault lifecycle":["Created","Archived","Deleted"],"Credential lifecycle":["Created","Archived","Deleted","Refresh failed"]};
+
+const SEEDS=[
+  {id:"code-review",name:"Code Review Automator",cat:"engineering",mcps:["gitlab","linear","slack"],model:"sonnet",hint:"Reviews open PRs, classifies findings BLOCKING/SUGGESTION/NITPICK, posts inline MR comments, files Linear tickets for blocking issues"},
+  {id:"deploy-monitor",name:"Deployment Monitor",cat:"engineering",mcps:["vercel","datadog","slack"],model:"sonnet",hint:"Watches Vercel deploy events, checks Datadog error rate post-deploy, pages on-call Slack channel if errors spike"},
+  {id:"vuln-audit",name:"Dependency Vulnerability Auditor",cat:"security",mcps:["gitlab","linear","slack"],model:"sonnet",hint:"Scans repo dependency manifests for CVEs via OSV, scores by severity, files Linear tickets, posts security digest"},
+  {id:"api-docs",name:"API Documentation Builder",cat:"engineering",mcps:["gitlab","postman"],model:"opus",hint:"Reads GitLab routes and controllers, generates complete OpenAPI 3.1 YAML spec, publishes to Postman collection"},
+  {id:"supabase-migrate",name:"Supabase Migration Writer",cat:"engineering",mcps:["supabase","slack"],model:"sonnet",hint:"Detects schema drift vs reference spec, writes idempotent SQL migrations, posts diff to Slack for human approval"},
+  {id:"flag-manager",name:"Feature Flag Lifecycle Manager",cat:"engineering",mcps:["posthog","linear","slack"],model:"sonnet",hint:"Audits PostHog flags for stale or fully-rolled-out entries, creates Linear cleanup tickets, posts weekly flag health"},
+  {id:"cf-deploy",name:"Cloudflare Worker Deployer",cat:"engineering",mcps:["cloudflare","slack"],model:"sonnet",hint:"Validates Worker script and wrangler config, deploys staging then production, smoke tests with auto-rollback on failure"},
+  {id:"netlify-audit",name:"Netlify Site Auditor",cat:"engineering",mcps:["netlify","slack"],model:"sonnet",hint:"Audits build failures, stale env vars, and form spam anomalies, posts scored remediation report to Slack"},
+  {id:"lead-enrich",name:"Lead Research Enrichment Agent",cat:"sales",mcps:["apollo","hubspot","airtable"],model:"opus",hint:"Enriches company list with Apollo firmographics and decision-maker contacts, writes records to HubSpot and Airtable"},
+  {id:"deal-stall",name:"Deal Stall Detector",cat:"sales",mcps:["hubspot","slack"],model:"sonnet",hint:"Scans pipeline for deals past activity thresholds, drafts re-engagement email notes, DMs deal owners in Slack"},
+  {id:"call-intel",name:"Sales Call Intelligence Agent",cat:"sales",mcps:["otter","hubspot","slack"],model:"opus",hint:"Reads Otter.ai transcripts, extracts MEDDICC signals and objections, updates HubSpot deal, DMs rep in Slack"},
+  {id:"contract-track",name:"Contract Lifecycle Tracker",cat:"operations",mcps:["docuseal","airtable","google_calendar","slack"],model:"opus",hint:"Extracts key clauses and renewal dates from contracts, creates Airtable records and Google Calendar reminders"},
+  {id:"close-report",name:"Close CRM Pipeline Reporter",cat:"sales",mcps:["close","slack"],model:"sonnet",hint:"Pulls Close pipeline weekly, computes stage conversion rates and per-rep quota attainment, posts leaderboard to Slack"},
+  {id:"clay-seq",name:"Clay Sequence Builder",cat:"sales",mcps:["clay","hubspot"],model:"opus",hint:"Enriches prospects in Clay by persona tier, writes 3-step personalized outreach sequences, exports to HubSpot"},
+  {id:"seo-brief",name:"SEO Content Brief Writer",cat:"marketing",mcps:["ahrefs","google_drive"],model:"opus",hint:"Fetches Ahrefs keyword data and analyzes top-5 SERP pages, produces detailed content brief saved to Google Drive"},
+  {id:"email-analyze",name:"Email Campaign Analyzer",cat:"marketing",mcps:["mailchimp","notion"],model:"sonnet",hint:"Pulls 30-day Mailchimp metrics, benchmarks against industry averages, writes A/B test recommendations in Notion"},
+  {id:"comp-intel",name:"Competitive Intelligence Watcher",cat:"marketing",mcps:["notion","slack"],model:"opus",hint:"Daily web research on competitor list, identifies product and pricing changes, posts structured digest to Slack"},
+  {id:"content-cal",name:"Content Calendar Builder",cat:"marketing",mcps:["notion","google_calendar","airtable","slack"],model:"sonnet",hint:"Maps quarterly content strategy to 90-day calendar, creates Airtable editorial tracker with Google Calendar deadlines"},
+  {id:"canva-assets",name:"Canva Social Asset Generator",cat:"marketing",mcps:["canva","google_drive"],model:"sonnet",hint:"Takes approved copy and brand guidelines, generates on-brand social images in Canva, exports to Google Drive"},
+  {id:"gamma-deck",name:"Gamma Deck Builder",cat:"operations",mcps:["gamma","slack"],model:"sonnet",hint:"Converts source material into a polished Gamma presentation using specified theme, shares link in Slack"},
+  {id:"meeting-prep",name:"Meeting Prep Briefing Agent",cat:"operations",mcps:["google_calendar","hubspot","gmail","otter","notion","slack"],model:"sonnet",hint:"Pulls CRM context, emails, and Otter transcripts for upcoming meetings, writes concise Notion briefs"},
+  {id:"weekly-report",name:"Weekly Status Report Builder",cat:"operations",mcps:["linear","notion","slack","gmail"],model:"sonnet",hint:"Aggregates Linear, Notion, and key metrics into a weekly status report, posts to Slack and emails stakeholders"},
+  {id:"onboarding",name:"New Employee Onboarding Orchestrator",cat:"hr",mcps:["notion","gmail","slack","google_calendar"],model:"sonnet",hint:"Creates Notion workspace and 30/60/90 plan, sends welcome email, posts Slack announcement, books orientation"},
+  {id:"invoice-proc",name:"Vendor Invoice Processor",cat:"finance",mcps:["google_drive","airtable","slack"],model:"sonnet",hint:"Reads invoices from Drive, matches against Airtable POs, flags discrepancies, routes for Slack approval"},
+  {id:"saas-spend",name:"SaaS Spend Auditor",cat:"finance",mcps:["tropic","airtable","google_drive","slack"],model:"sonnet",hint:"Inventories Tropic contracts, identifies unused licenses and duplicate tools, writes cost-reduction report to Drive"},
+  {id:"ar-chaser",name:"Overdue Invoice Chaser",cat:"finance",mcps:["hubspot","gmail","slack"],model:"sonnet",hint:"Identifies overdue HubSpot invoices, drafts progressively firmer chaser emails, logs activity, posts AR summary"},
+  {id:"budget-var",name:"Budget vs Actuals Variance Reporter",cat:"finance",mcps:["airtable","google_drive"],model:"sonnet",hint:"Reads budget from Airtable and actuals from Drive, computes variances by department, saves PDF report"},
+  {id:"jd-writer",name:"Job Description Writer",cat:"hr",mcps:["indeed","google_drive"],model:"opus",hint:"Researches comparable JDs on Indeed, writes an inclusive JD with market comp, saves to Google Drive"},
+  {id:"interview-synth",name:"Interview Debrief Synthesizer",cat:"hr",mcps:["notion","slack"],model:"opus",hint:"Synthesizes interview feedback from Notion and Slack, flags scoring disagreements, writes hire/no-hire recommendation"},
+  {id:"offboarding",name:"Employee Offboarding Runner",cat:"hr",mcps:["notion","gmail","google_calendar","slack"],model:"sonnet",hint:"Creates Notion offboarding checklist, sends KT email, books exit interview, posts IT access revocation tasks"},
+  {id:"survey-synth",name:"Employee Survey Pulse Synthesizer",cat:"hr",mcps:["surveymonkey","notion","gmail"],model:"opus",hint:"Reads SurveyMonkey results, clusters open-text into themes, segments by department, writes anonymized Notion report"},
+  {id:"churn-risk",name:"Churn Risk Early Warning Agent",cat:"customer-success",mcps:["hubspot","intercom","posthog","slack"],model:"sonnet",hint:"Scores customer churn risk from health scores, ticket volume, and product usage; DMs CSMs with interventions"},
+  {id:"support-digest",name:"Support Ticket Pattern Digest",cat:"customer-success",mcps:["intercom","notion","slack"],model:"opus",hint:"Reads Intercom conversations, clusters by issue type, surfaces top pain points, writes weekly product digest"},
+  {id:"health-score",name:"Customer Health Scorecard Builder",cat:"customer-success",mcps:["hubspot","posthog","intercom","airtable","slack"],model:"sonnet",hint:"Assembles health scores from usage, NPS, and ticket data, updates Airtable dashboard with RED/YELLOW/GREEN"},
+  {id:"renewal-deck",name:"Renewal Deck Builder",cat:"customer-success",mcps:["hubspot","posthog","intercom","gamma","slack"],model:"sonnet",hint:"Builds customer renewal presentation in Gamma from HubSpot and PostHog data, shares link to CSM in Slack"},
+  {id:"dd-triage",name:"Datadog Incident Triage Agent",cat:"security",mcps:["datadog","slack","linear"],model:"opus",hint:"Fetches correlated metrics and logs on alert, determines blast radius, classifies SEV1–3, files Linear incident ticket"},
+  {id:"sentry-filer",name:"Sentry Error Triage and Filer",cat:"security",mcps:["sentry","linear","slack"],model:"sonnet",hint:"Monitors Sentry for high-volume error groups, deduplicates against Linear, files prioritized bug tickets"},
+  {id:"access-audit",name:"Access Review Auditor",cat:"security",mcps:["supabase","posthog","datadog","airtable","slack"],model:"sonnet",hint:"Audits user access across systems, identifies orphaned and over-privileged accounts, creates Airtable remediation list"},
+  {id:"market-research",name:"Market Research Deep Diver",cat:"research",mcps:["scholar_gateway","google_drive"],model:"opus",hint:"Conducts multi-source research including Scholar Gateway academic papers, synthesizes into structured analysis in Drive"},
+  {id:"product-analytics",name:"Product Analytics Insight Agent",cat:"research",mcps:["posthog","notion"],model:"opus",hint:"Analyzes PostHog funnel drop-offs by segment, computes retention impact, writes insight report with A/B hypotheses"}
+];
+
+const CATS=["All","Engineering","Sales","Marketing","Operations","Finance","HR","Customer Success","Security","Research"];
+let selCat="All";
+let selSeedId=null;
+let currentAgent=null;
+let activeTab="overview";
+let generating=false;
+let loadMsgs=["Reading your requirements...","Selecting MCP integrations...","Writing system prompt...","Validating configuration...","Finalizing agent..."];
+let loadIdx=0,loadTimer=null;
+
+function renderCatChips(){
+  document.getElementById("cat-chips").innerHTML=CATS.map(c=>`<div class="cat${c===selCat?" on":""}" onclick="setCat('${c}')">${c}</div>`).join("");
+}
+
+function setCat(c){selCat=c;renderCatChips();renderSeeds();}
+
+function renderSeeds(){
+  const q=document.getElementById("srch").value.toLowerCase();
+  const f=SEEDS.filter(s=>{
+    const cm=selCat==="All"||s.cat===selCat.toLowerCase().replace(/ /g,"-");
+    return cm&&(!q||s.name.toLowerCase().includes(q)||s.hint.toLowerCase().includes(q)||s.mcps.some(m=>m.includes(q)));
+  });
+  document.getElementById("seed-meta").textContent=`${f.length} template${f.length!==1?"s":""}`;
+  document.getElementById("seed-list").innerHTML=f.map(s=>{
+    const tags=s.mcps.slice(0,4).map(m=>{const c=MC[m]||"#888";return `<span class="mct" style="background:${c}20;color:${c};border:1px solid ${c}40">${m.replace(/_/g," ").slice(0,9)}</span>`;}).join("");
+    return `<div class="seed${s.id===selSeedId?" on":""}" onclick="loadSeed('${s.id}')">
+      <div class="seed-name">${s.name}</div>
+      <div class="seed-hint">${s.hint}</div>
+      <div class="mcprow">${tags}</div>
+    </div>`;
+  }).join("");
+}
+
+function loadSeed(id){
+  const s=SEEDS.find(x=>x.id===id);
+  if(!s)return;
+  selSeedId=id;
+  document.getElementById("desc").value=s.hint;
+  renderSeeds();
+  generate();
+}
+
+const GEN_PROMPT=desc=>`You are an expert Claude Managed Agents configuration writer. Generate a complete production-ready agent config for this description:
+
+"${desc}"
+
+Available MCP servers (use only those that directly serve this agent's purpose):
+slack, notion, linear, gitlab, datadog, vercel, supabase, hubspot, gmail, google_calendar, google_drive, intercom, posthog, sentry, airtable, apollo, close, clay, otter, mailchimp, ahrefs, similarweb, canva, gamma, monday, shopify, clickup, figma, zapier, calendly, twilio, netlify, cloudflare, postman, docuseal, surveymonkey, tropic, indeed, scholar_gateway
+
+Return a JSON object with EXACTLY these fields:
+{
+  "name": "Short action-oriented name, max 35 chars",
+  "description": "One sentence starting with a verb, max 140 chars",
+  "cat": "one of: engineering | sales | marketing | operations | finance | hr | customer-success | security | research",
+  "mcps": ["array", "of", "relevant", "mcp", "names", "from", "the", "list", "above"],
+  "model": "claude-sonnet-4-6 for ops/monitoring/reporting, claude-opus-4-6 for research/synthesis/complex reasoning",
+  "system": "Detailed numbered step-by-step system prompt, 350-500 words. Reference specific MCP server names. Include safety/error handling. Use imperative statements."
+}
+
+Return ONLY valid JSON. No backticks. No explanation. No markdown fences.`;
+
+async function callClaude(desc){
+  const r=await fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      model:"claude-sonnet-4-20250514",
+      max_tokens:1000,
+      messages:[{role:"user",content:GEN_PROMPT(desc)}]
+    })
+  });
+  if(!r.ok){const e=await r.json();throw new Error(e.error?.message||`API error ${r.status}`);}
+  const d=await r.json();
+  const txt=d.content.find(b=>b.type==="text")?.text||"";
+  const clean=txt.replace(/```(?:json)?[\s\S]*?```/g,m=>m.replace(/```(?:json)?|```/g,"")).trim();
+  const match=clean.match(/\{[\s\S]*\}/);
+  if(!match)throw new Error("Could not parse agent config from response.");
+  return JSON.parse(match[0]);
+}
+
+async function generate(){
+  const desc=document.getElementById("desc").value.trim();
+  if(!desc||generating)return;
+  generating=true;
+  document.getElementById("gen-btn").disabled=true;
+  currentAgent=null;
+  activeTab="overview";
+  document.getElementById("start-btn").disabled=true;
+  showLoading();
+  try{
+    const agent=await callClaude(desc);
+    if(!agent.name||!agent.system)throw new Error("Incomplete config returned.");
+    currentAgent=agent;
+    document.getElementById("sess-title").value=agent.name;
+    document.getElementById("agt-text").textContent=agent.name;
+    document.getElementById("agt-text").style.color="var(--t1)";
+    document.getElementById("start-btn").disabled=false;
+    showResult();
+  }catch(e){
+    showError(e.message);
+  }finally{
+    generating=false;
+    document.getElementById("gen-btn").disabled=false;
+    clearInterval(loadTimer);
+  }
+}
+
+function showLoading(){
+  loadIdx=0;
+  clearInterval(loadTimer);
+  document.getElementById("dynamic").innerHTML=`<div class="loading"><div class="ld-inner"><div class="spinner"></div><div class="ld-msg" id="ldmsg">${loadMsgs[0]}</div></div></div>`;
+  loadTimer=setInterval(()=>{loadIdx=(loadIdx+1)%loadMsgs.length;const el=document.getElementById("ldmsg");if(el)el.textContent=loadMsgs[loadIdx];},1800);
+}
+
+function showError(msg){
+  clearInterval(loadTimer);
+  document.getElementById("dynamic").innerHTML=`<div class="error-block"><div class="et"><i class="ti ti-alert-circle" style="font-size:14px"></i>Generation failed</div><div class="em">${esc(msg)}</div></div>`;
+}
+
+function clearResult(){
+  document.getElementById("desc").value="";
+  document.getElementById("dynamic").innerHTML="";
+  currentAgent=null;selSeedId=null;activeTab="overview";
+  document.getElementById("agt-text").textContent="Select an agent";
+  document.getElementById("agt-text").style.color="var(--t3)";
+  document.getElementById("start-btn").disabled=true;
+  renderSeeds();
+}
+
+function setTab(t){activeTab=t;showResult();}
+
+function showResult(){
+  clearInterval(loadTimer);
+  if(!currentAgent)return;
+  const a=currentAgent;
+  const cm=CAT_META[a.cat]||{c:"#888",bg:"rgba(128,128,128,.14)"};
+  const mlist=(a.mcps||[]).filter(m=>MU[m]);
+  const tabs=["overview","system","mcps","json"].map(t=>`<div class="tab${activeTab===t?" on":""}" onclick="setTab('${t}')">${t==="mcps"?"MCP servers":t.charAt(0).toUpperCase()+t.slice(1)}</div>`).join("");
+
+  // Name section — display or edit
+  let nameHtml;
+  if(editingField==='name'){
+    nameHtml=`<input class="inline-edit-input" id="ie-val" value="${esc(editingValue)}" style="font-size:16px;font-weight:700;margin-bottom:5px">
+    <div id="ie-name-suggs"></div>
+    <div class="ie-actions" id="ie-actions">
+      <button class="ie-save" onclick="saveField('name')">Save</button>
+      <button class="ie-ai" onclick="aiRewriteField('name')"><i class="ti ti-sparkles"></i>AI suggest names</button>
+      <button class="ie-cancel" onclick="cancelEdit()">Cancel</button>
+    </div>`;
+  }else{
+    nameHtml=`<div class="edit-row"><div class="res-name">${esc(a.name)}</div><button class="edit-btn" onclick="editField('name')" title="Edit name"><i class="ti ti-pencil"></i></button></div>`;
+  }
+
+  // Description section — display or edit
+  let descHtml;
+  if(editingField==='description'){
+    descHtml=`<textarea class="inline-edit-ta" id="ie-val">${esc(editingValue)}</textarea>
+    <div class="ie-actions" id="ie-actions">
+      <button class="ie-save" onclick="saveField('description')">Save</button>
+      <button class="ie-ai" onclick="aiRewriteField('description')"><i class="ti ti-sparkles"></i>AI rewrite</button>
+      <button class="ie-cancel" onclick="cancelEdit()">Cancel</button>
+    </div>`;
+  }else{
+    descHtml=`<div class="edit-row"><div class="res-desc">${esc(a.description)}</div><button class="edit-btn" onclick="editField('description')" title="Edit description"><i class="ti ti-pencil"></i></button></div>`;
+  }
+
+  let tc="";
+  if(activeTab==="overview"){
+    const rows=mlist.map(m=>{const c=MC[m]||"#888";return `<div class="row-item"><div class="rdot" style="background:${c}"></div><div><div class="rn">${m.replace(/_/g," ")}</div><div class="ru">${MU[m]}</div></div><span class="badge-ok">connected</span></div>`;}).join("");
+    tc=`<div class="slabel" style="margin-bottom:8px">Built-in toolset</div>
+    <div class="row-item" style="margin-bottom:14px"><div class="rdot" style="background:var(--ac)"></div><div><div class="rn">agent_toolset_20260401</div><div class="ru">bash · file ops · web search · web fetch</div></div></div>
+    <div class="slabel">MCP servers (${mlist.length})</div>${rows}`;
+  }else if(activeTab==="system"){
+    tc=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
+      <button class="improve-btn" id="improve-sys-btn" onclick="improveSystemPrompt()"><i class="ti ti-sparkles"></i>Improve system prompt</button>
+      <button class="copy-btn" id="cpbtn" onclick="copyJson()" style="margin-bottom:0"><i class="ti ti-copy" style="font-size:12px;vertical-align:-1px"></i> Copy JSON</button>
+    </div>
+    <div class="slabel">System prompt</div><div class="sys-block">${esc(a.system)}</div>`;
+  }else if(activeTab==="mcps"){
+    const rows=mlist.map(m=>{const c=MC[m]||"#888";return `<div class="row-item"><div class="rdot" style="background:${c}"></div><div style="flex:1;min-width:0"><div class="rn">${m.replace(/_/g," ")}</div><div class="ru" style="white-space:normal;word-break:break-all">${MU[m]}</div></div><span class="badge-ok">connected</span></div>`;}).join("");
+    tc=`<div style="margin-bottom:9px"><button class="improve-btn" id="suggest-mcp-btn" onclick="suggestMoreMCPs()"><i class="ti ti-plus"></i>Suggest more MCPs</button></div>
+    <div class="slabel">${mlist.length} connected MCP server${mlist.length!==1?"s":""}</div>${rows}
+    <div id="mcp-sugg-area"></div>`;
+  }else if(activeTab==="json"){
+    const cfg=buildCfg(a);
+    const raw=JSON.stringify(cfg,null,2);
+    const hl=raw.replace(/("(?:[^"\\]|\\.)*")(\s*:)/g,'<span class="jk">$1</span>$2').replace(/:\s*("(?:[^"\\]|\\.)*")/g,': <span class="jstr">$1</span>').replace(/:\s*(\d+\.?\d*)/g,': <span class="jnum">$1</span>').replace(/:\s*(true|false)/g,': <span class="jbool">$1</span>');
+    tc=`<button class="copy-btn" id="cpbtn" onclick="copyJson()"><i class="ti ti-copy" style="font-size:12px;vertical-align:-1px"></i> Copy JSON config</button><div class="json-block">${hl}</div>`;
+  }
+
+  const varPanelHtml=document.getElementById("var-panel")?document.getElementById("var-panel").outerHTML:"";
+  document.getElementById("dynamic").innerHTML=`${varPanelHtml}<div class="result">
+    <div class="res-head">
+      ${nameHtml}
+      ${descHtml}
+      <div class="res-meta">
+        <span class="cpill" style="background:${cm.bg};color:${cm.c}">${(a.cat||"").replace(/-/g," ")}</span>
+        <span class="mpill">${a.model||"claude-sonnet-4-6"}</span>
+        <span class="mpill">${mlist.length} MCP${mlist.length!==1?"s":""}</span>
+      </div>
+    </div>
+    <div class="tabs">${tabs}</div>
+    ${tc}
+  </div>`;
+}
+
+function buildCfg(a){
+  return{name:a.name,description:a.description,model:{id:a.model||"claude-sonnet-4-6"},system:a.system,tools:[{type:"agent_toolset_20260401"}],mcp_servers:(a.mcps||[]).filter(m=>MU[m]).map(m=>({type:"url",url:MU[m],name:m})),skills:[],metadata:{category:a.cat}};
+}
+
+function copyJson(){
+  if(!currentAgent)return;
+  const txt=JSON.stringify(buildCfg(currentAgent),null,2);
+  navigator.clipboard.writeText(txt).then(()=>{
+    const b=document.getElementById("cpbtn");
+    if(b){b.classList.add("ok");b.innerHTML='<i class="ti ti-check" style="font-size:12px;vertical-align:-1px"></i> Copied!';}
+    setTimeout(()=>{if(b){b.classList.remove("ok");b.innerHTML='<i class="ti ti-copy" style="font-size:12px;vertical-align:-1px"></i> Copy JSON config';}},2000);
+  }).catch(()=>{
+    const ta=document.createElement("textarea");ta.value=txt;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();document.execCommand("copy");document.body.removeChild(ta);
+    notify("Copied to clipboard");
+  });
+}
+
+function downloadJson(){
+  if(!currentAgent)return;
+  const txt=JSON.stringify(buildCfg(currentAgent),null,2);
+  const a=document.createElement("a");
+  a.href="data:application/json;charset=utf-8,"+encodeURIComponent(txt);
+  a.download=(currentAgent.name||"agent").toLowerCase().replace(/[^a-z0-9]+/g,"-")+".json";
+  a.click();
+  notify("JSON downloaded");
+}
+
+function esc(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+function notify(msg){
+  const n=document.getElementById("notify");
+  document.getElementById("notify-msg").textContent=msg;
+  n.style.display="flex";
+  setTimeout(()=>{n.style.display="none";},2200);
+}
+
+function showMo(id){document.getElementById(id).classList.add("show");}
+function hideMo(id){document.getElementById(id).classList.remove("show");}
+
+function createEnv(){
+  const n=document.getElementById("env-name").value.trim();
+  if(!n)return;
+  document.getElementById("env-text").textContent=n;
+  document.getElementById("env-text").style.color="var(--t1)";
+  hideMo("mo-env");
+  notify(`Environment "${n}" created`);
+}
+
+function renderWebhookEvents(){
+  document.getElementById("evg").innerHTML=Object.entries(WE).map(([g,evts])=>`<div class="eg2"><div class="egh"><span>${g}</span><span>${evts.length} events</span></div><div class="egi">${evts.map(e=>`<label class="evitem"><input type="checkbox"> <span>${e}</span></label>`).join("")}</div></div>`).join("");
+}
+
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape")["mo-env","mo-vault","mo-mem","mo-wh"].forEach(hideMo);
+  if(e.key==="Enter"&&(e.metaKey||e.ctrlKey)){const ta=document.getElementById("desc");if(document.activeElement===ta)generate();}
+});
+
+["mo-env","mo-vault","mo-mem","mo-wh"].forEach(id=>{
+  document.getElementById(id).addEventListener("click",e=>{if(e.target===e.currentTarget)hideMo(id);});
+});
+
+renderCatChips();
+renderSeeds();
+renderWebhookEvents();
+</script>
+</body>
+</html>

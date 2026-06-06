@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FlashFusion — Operator Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #07070D;
+    --surface: #0D0C18;
+    --surface-2: #14132A;
+    --surface-3: #1B1A36;
+    --line: rgba(167,139,250,0.14);
+    --line-strong: rgba(167,139,250,0.28);
+    --text: #ECEAF5;
+    --text-2: #A8A4C4;
+    --text-3: #6B6890;
+    --accent: #A78BFA;
+    --accent-2: #7C3AED;
+    --accent-deep: #5B21B6;
+    --acid: #C7F73F;
+    --warm: #F5A524;
+    --rose: #F472B6;
+    --teal: #2DD4BF;
+    --ok: #10B981;
+    --bad: #EF4444;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+  .display { font-family: 'Inter Tight', Inter, sans-serif; letter-spacing: -0.025em; }
+  .serif { font-family: 'Instrument Serif', serif; font-style: italic; letter-spacing: -0.01em; }
+  .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(167,139,250,0.18); border-radius: 10px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(167,139,250,0.32); }
+
+  /* ---------- App shell ---------- */
+  .app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+
+  /* Sidebar */
+  .side {
+    border-right: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(124,58,237,0.04), transparent 40%);
+    padding: 22px 18px;
+    position: sticky; top: 0; height: 100vh;
+    display: flex; flex-direction: column; gap: 22px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; padding: 4px 6px; }
+  .brand-mark {
+    width: 28px; height: 28px;
+    background:
+      radial-gradient(circle at 30% 30%, #C4B5FD, #7C3AED 70%);
+    border-radius: 7px;
+    position: relative;
+    box-shadow: 0 0 0 1px rgba(167,139,250,0.4) inset, 0 6px 18px -6px rgba(124,58,237,0.6);
+  }
+  .brand-mark::after {
+    content: ''; position: absolute; inset: 6px;
+    border-left: 2px solid #FAFAF8; border-bottom: 2px solid #FAFAF8;
+    transform: skewX(-12deg);
+  }
+  .brand .name { font: 700 14px 'Inter Tight', sans-serif; letter-spacing: -0.01em; }
+  .brand .name span { color: var(--accent); }
+
+  .side-section { display: flex; flex-direction: column; gap: 2px; }
+  .side-section h4 {
+    font: 600 10px/1 'JetBrains Mono', monospace;
+    text-transform: uppercase; letter-spacing: 0.14em;
+    color: var(--text-3); padding: 0 8px 8px; margin: 0;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    color: var(--text-2); font-size: 13px;
+    cursor: pointer; user-select: none;
+    text-decoration: none;
+  }
+  .nav-item:hover { background: rgba(167,139,250,0.06); color: var(--text); }
+  .nav-item.active {
+    background: linear-gradient(90deg, rgba(167,139,250,0.18), rgba(167,139,250,0.04));
+    color: var(--text);
+    box-shadow: inset 2px 0 0 var(--accent);
+  }
+  .nav-item .ico { width: 16px; display: grid; place-items: center; opacity: 0.85; }
+  .nav-item .count {
+    margin-left: auto;
+    font: 500 11px 'JetBrains Mono', monospace;
+    color: var(--text-3);
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--line);
+    padding: 1px 6px; border-radius: 999px;
+  }
+  .nav-item .dot { margin-left: auto; width: 6px; height: 6px; border-radius: 50%; background: var(--acid); box-shadow: 0 0 8px var(--acid); }
+
+  .side-foot { margin-top: auto; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: rgba(167,139,250,0.04); }
+  .side-foot .label { font: 600 10px 'JetBrains Mono', monospace; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+  .side-foot .copy { font-size: 12.5px; color: var(--text-2); margin: 6px 0 10px; line-height: 1.45; }
+  .side-foot .who { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text); }
+  .who-av {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: linear-gradient(135deg, #F5A524, #C2410C);
+    display: grid; place-items: center; font-size: 11px; font-weight: 700; color: #fff;
+  }
+
+  /* ---------- Main ---------- */
+  main { padding: 24px 32px 60px; min-width: 0; }
+
+  /* Top bar */
+  .topbar {
+    display: flex; align-items: center; gap: 14px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .crumbs { font: 500 12px 'JetBrains Mono', monospace; color: var(--text-3); letter-spacing: 0.06em; }
+  .crumbs strong { color: var(--text); font-weight: 500; }
+  .topbar .grow { flex: 1; }
+  .search {
+    height: 34px; padding: 0 12px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 8px;
+    display: flex; align-items: center; gap: 10px; color: var(--text-3);
+    font-size: 13px; min-width: 320px;
+  }
+  .search input { background: transparent; border: 0; outline: 0; color: var(--text); font: inherit; flex: 1; }
+  .search kbd {
+    font: 500 11px 'JetBrains Mono', monospace;
+    border: 1px solid var(--line); padding: 1px 6px; border-radius: 4px;
+    color: var(--text-3); background: var(--bg);
+  }
+  .iconbtn {
+    width: 34px; height: 34px; border-radius: 8px;
+    background: var(--surface); border: 1px solid var(--line);
+    display: grid; place-items: center; color: var(--text-2); cursor: pointer;
+  }
+  .iconbtn:hover { color: var(--text); border-color: var(--line-strong); }
+  .me {
+    height: 34px; padding: 0 4px 0 10px; border-radius: 8px;
+    background: var(--surface); border: 1px solid var(--line);
+    display: flex; align-items: center; gap: 8px; cursor: pointer;
+    font-size: 13px;
+  }
+  .me .av { width: 24px; height: 24px; border-radius: 6px; background: linear-gradient(135deg, #F5A524, #C2410C); display: grid; place-items: center; font: 700 11px Inter; }
+
+  /* Hero */
+  .hero {
+    margin: 28px 0 28px;
+    display: grid; grid-template-columns: 1.4fr 1fr;
+    gap: 24px;
+  }
+  .hero-left h1 {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 56px; font-weight: 700;
+    letter-spacing: -0.035em; line-height: 1.0;
+    margin: 0 0 14px;
+  }
+  .hero-left h1 em { font-family: 'Instrument Serif', serif; font-style: italic; color: var(--accent); font-weight: 400; letter-spacing: -0.02em; }
+  .hero-left p { color: var(--text-2); font-size: 15.5px; line-height: 1.5; max-width: 560px; margin: 0 0 22px; }
+  .hero-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    height: 32px; padding: 0 12px;
+    border: 1px solid var(--line); border-radius: 999px;
+    font-size: 12.5px; color: var(--text-2); background: var(--surface);
+    cursor: pointer;
+  }
+  .pill:hover { color: var(--text); border-color: var(--line-strong); }
+  .pill.active { background: var(--accent); border-color: var(--accent); color: #1A0F2D; font-weight: 600; }
+  .pill .num { font: 500 11px 'JetBrains Mono', monospace; color: inherit; opacity: 0.7; }
+
+  /* Hero right — operator card */
+  .op-card {
+    background:
+      radial-gradient(circle at 90% 0%, rgba(124,58,237,0.18), transparent 50%),
+      linear-gradient(180deg, var(--surface-2), var(--surface));
+    border: 1px solid var(--line-strong);
+    border-radius: 16px;
+    padding: 18px;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+  .op-card::before {
+    content: ''; position: absolute; left: 0; right: 0; top: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(167,139,250,0.5), transparent);
+  }
+  .op-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font: 500 11px 'JetBrains Mono', monospace; color: var(--accent); letter-spacing: 0.14em; text-transform: uppercase; }
+  .op-pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--acid); box-shadow: 0 0 0 0 rgba(199,247,63,0.6); animation: pulse 1.6s infinite; }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(199,247,63,0.6); }
+    70% { box-shadow: 0 0 0 8px rgba(199,247,63,0); }
+    100% { box-shadow: 0 0 0 0 rgba(199,247,63,0); }
+  }
+  .op-title { font: 600 17px/1.3 'Inter Tight', sans-serif; letter-spacing: -0.01em; margin: 0 0 14px; }
+  .op-stat-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .op-stat {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: rgba(7,7,13,0.4);
+  }
+  .op-stat .lbl { font: 500 10px 'JetBrains Mono', monospace; color: var(--text-3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; }
+  .op-stat .val { font: 700 22px 'Inter Tight', sans-serif; letter-spacing: -0.02em; font-feature-settings: 'tnum'; }
+  .op-stat .sub { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+  .op-stat .delta-up { color: var(--ok); }
+  .op-foot {
+    margin-top: 14px;
+    border-top: 1px dashed var(--line);
+    padding-top: 12px;
+    font-size: 12.5px; color: var(--text-2);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .op-foot .next-tag { font: 500 10px 'JetBrains Mono', monospace; padding: 2px 6px; border-radius: 4px; background: var(--accent); color: #1A0F2D; letter-spacing: 0.08em; }
+
+  /* Section heads */
+  .sec-head { display: flex; align-items: baseline; gap: 12px; margin: 28px 0 14px; }
+  .sec-head h2 { font-family: 'Inter Tight', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin: 0; }
+  .sec-head h2 em { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; color: var(--accent); }
+  .sec-head .meta { font: 500 11px 'JetBrains Mono', monospace; color: var(--text-3); letter-spacing: 0.08em; text-transform: uppercase; }
+  .sec-head .grow { flex: 1; }
+  .sec-head .ctrl {
+    display: inline-flex; gap: 2px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 8px; padding: 3px;
+  }
+  .sec-head .ctrl button {
+    background: transparent; color: var(--text-2);
+    border: 0; font: 500 12px Inter, sans-serif;
+    padding: 5px 10px; border-radius: 6px; cursor: pointer;
+  }
+  .sec-head .ctrl button.active { background: var(--surface-3); color: var(--text); }
+
+  /* Pinned strip */
+  .pinned {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .pin {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 14px; padding: 16px;
+    display: flex; flex-direction: column; gap: 10px;
+    cursor: pointer; position: relative; overflow: hidden;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+  .pin:hover { transform: translateY(-1px); border-color: var(--line-strong); }
+  .pin .pin-head { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-2); }
+  .pin .pin-head .num { font: 500 10px 'JetBrains Mono', monospace; color: var(--text-3); letter-spacing: 0.08em; }
+  .pin h3 { font: 600 17px 'Inter Tight', sans-serif; letter-spacing: -0.01em; margin: 0; }
+  .pin .progress {
+    height: 6px; background: rgba(167,139,250,0.1); border-radius: 3px; overflow: hidden;
+  }
+  .pin .progress div { height: 100%; background: linear-gradient(90deg, var(--accent), var(--rose)); border-radius: 3px; }
+  .pin .pin-foot { display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; color: var(--text-3); }
+
+  /* Tool grid */
+  .tools {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+  }
+  .tool {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 14px; padding: 16px 16px 14px;
+    display: flex; flex-direction: column; gap: 10px;
+    cursor: pointer; position: relative; overflow: hidden;
+    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    min-height: 156px;
+  }
+  .tool:hover {
+    border-color: var(--line-strong);
+    transform: translateY(-2px);
+    box-shadow: 0 14px 36px -22px rgba(167,139,250,0.5);
+  }
+  .tool .row1 { display: flex; align-items: flex-start; gap: 10px; }
+  .tool .glyph {
+    width: 38px; height: 38px; border-radius: 10px;
+    flex-shrink: 0;
+    display: grid; place-items: center;
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+  }
+  .tool .num { margin-left: auto; font: 500 10.5px 'JetBrains Mono', monospace; color: var(--text-3); letter-spacing: 0.08em; }
+  .tool h4 { font: 600 14.5px 'Inter Tight', sans-serif; letter-spacing: -0.005em; margin: 4px 0 0; line-height: 1.25; }
+  .tool .desc { font-size: 12.5px; color: var(--text-2); line-height: 1.45; -webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+  .tool .foot {
+    margin-top: auto; padding-top: 10px;
+    border-top: 1px dashed var(--line);
+    display: flex; align-items: center; gap: 10px;
+    font-size: 11.5px; color: var(--text-3);
+  }
+  .tool .foot .tag {
+    padding: 2px 7px; border-radius: 4px;
+    background: rgba(167,139,250,0.1);
+    color: var(--accent); font-weight: 500;
+    font: 500 10.5px 'JetBrains Mono', monospace;
+    letter-spacing: 0.06em;
+  }
+  .tool .foot .tag.acid { background: rgba(199,247,63,0.1); color: var(--acid); }
+  .tool .foot .tag.warm { background: rgba(245,165,36,0.1); color: var(--warm); }
+  .tool .foot .tag.rose { background: rgba(244,114,182,0.1); color: var(--rose); }
+  .tool .foot .tag.teal { background: rgba(45,212,191,0.1); color: var(--teal); }
+  .tool .foot .uses { margin-left: auto; font-feature-settings: 'tnum'; }
+  .tool .corner-mark {
+    position: absolute; top: 12px; right: 12px;
+    width: 18px; height: 18px;
+    color: var(--text-3);
+    opacity: 0.6;
+  }
+
+  /* Right column = signals */
+  .twocol { display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items: start; }
+  .panel {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 14px; padding: 16px;
+  }
+  .panel h3 { font: 600 13px 'JetBrains Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin: 0 0 14px; }
+  .signal { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .signal:last-child { border-bottom: 0; padding-bottom: 0; }
+  .signal:first-child { padding-top: 0; }
+  .signal .stamp {
+    width: 56px; flex-shrink: 0;
+    font: 500 10.5px 'JetBrains Mono', monospace;
+    color: var(--text-3); letter-spacing: 0.04em;
+    padding-top: 2px;
+  }
+  .signal .body { font-size: 12.5px; color: var(--text); line-height: 1.45; }
+  .signal .body .who { color: var(--accent); font-weight: 500; }
+  .signal .body .it { color: var(--text-2); }
+
+  .quote-card {
+    background: linear-gradient(180deg, rgba(124,58,237,0.12), rgba(124,58,237,0.02));
+    border: 1px solid var(--line-strong);
+    border-radius: 14px;
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .quote-card .qmark {
+    position: absolute; top: -18px; left: 8px;
+    font-family: 'Instrument Serif', serif; font-style: italic;
+    font-size: 110px; color: var(--accent); opacity: 0.6; line-height: 1;
+  }
+  .quote-card blockquote {
+    margin: 18px 0 14px;
+    font: 500 16px/1.4 'Inter Tight', sans-serif;
+    letter-spacing: -0.01em;
+    position: relative;
+  }
+  .quote-card blockquote em { font-family: 'Instrument Serif', serif; font-style: italic; color: var(--accent); font-weight: 400; }
+  .quote-card .attrib { font: 500 11px 'JetBrains Mono', monospace; color: var(--text-3); letter-spacing: 0.08em; text-transform: uppercase; }
+
+  /* Pipeline panel */
+  .pipe-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 0; border-bottom: 1px solid var(--line);
+    font-size: 12.5px;
+  }
+  .pipe-row:last-child { border-bottom: 0; }
+  .pipe-row .stage-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+  .pipe-row .name { flex: 1; }
+  .pipe-row .name .co { color: var(--text); }
+  .pipe-row .name .stage { color: var(--text-3); font-size: 11px; }
+  .pipe-row .amt { font: 600 12.5px 'JetBrains Mono', monospace; color: var(--text); font-feature-settings: 'tnum'; }
+
+  /* Footer marquee */
+  .marquee {
+    margin-top: 40px;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 16px 0;
+    overflow: hidden;
+    position: relative;
+    font: 500 13px 'JetBrains Mono', monospace;
+    color: var(--text-3); letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .marquee-track { display: flex; gap: 60px; white-space: nowrap; animation: scroll 50s linear infinite; }
+  .marquee-track span { display: inline-flex; align-items: center; gap: 16px; }
+  .marquee-track .sep { color: var(--accent); }
+  @keyframes scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* Responsive */
+  @media (max-width: 1180px) {
+    .twocol { grid-template-columns: 1fr; }
+    .hero { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 860px) {
+    .app { grid-template-columns: 1fr; }
+    .side { display: none; }
+    .pinned { grid-template-columns: 1fr; }
+  }
+
+  /* Tweaks panel host (always visible) */
+  .tweaks {
+    position: fixed; right: 18px; bottom: 18px;
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: 12px;
+    padding: 12px;
+    width: 230px;
+    z-index: 100;
+    box-shadow: 0 14px 40px -10px rgba(0,0,0,0.6);
+  }
+  .tweaks h5 { margin: 0 0 10px; font: 600 11px 'JetBrains Mono', monospace; letter-spacing: 0.1em; color: var(--accent); text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+  .tweaks .row { display: flex; gap: 6px; margin-bottom: 8px; }
+  .tweaks .row:last-child { margin-bottom: 0; }
+  .tweaks .lbl { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; flex: 1; align-self: center; }
+  .tweaks .swatch { width: 22px; height: 22px; border-radius: 6px; cursor: pointer; border: 1px solid var(--line); }
+  .tweaks .swatch.active { box-shadow: 0 0 0 2px var(--text); }
+  .tweaks .seg { display: inline-flex; gap: 2px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 2px; }
+  .tweaks .seg button { background: transparent; border: 0; color: var(--text-2); padding: 3px 8px; border-radius: 4px; font: 500 11px Inter; cursor: pointer; }
+  .tweaks .seg button.active { background: var(--surface-3); color: var(--text); }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ===== Sidebar ===== -->
+  <aside class="side">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="name">FlashFusion<span>·</span></div>
+    </div>
+
+    <div class="side-section">
+      <h4>Workspace</h4>
+      <a class="nav-item active">
+        <span class="ico">▤</span><span>Operator Hub</span>
+      </a>
+      <a class="nav-item">
+        <span class="ico">◇</span><span>Pipeline</span><span class="count">7</span>
+      </a>
+      <a class="nav-item">
+        <span class="ico">◐</span><span>Sprints</span><span class="dot"></span>
+      </a>
+      <a class="nav-item">
+        <span class="ico">▢</span><span>Clients</span><span class="count">12</span>
+      </a>
+      <a class="nav-item">
+        <span class="ico">≣</span><span>Inbox</span><span class="count">3</span>
+      </a>
+    </div>
+
+    <div class="side-section">
+      <h4>Library</h4>
+      <a class="nav-item"><span class="ico">⌘</span><span>Skills</span><span class="count">42</span></a>
+      <a class="nav-item"><span class="ico">¶</span><span>Prompts</span><span class="count">25</span></a>
+      <a class="nav-item"><span class="ico">▷</span><span>Agents</span><span class="count">8</span></a>
+      <a class="nav-item"><span class="ico">◯</span><span>Battle Cards</span></a>
+    </div>
+
+    <div class="side-section">
+      <h4>Office</h4>
+      <a class="nav-item"><span class="ico">$</span><span>Revenue</span></a>
+      <a class="nav-item"><span class="ico">✦</span><span>Newsletter</span></a>
+      <a class="nav-item"><span class="ico">✶</span><span>Chaos Club</span></a>
+    </div>
+
+    <div class="side-foot">
+      <div class="label">vCAIO Memo · April</div>
+      <div class="copy">Three signals worth your attention this week. Drafted, awaiting review.</div>
+      <div class="who">
+        <div class="who-av">KR</div>
+        Kyle Rosebrook
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== Main ===== -->
+  <main>
+    <div class="topbar">
+      <div class="crumbs">FF / <strong>Operator Hub</strong> / Today</div>
+      <div class="grow"></div>
+      <div class="search">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
+        <input placeholder="Jump to a tool, prompt, or client…" />
+        <kbd>⌘K</kbd>
+      </div>
+      <button class="iconbtn" title="Notifications">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      </button>
+      <button class="iconbtn" title="New">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+      <div class="me">
+        <div class="av">KR</div>
+        Kyle
+        <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 4.5 3 3 3-3"/></svg>
+      </div>
+    </div>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-left">
+        <div class="mono" style="font-size: 11.5px; color: var(--accent); letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 18px;">
+          ▤ Wednesday · April 23 · Week 17
+        </div>
+        <h1>Good morning, Kyle.<br /><em>Three things</em> need you today.</h1>
+        <p>An audit deck due this afternoon. A sprint kickoff brief sitting in draft. And the monthly vCAIO memo is ready for your read-through.</p>
+        <div class="hero-pills">
+          <span class="pill active">Today</span>
+          <span class="pill">This week</span>
+          <span class="pill">Pipeline</span>
+          <span class="pill">Backlog</span>
+        </div>
+      </div>
+
+      <!-- Operator card -->
+      <div class="op-card">
+        <div class="op-head"><span class="op-pulse"></span>Operator hub · live</div>
+        <h3 class="op-title">FlashFusion · the system</h3>
+        <div class="op-stat-row">
+          <div class="op-stat">
+            <div class="lbl">Tools</div>
+            <div class="val">16</div>
+            <div class="sub">in the library</div>
+          </div>
+          <div class="op-stat">
+            <div class="lbl">Lanes</div>
+            <div class="val">3</div>
+            <div class="sub">sell · deliver · office</div>
+          </div>
+          <div class="op-stat">
+            <div class="lbl">Method</div>
+            <div class="val" style="font-size:28px">3-Rule</div>
+            <div class="sub">identify · encode · deploy</div>
+          </div>
+        </div>
+        <div class="op-foot">
+          <span class="next-tag">NEXT</span>
+          Draft the audit deck — runs on Audit Report skill
+        </div>
+      </div>
+    </section>
+
+    <!-- Pinned -->
+    <div class="sec-head">
+      <h2>Pinned <em>workflows</em></h2>
+      <span class="meta">/ active right now</span>
+      <div class="grow"></div>
+      <div class="ctrl">
+        <button class="active">Mine</button>
+        <button>Team</button>
+        <button>All</button>
+      </div>
+    </div>
+
+    <div class="pinned">
+      <div class="pin">
+        <div class="pin-head"><span class="num">06 ·</span> Audit Report Generator</div>
+        <h3 class="display">[Client] audit deck</h3>
+        <div class="progress"><div style="width: 60%"></div></div>
+        <div class="pin-foot">
+          <span>Drafting in progress</span>
+          <span>Due this week</span>
+        </div>
+      </div>
+      <div class="pin">
+        <div class="pin-head"><span class="num">05 ·</span> Proposal Builder</div>
+        <h3 class="display">[Client] Sprint proposal</h3>
+        <div class="progress"><div style="width: 80%; background: linear-gradient(90deg, var(--acid), var(--teal));"></div></div>
+        <div class="pin-foot">
+          <span>Awaiting your sign-off</span>
+          <span>Send by EOD</span>
+        </div>
+      </div>
+      <div class="pin">
+        <div class="pin-head"><span class="num">04 ·</span> Sprint Tracker</div>
+        <h3 class="display">[Client] Sprint · final week</h3>
+        <div class="progress"><div style="width: 75%; background: linear-gradient(90deg, var(--warm), var(--rose));"></div></div>
+        <div class="pin-foot">
+          <span>Training delivered</span>
+          <span>Handoff this week</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two column: Tools + signals -->
+    <div class="twocol" style="margin-top: 36px;">
+      <div>
+        <div class="sec-head">
+          <h2>The <em>library</em> — 16 tools</h2>
+          <span class="meta">/ click to launch</span>
+          <div class="grow"></div>
+          <div class="ctrl">
+            <button class="active">All</button>
+            <button>Sales</button>
+            <button>Delivery</button>
+            <button>Office</button>
+          </div>
+        </div>
+
+        <div class="tools">
+          <!-- 01 -->
+          <div class="tool">
+            <div class="row1">
+              <div class="glyph">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 14l3-3 2 2 4-5"/><circle cx="11" cy="11" r="0.8" fill="#A78BFA"/></svg>
+              </div>
+              <div style="flex:1">
+                <h4>ROI Calculator</h4>
+              </div>
+              <span class="num">01</span>
+            </div>
+            <div class="desc">Build the executive ROI narrative — payback period, year-1 net, opportunity cost of waiting.</div>
+            <div class="foot">
+              <span class="tag">SALES</span>
+</div>
+          </div>
+
+          <!-- 02 -->
+          <div class="tool">
+            <div class="row1">
+              <div class="glyph">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l5 3"/></svg>
+              </div>
+              <div style="flex:1"><h4>Discovery Scorecard</h4></div>
+              <span class="num">02</span>
+            </div>
+            <div class="desc">Score a prospect's ICP fit, urgency, decision-maker access, and budget signal in one pass.</div>
+            <div class="foot">
+              <span class="tag">SALES</span>
+</div>
+          </div>
+
+          <!-- 03 -->
+          <div class="tool">
+            <div class="row1">
+              <div class="glyph">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.6"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>
+              </div>
+              <div style="flex:1"><h4>Skills Browser</h4></div>
+              <span class="num">03</span>
+            </div>
+            <div class="desc">Search the skill library by category, complexity, deployment time. Stack the right loadout.</div>
+            <div class="foot">
+              <span class="tag teal">DELIVERY</span>
+</div>
+          </div>
+
+          <!-- 04 -->
+          <div class="tool">
+            <div class="row1">
+              <div class="glyph">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.6"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg>
+              </div>
+              <div style="flex:1"><h4>Sprint Tracker</h4></div>
+              <span class="num">04</span>
+            </div>
+            <div class="desc">Five-week sprint board with milestones, blockers, and a weekly stakeholder update generator.</div>
+            <div class="foot">
+              <span class="tag teal">DELIVERY</span>
+</div>
+          </div>
+
+          <!-- 05 -->
+          <div class="tool">
+            <div class="row1">
+              <div class="glyph">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.6"><path d="M14 3v5h5M6 21h12a2 2 0 0 0 2-2V8l-5-5H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2z"/><path d="M9 13h6M9 17h4"/></svg>
+              </div>
+              <div style="flex:1"><h4>Proposal Builder</h4></div>
+              <span class="num">05</span>
+            </div>
+            <div class="desc">Audit → Sprint → Retainer proposal in Kyle's voice. Pulls from discovery; outputs SOW-ready text.</div>
+            <div class="foot">
+              <span class="tag">SALES</span>
+</div>
+          </div>
+
+          <!-- 06 -->
+          <div class="tool">
+            <div class="row1">
+              <div class="glyph">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.6"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+              </div>
+              <div style="flex:1"><h4>Audit Report Gen</h4></div>
+              <span class="num">06</span>
+            </div>
+            <div class="desc">Turn the AI Setup Audit scorecard into a delivered report — gaps, priority matrix, recommended next step.</div>
+            <div class="foot">
+              <span class="tag teal">DELIVERY</span>
+</div>
+          </div>
+
+          <!-- 07 -->
+          <div class="tool">
+            <div class="row1">
+              <div class="glyph">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.6"><path d="M3 17l4-4 4 4 6-6 4 4"/><path d="M3 21h18"/></svg>
+              </div>
+              <div style="flex:1"><h4>Pipeline Dashboard</h4></div>
+              <span class="num">07</span>
+            </div>
+            <div class="desc">Deals by stage, weighted forecast, days-in-stage drift. Surfaces what's stalling.</div>
+            <div class="foot">
+              <span class="tag warm">OFFICE</span>
+</div>
+          </div>
+
+          <!-- 08 -->
+          <div class="tool">
+            <div class="row1">
+              <div class="glyph">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.6"><path d="M12 2v20M5 9c4 4 10 4 14 0M5 15c4 4 10 4 14 0"/></svg>
+              </div>
+              <div style="flex:1"><h4>Revenue Tracker</h4></div>
+              <span class="num">08</span>
+            </div>
+            <div class="desc">MRR, ARR, retainer churn, upsell ratio. Monthly close in two clicks.</div>
+            <div class="foot">
+              <span class="tag warm">OFFICE</span>
+</div>
+          </div>
+
+          <!-- 09 -->
+          <div class="tool">
+            <div class="row1">
+              <div class="glyph">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.6"><path d="M22 2 11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg>
+              </div>
+              <div style="flex:1"><h4>Outreach Tracker</h4></div>
+              <span class="num">09</span>
+            </div>
+            <div class="desc">First-touch and follow-up cadence by channel. Reply rate, days-to-meeting, fall-off.</div>
+            <div class="foot">
+              <span class="tag">SALES</span>
+</div>
+          </div>
+
+          <!-- 10 -->
+          <div class="tool">
+            <div class="row1">
+              <div class="glyph">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.6"><path d="M5 4h14v6c0 4-3 7-7 7s-7-3-7-7zM10 22h4M12 17v5"/></svg>
+              </div>
+              <div style="flex:1"><h4>Battle Card Browser</h4></div>
+              <span class="num">10</span>
+            </div>
+            <div class="desc">Competitor positioning, win/lose conditions, current objections. Updated weekly.</div>
+            <div class="foot">
+              <span class="tag">SALES</span>
+</div>
+          </div>
+
+          <!-- 11 -->
+          <div class="tool">
+            <div class="row1">
+              <div class="glyph">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 9v12"/></svg>
+              </div>
+              <div style="flex:1"><h4>Client Dashboard</h4></div>
+              <span class="num">11</span>
+            </div>
+            <div class="desc">Per-client view: sprint stage, deliverables checklist, activity log, health score.</div>
+            <div class="foot">
+              <span class="tag teal">DELIVERY</span>
+</div>
+          </div>
+
+          <!-- 12 -->
+          <div class="tool">
+            <div class="row1">
+              <div class="glyph">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.6"><path d="M4 4h16v12H4z"/><path d="M4 16l8 5 8-5"/></svg>
+              </div>
+              <div style="flex:1"><h4>Newsletter Generator</h4></div>
+              <span class="num">12</span>
+            </div>
+            <div class="desc">Draft this week's edition of The Prompt — signals, skill spotlight, close. 400-word ceiling.</div>
+            <div class="foot">
+              <span class="tag warm">OFFICE</span>
+</div>
+          </div>
+
+          <!-- 13 -->
+          <div class="tool">
+            <div class="row1">
+              <div class="glyph">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg>
+              </div>
+              <div style="flex:1"><h4>Skills Gap Detector</h4></div>
+              <span class="num">13</span>
+            </div>
+            <div class="desc">Reads client tools + use case, returns the 5 gaps causing the most pain right now.</div>
+            <div class="foot">
+              <span class="tag teal">DELIVERY</span>
+</div>
+          </div>
+
+          <!-- 14 -->
+          <div class="tool">
+            <div class="row1">
+              <div class="glyph">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.6"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              </div>
+              <div style="flex:1"><h4>Onboarding Hub</h4></div>
+              <span class="num">14</span>
+            </div>
+            <div class="desc">Client-facing kickoff checklist, week-by-week expectations, contact escalation paths.</div>
+            <div class="foot">
+              <span class="tag teal">DELIVERY</span>
+</div>
+          </div>
+
+          <!-- 15 -->
+          <div class="tool">
+            <div class="row1">
+              <div class="glyph">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.6"><path d="M12 2l3 6 6 1-4.5 4.5 1 6L12 17l-5.5 2.5 1-6L3 9l6-1z"/></svg>
+              </div>
+              <div style="flex:1"><h4>Agent Builder</h4></div>
+              <span class="num">15</span>
+            </div>
+            <div class="desc">Compose triggers, steps, guardrails, and HITL gates. Outputs an n8n-ready spec.</div>
+            <div class="foot">
+              <span class="tag acid">PLATFORM</span>
+</div>
+          </div>
+
+          <!-- 16 -->
+          <div class="tool" style="border-color: rgba(244,114,182,0.25);">
+            <div class="row1">
+              <div class="glyph" style="border-color: rgba(244,114,182,0.3); background: rgba(244,114,182,0.06);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F472B6" stroke-width="1.6"><path d="M3 12c0-5 4-9 9-9s9 4 9 9-4 9-9 9-9-4-9-9z"/><path d="M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/></svg>
+              </div>
+              <div style="flex:1"><h4>Daily Dispatch</h4></div>
+              <span class="num">16</span>
+            </div>
+            <div class="desc">Chaos Club's daily peer-support post. No toxic positivity, no clichés, ends with one doable thing.</div>
+            <div class="foot">
+              <span class="tag rose">CHAOS CLUB</span>
+</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right rail -->
+      <aside style="display:flex; flex-direction: column; gap: 16px;">
+        <div class="quote-card">
+          <div class="qmark">"</div>
+          <blockquote>
+            What used to take a <em>week</em> of back-and-forth now happens in a single <em>conversation</em>.
+          </blockquote>
+          <div class="attrib">— FlashFusion thesis</div>
+        </div>
+
+        <div class="panel">
+          <h3>▤ Recent signals</h3>
+          <div class="signal">
+            <div class="stamp">NOW</div>
+            <div class="body"><span class="who">Audit</span> <span class="it">— scorecard returned. Top gap surfaces in summary.</span></div>
+          </div>
+          <div class="signal">
+            <div class="stamp">EARLIER</div>
+            <div class="body"><span class="who">Pilot</span> <span class="it">— migration agent passed verification. Ready for rollout.</span></div>
+          </div>
+          <div class="signal">
+            <div class="stamp">YDAY</div>
+            <div class="body"><span class="who">SOW</span> <span class="it">— countersigned. Kickoff scheduled this week.</span></div>
+          </div>
+          <div class="signal">
+            <div class="stamp">YDAY</div>
+            <div class="body"><span class="who">Inbound</span> <span class="it">— new lead. Discovery booked.</span></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>◇ Pipeline · stages</h3>
+          <div class="pipe-row">
+            <div class="stage-dot" style="background: var(--acid);"></div>
+            <div class="name"><div class="co">Closed-won</div><div class="stage">Sprint signed</div></div>
+            <div class="amt">→</div>
+          </div>
+          <div class="pipe-row">
+            <div class="stage-dot" style="background: var(--accent);"></div>
+            <div class="name"><div class="co">Proposal out</div><div class="stage">Audit · pending sig</div></div>
+            <div class="amt">→</div>
+          </div>
+          <div class="pipe-row">
+            <div class="stage-dot" style="background: var(--warm);"></div>
+            <div class="name"><div class="co">Discovery</div><div class="stage">First call booked</div></div>
+            <div class="amt">→</div>
+          </div>
+          <div class="pipe-row">
+            <div class="stage-dot" style="background: var(--warm);"></div>
+            <div class="name"><div class="co">Qualifying</div><div class="stage">Scorecard returned</div></div>
+            <div class="amt">→</div>
+          </div>
+          <div class="pipe-row">
+            <div class="stage-dot" style="background: var(--rose);"></div>
+            <div class="name"><div class="co">Stalled</div><div class="stage">Re-engage queue</div></div>
+            <div class="amt">→</div>
+          </div>
+        </div>
+
+        <div class="panel" style="background: linear-gradient(180deg, rgba(199,247,63,0.06), transparent);">
+          <h3 style="color: var(--acid);">✦ The Prompt · ed. 17</h3>
+          <div style="font-size: 13px; color: var(--text-2); line-height: 1.5; margin-bottom: 10px;">
+            Draft is under the 400-word ceiling. Spotlight this week: <strong style="color: var(--text);">vCAIO Memo skill pack</strong>.
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="iconbtn" style="width:auto; padding: 0 12px; font-size: 12px; gap: 6px; display: inline-flex; align-items: center;">
+              <span class="mono" style="font-size: 11px; letter-spacing: 0.08em;">REVIEW DRAFT</span>
+            </button>
+            <button class="iconbtn" style="width:auto; padding: 0 12px; font-size: 12px; gap: 6px; display: inline-flex; align-items: center; color: var(--acid);">
+              <span class="mono" style="font-size: 11px; letter-spacing: 0.08em;">SEND THU 7AM</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Marquee -->
+    <div class="marquee">
+      <div class="marquee-track">
+        <span>FF Operator Hub</span><span class="sep">●</span>
+        <span>16 tools online</span><span class="sep">●</span>
+        <span>Sell · Deliver · Office</span><span class="sep">●</span>
+        <span>The 3-Rule · identify · encode · deploy</span><span class="sep">●</span>
+        <span>Built by Kyle Rosebrook</span><span class="sep">●</span>
+        <span>FF Operator Hub</span><span class="sep">●</span>
+        <span>16 tools online</span><span class="sep">●</span>
+        <span>Sell · Deliver · Office</span><span class="sep">●</span>
+        <span>The 3-Rule · identify · encode · deploy</span><span class="sep">●</span>
+        <span>Built by Kyle Rosebrook</span><span class="sep">●</span>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Visible micro-tweaks -->
+<div class="tweaks">
+  <h5>◐ Tweaks</h5>
+  <div class="row">
+    <span class="lbl">Accent</span>
+    <div class="swatch active" style="background:#A78BFA" data-accent="#A78BFA" data-deep="#7C3AED"></div>
+    <div class="swatch" style="background:#C7F73F" data-accent="#C7F73F" data-deep="#84CC16"></div>
+    <div class="swatch" style="background:#F472B6" data-accent="#F472B6" data-deep="#DB2777"></div>
+    <div class="swatch" style="background:#2DD4BF" data-accent="#2DD4BF" data-deep="#0F766E"></div>
+  </div>
+  <div class="row">
+    <span class="lbl">Density</span>
+    <div class="seg">
+      <button data-density="compact">Tight</button>
+      <button class="active" data-density="comfortable">Mid</button>
+      <button data-density="spacious">Lush</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Accent swatches
+  document.querySelectorAll('.tweaks .swatch').forEach(sw => {
+    sw.addEventListener('click', () => {
+      document.querySelectorAll('.tweaks .swatch').forEach(s => s.classList.remove('active'));
+      sw.classList.add('active');
+      document.documentElement.style.setProperty('--accent', sw.dataset.accent);
+      document.documentElement.style.setProperty('--accent-2', sw.dataset.deep);
+    });
+  });
+
+  // Density
+  document.querySelectorAll('.tweaks .seg button').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.tweaks .seg button').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      const d = b.dataset.density;
+      const main = document.querySelector('main');
+      if (d === 'compact') main.style.padding = '16px 24px 40px';
+      else if (d === 'spacious') main.style.padding = '32px 48px 80px';
+      else main.style.padding = '24px 32px 60px';
+    });
+  });
+</script>
+
+</body>
+</html>

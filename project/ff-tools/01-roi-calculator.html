@@ -1,0 +1,92 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>FF — ROI Calculator</title><style>*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0F0618;color:#f1f5f9;font-family:'Inter',system-ui,sans-serif;padding:2rem 1rem}
+.w{max-width:800px;margin:0 auto}
+.brand{font-size:12px;color:#A855F7;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem}
+h1{font-size:24px;font-weight:600;margin-bottom:.4rem}
+.sub{font-size:14px;color:#94a3b8;margin-bottom:1.75rem}
+.card{background:#1A0B2E;border:1px solid rgba(168,85,247,.25);border-radius:12px;padding:1.5rem;margin-bottom:1rem}
+.ct{font-size:11px;color:#A855F7;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:1rem}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem}
+.field{margin-bottom:.75rem}
+label{font-size:12px;color:#94a3b8;display:block;margin-bottom:.4rem}
+input,select,textarea{width:100%;background:#0A0414;border:1px solid rgba(168,85,247,.3);border-radius:6px;color:#f1f5f9;padding:.5rem .75rem;font-size:13px;font-family:system-ui}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#A855F7}
+.btn{padding:.75rem 1.5rem;background:#A855F7;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer}
+.btn:hover{background:#9333EA}
+.btn-ghost{background:transparent;border:1px solid rgba(168,85,247,.4);color:#C99BFF}
+.badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:500}
+.badge-purple{background:rgba(168,85,247,.2);color:#C99BFF;border:1px solid rgba(168,85,247,.3)}
+.badge-green{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.25)}
+.badge-amber{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.25)}
+.badge-red{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.25)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.06em;padding:.5rem .75rem;border-bottom:1px solid rgba(168,85,247,.15)}
+td{padding:.6rem .75rem;border-bottom:1px solid rgba(255,255,255,.05);color:#cbd5e1}
+tr:hover td{background:rgba(168,85,247,.05)}
+.score-ring{display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;border:3px solid;font-size:16px;font-weight:700}
+.res{background:#0A0414;border:1px solid rgba(168,85,247,.4);border-radius:12px;padding:1.5rem;margin-top:1rem}
+.mg{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.75rem;margin-bottom:1.25rem}
+.m{background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.2);border-radius:8px;padding:.875rem}
+.ml{font-size:11px;color:#64748b;margin-bottom:.3rem}.mv{font-size:20px;font-weight:600}.ms{font-size:10px;color:#475569;margin-top:.2rem}
+.bar{height:6px;background:#251443;border-radius:6px;overflow:hidden;margin-bottom:.75rem}
+.fill{height:100%;background:linear-gradient(90deg,#A855F7,#22D3EE);transition:width .4s}
+input[type=range]{accent-color:#A855F7;cursor:pointer;width:100%;margin-top:.4rem}
+.bv{font-size:20px;font-weight:600;color:#C99BFF}.un{font-size:13px;color:#64748b;margin-left:4px}
+
+/* ---- FlashFusion elevated layer ---- */
+body{font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;position:relative}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background:radial-gradient(620px 380px at 16% -8%,rgba(168,85,247,.16),transparent 70%),radial-gradient(520px 340px at 94% 2%,rgba(34,211,238,.08),transparent 70%)}
+h1{font-family:'Poppins',sans-serif;letter-spacing:-.02em}
+.brand{font-family:'JetBrains Mono',monospace;color:#A855F7;font-weight:500}
+.ct,.section-label{font-family:'JetBrains Mono',monospace}
+.card{border-color:rgba(168,85,247,.18);box-shadow:0 1px 0 rgba(255,255,255,.02) inset}
+.btn{background:linear-gradient(135deg,#A855F7,#9333EA);box-shadow:0 4px 16px rgba(168,85,247,.24);transition:filter .15s,box-shadow .15s}
+.btn:hover{background:linear-gradient(135deg,#A855F7,#9333EA);filter:brightness(1.09);box-shadow:0 6px 22px rgba(168,85,247,.34)}
+.btn-ghost{background:transparent;box-shadow:none}
+input:focus,select:focus,textarea:focus{box-shadow:0 0 0 3px rgba(168,85,247,.16)}
+code{font-family:'JetBrains Mono',monospace}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(168,85,247,.22);border-radius:10px}::-webkit-scrollbar-thumb:hover{background:rgba(168,85,247,.36)}
+@media(prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style></head><body><div class="w">
+<div class="brand">FlashFusion AI Enablement</div>
+<h1>AI Implementation ROI Calculator</h1>
+<p class="sub">Estimate your return before the first conversation.</p>
+<div class="card"><div class="ct">Team and Cost</div><div class="g2">
+<div class="field"><label>Team size using AI tools</label><span class="bv" id="vt">15</span><span class="un">people</span><br><input type="range" id="rt" min="1" max="200" value="15" oninput="calc()"></div>
+<div class="field"><label>Avg hourly fully-loaded cost</label>$<span class="bv" id="vr">85</span><span class="un">/hr</span><br><input type="range" id="rr" min="20" max="300" value="85" step="5" oninput="calc()"></div>
+</div>
+<div class="field"><label>Hours saved per person per week</label><span class="bv" id="vh">3</span><span class="un">hrs/week</span><br><input type="range" id="rh" min="0.5" max="20" value="3" step="0.5" oninput="calc()"></div>
+</div>
+<div class="card"><div class="ct">Engagement</div><div class="g2">
+<div class="field"><label>FlashFusion investment</label>$<span class="bv" id="vc">4,500</span><br><input type="range" id="rc" min="1500" max="25000" value="4500" step="500" oninput="calc()"></div>
+<div class="field"><label>Weeks to full deployment</label><span class="bv" id="vw">6</span><span class="un">weeks</span><br><input type="range" id="rw" min="1" max="26" value="6" oninput="calc()"></div>
+</div></div>
+<div class="res">
+<div style="font-size:13px;font-weight:600;color:#c4b5fd;margin-bottom:1rem">Projected Return</div>
+<div class="mg">
+<div class="m"><div class="ml">Weekly value</div><div class="mv" id="mw">-</div><div class="ms">hrs x rate x team</div></div>
+<div class="m"><div class="ml">Annual value</div><div class="mv" id="ma">-</div><div class="ms">52-week projection</div></div>
+<div class="m"><div class="ml">Year-1 ROI</div><div class="mv" id="mr">-</div><div class="ms">net of engagement</div></div>
+<div class="m"><div class="ml">Payback period</div><div class="mv" id="mp">-</div><div class="ms">break-even</div></div>
+</div>
+<div class="bar"><div class="fill" id="fill" style="width:0%"></div></div>
+<div style="font-size:13px;color:#C99BFF;margin-bottom:1rem" id="nb"></div>
+<button class="btn" style="width:100%;margin-bottom:.5rem" onclick="window.open('https://audit.flashfusion.co','_blank')">Get Your Free AI Setup Audit</button>
+<div style="font-size:11px;color:#334155;text-align:center">Estimates only. Results vary by implementation.</div>
+</div></div>
+<script>
+function fmt(n){return n>=1e6?"$"+(n/1e6).toFixed(1)+"M":n>=1000?"$"+(n/1000).toFixed(0)+"K":"$"+Math.round(n)}
+function calc(){
+var t=+rt.value,r=+rr.value,h=+rh.value,c=+rc.value,w=+rw.value;
+vt.textContent=t;vr.textContent=r;vh.textContent=h;vc.textContent=c.toLocaleString();vw.textContent=w;
+var wk=t*r*h,ann=wk*52,net=ann-c,roi=c>0?Math.round(net/c*100):0,pb=wk>0?Math.ceil(c/wk):0;
+mw.textContent=fmt(wk);ma.textContent=fmt(ann);mr.textContent=roi+"%";mp.textContent=pb+" wks";
+fill.style.width=Math.min(Math.max(roi/2000*100,0),100)+"%";
+nb.textContent=pb>0?"Break-even at week "+pb+". Everything after is recovered capacity.":"";
+}
+calc();
+</script></body></html>

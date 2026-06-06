@@ -1,0 +1,193 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>FF — Skills Gap Detector</title><style>*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0F0618;color:#f1f5f9;font-family:'Inter',system-ui,sans-serif;padding:2rem 1rem}
+.w{max-width:820px;margin:0 auto}
+.brand{font-size:12px;color:#A855F7;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem}
+h1{font-size:24px;font-weight:600;margin-bottom:.4rem}
+.sub{font-size:14px;color:#94a3b8;margin-bottom:1.75rem}
+.card{background:#1A0B2E;border:1px solid rgba(168,85,247,.25);border-radius:12px;padding:1.5rem;margin-bottom:1rem}
+.ct{font-size:11px;color:#A855F7;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:1rem}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem}
+.field{margin-bottom:.75rem}
+label{font-size:12px;color:#94a3b8;display:block;margin-bottom:.4rem}
+input,select,textarea{width:100%;background:#0A0414;border:1px solid rgba(168,85,247,.3);border-radius:6px;color:#f1f5f9;padding:.5rem .75rem;font-size:13px;font-family:system-ui}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#A855F7}
+.btn{padding:.75rem 1.5rem;background:#A855F7;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer}
+.btn:hover{background:#9333EA}
+.btn-ghost{background:transparent;border:1px solid rgba(168,85,247,.4);color:#C99BFF}
+.badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:500}
+.badge-green{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.25)}
+.badge-amber{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.25)}
+.badge-purple{background:rgba(168,85,247,.2);color:#C99BFF;border:1px solid rgba(168,85,247,.3)}
+.mcard{background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.2);border-radius:8px;padding:.875rem}
+.mlbl{font-size:11px;color:#64748b;margin-bottom:.3rem}
+.mval{font-size:22px;font-weight:600}
+.q-block{margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid rgba(255,255,255,.06)}
+.q-block:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.q-text{font-size:15px;font-weight:500;color:#e2e8f0;margin-bottom:.75rem}
+.options{display:flex;flex-direction:column;gap:.4rem}
+.option{display:flex;align-items:center;gap:.75rem;cursor:pointer;padding:.5rem .75rem;border-radius:6px;border:1px solid rgba(168,85,247,.15);background:transparent;transition:all .15s}
+.option:hover{background:rgba(168,85,247,.08);border-color:rgba(168,85,247,.3)}
+.option.sel{background:rgba(168,85,247,.15);border-color:#A855F7}
+.option input{accent-color:#A855F7;flex-shrink:0}
+.option label{font-size:13px;color:#cbd5e1;cursor:pointer;flex:1}
+.rec-card{background:#0A0414;border:1px solid rgba(168,85,247,.35);border-radius:10px;padding:1.25rem;margin-bottom:.75rem}
+.rec-name{font-size:14px;font-weight:600;color:#C99BFF;margin-bottom:.3rem}
+.rec-reason{font-size:13px;color:#94a3b8;margin-bottom:.5rem}
+.rec-priority{font-size:11px;font-weight:600}
+.pri-h{color:#f87171}.pri-m{color:#fbbf24}.pri-l{color:#34d399}
+
+/* ---- FlashFusion elevated layer ---- */
+body{font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;position:relative}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background:radial-gradient(620px 380px at 16% -8%,rgba(168,85,247,.16),transparent 70%),radial-gradient(520px 340px at 94% 2%,rgba(34,211,238,.08),transparent 70%)}
+h1{font-family:'Poppins',sans-serif;letter-spacing:-.02em}
+.brand{font-family:'JetBrains Mono',monospace;color:#A855F7;font-weight:500}
+.ct,.section-label{font-family:'JetBrains Mono',monospace}
+.card{border-color:rgba(168,85,247,.18);box-shadow:0 1px 0 rgba(255,255,255,.02) inset}
+.btn{background:linear-gradient(135deg,#A855F7,#9333EA);box-shadow:0 4px 16px rgba(168,85,247,.24);transition:filter .15s,box-shadow .15s}
+.btn:hover{background:linear-gradient(135deg,#A855F7,#9333EA);filter:brightness(1.09);box-shadow:0 6px 22px rgba(168,85,247,.34)}
+.btn-ghost{background:transparent;box-shadow:none}
+input:focus,select:focus,textarea:focus{box-shadow:0 0 0 3px rgba(168,85,247,.16)}
+code{font-family:'JetBrains Mono',monospace}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(168,85,247,.22);border-radius:10px}::-webkit-scrollbar-thumb:hover{background:rgba(168,85,247,.36)}
+@media(prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style></head><body><div class="w">
+<div class="brand">FlashFusion AI Enablement</div>
+<h1>Skills Gap Detector</h1>
+<p class="sub">Answer 5 questions — get your personalized skill pack recommendation.</p>
+<div class="card" id="quiz">
+<div class="q-block">
+<div class="q-text">1. What is your team's primary AI use case?</div>
+<div class="options" data-q="usecase">
+<label class="option"><input type="radio" name="uc" value="content"> <label>Writing, content, and communications</label></label>
+<label class="option"><input type="radio" name="uc" value="automation"> <label>Automating repetitive workflows</label></label>
+<label class="option"><input type="radio" name="uc" value="analysis"> <label>Research, analysis, and decision support</label></label>
+<label class="option"><input type="radio" name="uc" value="dev"> <label>Software development and engineering</label></label>
+<label class="option"><input type="radio" name="uc" value="sales"> <label>Sales, outreach, and client work</label></label>
+</div>
+</div>
+<div class="q-block">
+<div class="q-text">2. What is your biggest current AI frustration?</div>
+<div class="options">
+<label class="option"><input type="radio" name="fr" value="inconsistent"> <label>Output quality is inconsistent</label></label>
+<label class="option"><input type="radio" name="fr" value="slow"> <label>AI tools don't connect to our workflows</label></label>
+<label class="option"><input type="radio" name="fr" value="training"> <label>Team doesn't know how to use AI effectively</label></label>
+<label class="option"><input type="radio" name="fr" value="governance"> <label>No policies or guardrails in place</label></label>
+<label class="option"><input type="radio" name="fr" value="roi"> <label>Can't measure what AI is actually doing for us</label></label>
+</div>
+</div>
+<div class="q-block">
+<div class="q-text">3. How large is the team that will use AI tools?</div>
+<div class="options">
+<label class="option"><input type="radio" name="sz" value="small"> <label>1-10 people</label></label>
+<label class="option"><input type="radio" name="sz" value="mid"> <label>11-50 people</label></label>
+<label class="option"><input type="radio" name="sz" value="large"> <label>51-200 people</label></label>
+<label class="option"><input type="radio" name="sz" value="enterprise"> <label>200+ people</label></label>
+</div>
+</div>
+<div class="q-block">
+<div class="q-text">4. What best describes your compliance situation?</div>
+<div class="options">
+<label class="option"><input type="radio" name="comp" value="heavy"> <label>Heavy — SOC 2, HIPAA, or similar requirements</label></label>
+<label class="option"><input type="radio" name="comp" value="moderate"> <label>Moderate — we have internal policies</label></label>
+<label class="option"><input type="radio" name="comp" value="light"> <label>Light — startup, minimal requirements</label></label>
+</div>
+</div>
+<div class="q-block">
+<div class="q-text">5. What's your timeline for getting AI workflows in production?</div>
+<div class="options">
+<label class="option"><input type="radio" name="tl" value="now"> <label>Now — we have urgency</label></label>
+<label class="option"><input type="radio" name="tl" value="quarter"> <label>This quarter</label></label>
+<label class="option"><input type="radio" name="tl" value="year"> <label>Within the year</label></label>
+<label class="option"><input type="radio" name="tl" value="exploring"> <label>Just exploring</label></label>
+</div>
+</div>
+<button class="btn" style="width:100%;margin-top:.5rem" onclick="recommend()">See My Skill Recommendations</button>
+</div>
+<div id="recs" style="display:none">
+<div style="font-size:16px;font-weight:600;color:#f1f5f9;margin-bottom:1rem" id="rec-title"></div>
+<div id="rec-list"></div>
+<div class="card" style="text-align:center;margin-top:1rem">
+<div style="font-size:14px;color:#94a3b8;margin-bottom:.75rem">Get a full AI Setup Audit to see all gaps — not just the top ones.</div>
+<button class="btn" onclick="window.open('https://audit.flashfusion.co','_blank')">Free AI Setup Audit</button>
+</div>
+</div>
+</div>
+<script>
+var SKILL_MAP={
+content:["generating-social-posts","drafting-multi-format-content","producing-ai-newsletter"],
+automation:["workflow-automation","orchestrating-ai-agents","task-decomposition"],
+analysis:["applying-adversarial-review","code-auditor","task-decomposition"],
+dev:["code-auditor","applying-sparc-methodology","engineering-staff-workflows","debug-like-expert"],
+sales:["roi-calculator-building","ai-solution-architecture","generating-social-posts"],
+inconsistent:["applying-adversarial-review","developing-skills"],
+slow:["workflow-automation","orchestrating-ai-agents"],
+training:["generating-kb-articles","drafting-multi-format-content"],
+governance:["applying-adversarial-review","engineering-staff-workflows"],
+roi:["roi-calculator-building","applying-adversarial-review"],
+heavy:["engineering-staff-workflows","applying-adversarial-review"],
+now:["ai-audit-delivery","enablement-sprint-planning"],
+};
+var SKILL_DESC={
+"generating-social-posts":"Produces LinkedIn/X/Threads content in your brand voice — hook A/B/C variants, ready to post.",
+"drafting-multi-format-content":"48 templates covering scripts, threads, carousels, and customer lifecycle emails.",
+"workflow-automation":"Connects your SaaS tools via n8n, Zapier, or Make. Multi-step automation without code.",
+"orchestrating-ai-agents":"Designs and deploys multi-agent systems using MCP, LangChain, or CrewAI.",
+"applying-adversarial-review":"Every claim labeled sourced or generated. Flags agreement streaks. Anti-hallucination.",
+"roi-calculator-building":"Builds B2B ROI models with payback period, net value, and executive narrative.",
+"ai-solution-architecture":"Pre-sales technical architectures for AI/ML. Integration mapping, risk flags.",
+"code-auditor":"Full codebase analysis: architecture, security, performance, tech debt.",
+"applying-sparc-methodology":"Structured dev: Spec → Pseudocode → Architecture → Refinement → Completion.",
+"engineering-staff-workflows":"Security-first staff engineer workflow. WSJF prioritization, threat modeling.",
+"debug-like-expert":"Systematic root cause analysis with hypothesis testing.",
+"generating-kb-articles":"Formatted .docx KB articles, SOPs, runbooks, onboarding guides.",
+"task-decomposition":"Breaks complex multi-part requests into parallel workstreams.",
+"producing-ai-newsletter":"Research, draft, edit, format, and deliver newsletter editions end-to-end.",
+"developing-skills":"Creates and manages Claude skill packs per Anthropic March 2026 spec.",
+"ai-audit-delivery":"Runs FF AI Setup Audits end-to-end — gap analysis, priority matrix, report.",
+"enablement-sprint-planning":"Plans 5-week enablement sprints with milestones and client delivery checklist.",
+};
+function recommend(){
+var uc=document.querySelector("input[name='uc']:checked");
+var fr=document.querySelector("input[name='fr']:checked");
+var comp=document.querySelector("input[name='comp']:checked");
+var tl=document.querySelector("input[name='tl']:checked");
+if(!uc||!fr){alert("Please answer all questions.");return;}
+var picks={};
+var score=function(skills,pri){skills.forEach(function(s){picks[s]=(picks[s]||0)+pri;});};
+if(SKILL_MAP[uc.value]) score(SKILL_MAP[uc.value],3);
+if(SKILL_MAP[fr.value]) score(SKILL_MAP[fr.value],2);
+if(comp&&comp.value==="heavy") score(["engineering-staff-workflows","applying-adversarial-review"],2);
+if(tl&&tl.value==="now") score(["ai-audit-delivery","enablement-sprint-planning"],3);
+var sorted=Object.entries(picks).sort(function(a,b){return b[1]-a[1]}).slice(0,6);
+document.getElementById("rec-title").textContent="Top "+sorted.length+" recommended skill packs for your team";
+var el=document.getElementById("rec-list");el.innerHTML="";
+sorted.forEach(function(pair,i){
+var s=pair[0],score=pair[1];
+var pri=score>=5?"h":score>=3?"m":"l";
+var priLabel=pri==="h"?"High priority":pri==="m"?"Medium priority":"Supporting";
+var priClass="pri-"+(pri==="h"?"h":pri==="m"?"m":"l");
+var d=document.createElement("div");d.className="rec-card";
+d.innerHTML='<div class="rec-name">'+(i+1)+". "+s+'</div><div class="rec-reason">'+(SKILL_DESC[s]||"Production-ready Claude skill pack.")+'</div><div class="rec-priority '+priClass+'">'+priLabel+'</div>';
+el.appendChild(d);
+});
+document.getElementById("quiz").style.display="none";
+document.getElementById("recs").style.display="block";
+}
+document.querySelectorAll(".option").forEach(function(opt){
+opt.addEventListener("click",function(){
+var inp=opt.querySelector("input");
+if(inp){
+inp.checked=true;
+var name=inp.name;
+document.querySelectorAll("input[name='"+name+"']").forEach(function(r){
+r.closest(".option").classList.remove("sel");
+});
+opt.classList.add("sel");
+}
+});
+});
+</script></body></html>

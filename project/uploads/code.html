@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FlashFusion Home Screen</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#3B82F6", // Blue similar to the button in the screenshot
+                        "background-light": "#F3F4F6", // Light gray background from screenshot
+                        "background-dark": "#111827", // Dark gray for dark mode
+                        "card-light": "#FFFFFF",
+                        "card-dark": "#1F2937",
+                        "text-main-light": "#111827",
+                        "text-main-dark": "#F9FAFB",
+                        "text-sub-light": "#6B7280",
+                        "text-sub-dark": "#9CA3AF",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                        sans: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                        xl: "1rem",
+                        "2xl": "1.5rem",
+                        "3xl": "2rem",
+                    },
+                },
+            },
+        };
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }.no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen text-text-main-light dark:text-text-main-dark transition-colors duration-300">
+<header class="fixed top-0 w-full z-50 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
+<div class="max-w-lg mx-auto md:max-w-xl lg:max-w-2xl flex flex-col">
+<div class="px-4 pt-4 pb-2 w-full">
+<div class="relative group">
+<span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+<span class="material-icons text-gray-400 group-focus-within:text-primary transition-colors text-[28px]">search</span>
+</span>
+<input class="block w-full pl-14 pr-14 py-4 border-none rounded-3xl bg-white dark:bg-card-dark shadow-lg focus:shadow-xl focus:ring-2 focus:ring-primary/50 text-base placeholder-gray-400 dark:placeholder-gray-500 transition-all" placeholder="Search content, topics, or friends..." type="text"/>
+<button class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-primary transition-colors">
+<span class="material-icons text-2xl">tune</span>
+</button>
+</div>
+</div>
+<div class="flex items-center justify-between px-4 pb-3 pt-1 w-full">
+<div class="flex items-center gap-2">
+<div class="bg-primary rounded-lg p-1.5 flex items-center justify-center">
+<span class="material-icons text-white text-lg">bolt</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">FlashFusion</h1>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors text-text-sub-light dark:text-text-sub-dark">
+<span class="material-icons">notifications_none</span>
+</button>
+<button class="w-9 h-9 rounded-full bg-gradient-to-tr from-primary to-purple-500 p-0.5 shadow-md">
+<img alt="User Profile" class="w-full h-full rounded-full object-cover border-2 border-white dark:border-gray-900" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-bcxMWGlAoisadr-2EcWZxzCsq9h5g2aHDOvDemo2-swzG6hdFfNEWCxAlCJfm3i2C0le9_bDn5-NnsOrgv6FCSNTOlUw_F9pl55b8WeZL8wL6uHDH6LKWiwZ_gozB-A6RIbPO8KvHEC-e7PsAgsdh2594kXm9utSgkUiYSE50mh7Qxsn-7AVvMEJO3YkoaEeEVwf5Jp9M1TYCJ5SOtqlAbfv0ysOTSZPiX_oKZTZ026zZ4j83AVR01bEWP6yHuBNtQXbsSA4p2GY"/>
+</button>
+</div>
+</div>
+</div>
+</header>
+<main class="pt-40 px-4 pb-24 max-w-lg mx-auto md:max-w-xl lg:max-w-2xl">
+<section class="mb-8 mt-2">
+<h2 class="text-2xl font-bold mb-1">Good Morning, Alex!</h2>
+<p class="text-text-sub-light dark:text-text-sub-dark text-sm">Here's your daily fusion digest.</p>
+</section>
+<section class="mb-8">
+<div class="flex justify-between items-center mb-3">
+<h3 class="font-bold text-lg">Trending Now</h3>
+<a class="text-primary text-sm font-semibold hover:underline" href="#">See All</a>
+</div>
+<div class="relative overflow-hidden rounded-2xl bg-card-light dark:bg-card-dark shadow-lg group cursor-pointer transition-transform hover:scale-[1.01]">
+<div class="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md z-10 uppercase tracking-wide">Live</div>
+<img alt="Abstract digital event background" class="w-full h-48 object-cover opacity-90 group-hover:opacity-100 transition-opacity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7PkhOziYksHdmOCpft8E3tCZ8FY9luSWe3Jbz58d9Beqplp3jLcijSBGDxPHdWmJmV5RHCVsF1chlhJ_tqyHo_QPDu4RkM3IBJ-CZR5XZSovWjRZLTVS1uSj6vGw3Xmg8cwOkBALJDGFZJ0HqT3RDBUP1Qh1ENpjJqfLIQzXwyG5s7D_GZTdr-eTA88ZvFEPfG0jaI4mMjS0K4G9dmxJXI8W_ybM42xHbPMi4X709JTzRpu8S8yvNnTyIJsPDHSDrjXHSNLEu1jTd"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-4 w-full">
+<span class="text-blue-300 text-xs font-medium mb-1 block">Technology • 5m ago</span>
+<h4 class="text-white font-bold text-xl leading-snug">The Future of AI Integration in Daily Apps</h4>
+<div class="flex items-center mt-3 gap-2">
+<div class="flex -space-x-2">
+<img alt="Avatar" class="w-6 h-6 rounded-full border border-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5GbC-2x8zic-IiUuwXMxOoy3_rz7LeQd21Qxejwna3sUAfRSLj_XNVST0nqd5SGdPVllfJiCcuDTqtTGLmY4iGrLTWgTNX-g8tLapRZKHZGemszPlpT2MKxNUmtlZzN25IHP6l3-hqM02GwW71O28itRc3zx1sGD8Y4HvCfZJ0R1N1-dWEAKYnFY2Qs7eYzCVRJXHn3I2tEcFU9CBhSQE_XwS6N-fWozqXhaeyMp-799iOnwUsFzBhGh73uALOhYoeEyCjwuV3wo7"/>
+<img alt="Avatar" class="w-6 h-6 rounded-full border border-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDb4DQAPHpbNzdQCCf0TMeBh99bXyvIw3wIQxoImIVxKh9EUWZxh5rkk0TGy6U8rjQGFPSTSqpfYNJZnhySExK4iUairEskxn3zuTMeySjxakfwIGYQ-bLoqJebbTNrzY07TYXIiqnEZT5nCwAqnIVf6BBTqiwA17t86P7scNlJJFlh9uX_wRNbjtjYhjGZlm94Y7_UM5XIReWCeoELmFTTXMg1EQ0wk8W966nBowfc2LcadC6Ti3Vo8xPflchoGHO9-HHnQt-xGh0a"/>
+<img alt="Avatar" class="w-6 h-6 rounded-full border border-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgOhLZ_gW9XyLUFUHF8rrqdNRRRcZHza3jEaSOJpPVaMGxo1fyPrKhtNXTdhj7gnQNqT8kTLAdqWuRssPcbQmENMDuTyHgJgVwFpPNvimxPvR8JI15n6wUfgwXsDzVDADi3k_cHwfD-iWDZ_uIQAH41GeKtqs9npWxmhnocEpy28vtEHaUvaLe2pVguurBEr8ekDjYWTrCY36p4gmcGD95dvQM8vn-UeQ9pFZI51nqWOMGqOmtPwH_RKQRmokGYp59tBZ6cL428LaM"/>
+</div>
+<span class="text-gray-300 text-xs">+2.4k watching</span>
+</div>
+</div>
+</div>
+</section>
+<section class="mb-8">
+<div class="grid grid-cols-4 gap-4">
+<button class="flex flex-col items-center gap-2 group">
+<div class="w-14 h-14 rounded-2xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center group-hover:bg-blue-200 dark:group-hover:bg-blue-900/50 transition-colors">
+<span class="material-icons text-blue-600 dark:text-blue-400">article</span>
+</div>
+<span class="text-xs font-medium text-text-sub-light dark:text-text-sub-dark">News</span>
+</button>
+<button class="flex flex-col items-center gap-2 group">
+<div class="w-14 h-14 rounded-2xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center group-hover:bg-purple-200 dark:group-hover:bg-purple-900/50 transition-colors">
+<span class="material-icons text-purple-600 dark:text-purple-400">analytics</span>
+</div>
+<span class="text-xs font-medium text-text-sub-light dark:text-text-sub-dark">Stats</span>
+</button>
+<button class="flex flex-col items-center gap-2 group">
+<div class="w-14 h-14 rounded-2xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center group-hover:bg-orange-200 dark:group-hover:bg-orange-900/50 transition-colors">
+<span class="material-icons text-orange-600 dark:text-orange-400">whatshot</span>
+</div>
+<span class="text-xs font-medium text-text-sub-light dark:text-text-sub-dark">Hot</span>
+</button>
+<button class="flex flex-col items-center gap-2 group">
+<div class="w-14 h-14 rounded-2xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center group-hover:bg-green-200 dark:group-hover:bg-green-900/50 transition-colors">
+<span class="material-icons text-green-600 dark:text-green-400">bookmark</span>
+</div>
+<span class="text-xs font-medium text-text-sub-light dark:text-text-sub-dark">Saved</span>
+</button>
+</div>
+</section>
+<section>
+<h3 class="font-bold text-lg mb-4">Your Feed</h3>
+<div class="space-y-4">
+<div class="bg-card-light dark:bg-card-dark p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 flex gap-4 transition-all hover:shadow-md">
+<div class="shrink-0 relative">
+<img alt="Design thumbnail" class="w-20 h-20 rounded-lg object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYeWc7OIsHl2ottmDaxZzrF_oIwg1OuD1pqbfIw0u4J6rkisbvrM9OUYQFgUs3n0NwhfzgGiRhkgs-sWnFgpt-UGkT9J0KffK91Woku77WrQfLhixQQAZsOrvlUflRv-e5Wk4rfVdnRM1fcqpp74ZwDUimt0qhFzVXiZEFuVf45HeByI5BGRcWD_fvzWLRnEHHsJ5roOQ6CtDVo4o3mfgiuL9kE5m79AVKCUaNA497dz9__EAdaf3rUfq5OXEoC9Auf-AwXl1HELbm"/>
+<div class="absolute -bottom-2 -right-2 bg-white dark:bg-gray-800 rounded-full p-1 shadow-sm">
+<span class="material-icons text-primary text-sm">play_circle</span>
+</div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start">
+<span class="text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">Design</span>
+<span class="text-xs text-text-sub-light dark:text-text-sub-dark">2h ago</span>
+</div>
+<h4 class="font-semibold text-sm mt-1 truncate">Minimalist UI Principles 2024</h4>
+<p class="text-xs text-text-sub-light dark:text-text-sub-dark mt-1 line-clamp-2">Exploring the shift towards neo-brutalism and softer shadows in modern interfaces.</p>
+</div>
+</div>
+<div class="bg-card-light dark:bg-card-dark p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 flex gap-4 transition-all hover:shadow-md">
+<div class="shrink-0 relative">
+<img alt="Finance chart thumbnail" class="w-20 h-20 rounded-lg object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDu9waPnS14uH7hirvs8KSCF1uE6YmDrUoRKaLd5SWlszWV1_AGJ6KTTanWVRYOoAtWpwxNkzXXAYXQV4kozWMOTiFZIROmCCR8OEUWlIradpiF5xA75bLjeHTnpiY9qJqVpaDoBcnWoWiFNGpjM3FVwYs_ovbweI55ayQmm1rYyXNtAscdDXsxHFyUv8jPs1IQjg4jVNT-zhxQ2EmBgJ12BAc4jwaFTECevUlxr1TOF1LFkRDEYdwkrg7pb1fvNBA146fHr9jYc3RV"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start">
+<span class="text-xs font-medium text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30 px-2 py-0.5 rounded-full">Finance</span>
+<span class="text-xs text-text-sub-light dark:text-text-sub-dark">4h ago</span>
+</div>
+<h4 class="font-semibold text-sm mt-1 truncate">Market Analysis: Tech Sector</h4>
+<p class="text-xs text-text-sub-light dark:text-text-sub-dark mt-1 line-clamp-2">A deep dive into the fluctuating market trends affecting major tech giants this quarter.</p>
+</div>
+</div>
+<div class="bg-card-light dark:bg-card-dark p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 flex gap-4 transition-all hover:shadow-md">
+<div class="shrink-0 relative">
+<div class="w-20 h-20 rounded-lg bg-gradient-to-br from-pink-500 to-orange-400 flex items-center justify-center text-white">
+<span class="material-icons">music_note</span>
+</div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start">
+<span class="text-xs font-medium text-pink-600 dark:text-pink-400 bg-pink-100 dark:bg-pink-900/30 px-2 py-0.5 rounded-full">Audio</span>
+<span class="text-xs text-text-sub-light dark:text-text-sub-dark">6h ago</span>
+</div>
+<h4 class="font-semibold text-sm mt-1 truncate">Daily Mix: Focus Flow</h4>
+<p class="text-xs text-text-sub-light dark:text-text-sub-dark mt-1 line-clamp-2">Curated ambient tracks to boost your productivity during deep work sessions.</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<nav class="fixed bottom-0 w-full bg-card-light dark:bg-card-dark border-t border-gray-200 dark:border-gray-800 pb-safe pt-2 px-6 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-40">
+<div class="flex justify-between items-center max-w-lg mx-auto md:max-w-xl lg:max-w-2xl h-14">
+<a class="flex flex-col items-center gap-1 text-primary w-12" href="#">
+<span class="material-icons">home</span>
+<span class="text-[10px] font-medium">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-text-sub-light dark:text-text-sub-dark hover:text-gray-900 dark:hover:text-gray-200 transition-colors w-12" href="#">
+<span class="material-icons">explore</span>
+<span class="text-[10px] font-medium">Explore</span>
+</a>
+<div class="relative -top-5">
+<button class="bg-primary text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/40 hover:scale-105 transition-transform">
+<span class="material-icons text-2xl">add</span>
+</button>
+</div>
+<a class="flex flex-col items-center gap-1 text-text-sub-light dark:text-text-sub-dark hover:text-gray-900 dark:hover:text-gray-200 transition-colors w-12" href="#">
+<span class="material-icons">chat_bubble_outline</span>
+<span class="text-[10px] font-medium">Chat</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-text-sub-light dark:text-text-sub-dark hover:text-gray-900 dark:hover:text-gray-200 transition-colors w-12" href="#">
+<span class="material-icons">person_outline</span>
+<span class="text-[10px] font-medium">Profile</span>
+</a>
+</div>
+<div class="h-6 w-full"></div>
+</nav>
+<style>
+        main {
+            padding-bottom: 7rem;}
+    </style>
+</body></html>

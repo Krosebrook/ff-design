@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FlashFusion — Three Directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ff-base:    #0F0618;
+    --ff-raised:  #1A0B2E;
+    --ff-overlay: #251443;
+    --ff-border:  rgba(168, 85, 247, 0.2);
+    --ff-border-strong: rgba(168, 85, 247, 0.4);
+    --ff-purple:  #A855F7;
+    --ff-pink:    #F472B6;
+    --ff-cyan:    #22D3EE;
+    --ff-acid:    #C7F73F;
+    --ff-warm:    #F59E0B;
+    --ff-text:    #F8FAFC;
+    --ff-text-2:  #CBD5E1;
+    --ff-text-3:  #64748B;
+    --ff-gradient: linear-gradient(90deg, #A855F7 0%, #F472B6 55%, #22D3EE 100%);
+    --ff-gradient-soft: linear-gradient(135deg, rgba(168,85,247,0.18), rgba(244,114,182,0.12) 50%, rgba(34,211,238,0.16));
+  }
+  html, body { margin: 0; padding: 0; background: #06030C; color: var(--ff-text); font-family: 'Inter', system-ui, sans-serif; }
+  #root { position: absolute; inset: 0; }
+
+  /* Brand mark — used in every direction */
+  .ff-mark {
+    display: inline-grid; place-items: center;
+    border-radius: 9px;
+    background: radial-gradient(circle at 30% 28%, #2E1052 0%, #0F0618 70%);
+    border: 1px solid rgba(168,85,247,0.45);
+    position: relative;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.4), 0 10px 30px -10px rgba(168,85,247,0.5);
+  }
+  .ff-mark svg { display: block; }
+  .ff-wordmark { font: 800 18px/1 'Poppins', sans-serif; letter-spacing: -0.02em; }
+  .ff-wordmark .a { background: var(--ff-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+  .gtxt { background: var(--ff-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  .serif { font-family: 'Instrument Serif', serif; font-style: italic; }
+  .poppins { font-family: 'Poppins', sans-serif; }
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="ff-shared.jsx"></script>
+<script type="text/babel" src="ff-landing.jsx"></script>
+<script type="text/babel" src="ff-infographic.jsx"></script>
+<script type="text/babel" src="ff-deck.jsx"></script>
+<script type="text/babel" data-presets="env,react">
+  const root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(
+    <DesignCanvas persistKey="ff-three-ways" initial={{ scale: 0.32 }}>
+      <DCSection id="landing" title="A · Marketing site" subtitle="Public-facing hero, agent ticker, the 3-Rule, library, proof, pricing.">
+        <DCArtboard id="landing-1" label="flashfusion.io — full home" width={1440} height={3400}>
+          <FFLanding />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="infographic" title="B · The Operator OS" subtitle="One explainer poster. The architecture of the agency-as-a-platform.">
+        <DCArtboard id="infographic-1" label="Single-page infographic" width={1600} height={2200}>
+          <FFInfographic />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="deck" title="C · Pitch deck" subtitle="Six 16:9 slides — for an investor, a partner, or a 7-minute talk.">
+        <DCArtboard id="deck-1" label="01 · Cover" width={1280} height={720}><FFSlide n={1} /></DCArtboard>
+        <DCArtboard id="deck-2" label="02 · The problem" width={1280} height={720}><FFSlide n={2} /></DCArtboard>
+        <DCArtboard id="deck-3" label="03 · The 3-Rule" width={1280} height={720}><FFSlide n={3} /></DCArtboard>
+        <DCArtboard id="deck-4" label="04 · The library" width={1280} height={720}><FFSlide n={4} /></DCArtboard>
+        <DCArtboard id="deck-5" label="05 · What ships" width={1280} height={720}><FFSlide n={5} /></DCArtboard>
+        <DCArtboard id="deck-6" label="06 · Call to action" width={1280} height={720}><FFSlide n={6} /></DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+</script>
+</body>
+</html>

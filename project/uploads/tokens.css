@@ -1,0 +1,106 @@
+/* FlashFusion locked design tokens.
+ * Source of truth: frontend-design skill v2.0.0 / FlashFusion-tokens.md.
+ * Do not edit values here without updating the skill profile.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap');
+
+:root {
+  /* Surfaces */
+  --surface-base:    #0F0618;
+  --surface-raised:  #1A0B2E;
+  --surface-overlay: #251443;
+
+  /* Borders */
+  --border-primary: rgba(168, 85, 247, 0.2);
+  --border-active:  rgba(168, 85, 247, 0.4);
+
+  /* Accent triad */
+  --accent-primary:   #A855F7;
+  --accent-secondary: #F472B6;
+  --accent-cyan:      #22D3EE;
+
+  /* Gradient — earned moments only (hero text, primary CTA, progress fills) */
+  --gradient-accent: linear-gradient(90deg, #A855F7 0%, #F472B6 55%, #22D3EE 100%);
+
+  /* Glow — max 1–2 elements per screen */
+  --glow-primary:   0 0 20px rgba(168, 85, 247, 0.4);
+  --glow-secondary: 0 0 20px rgba(244, 114, 182, 0.3);
+  --glow-subtle:    0 0 12px rgba(168, 85, 247, 0.2);
+
+  /* Text */
+  --text-primary:   #F8FAFC;
+  --text-secondary: #CBD5E1;
+  --text-tertiary:  #64748B;
+
+  /* Typography */
+  --font-heading: 'Poppins', 'Nunito', sans-serif;
+  --font-body:    'Inter', 'DM Sans', system-ui, sans-serif;
+  --font-code:    'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Semantic */
+  --color-success: #4ade80;
+  --color-warning: #fbbf24;
+  --color-error:   #f87171;
+  --color-info:    #22D3EE;
+
+  --color-success-bg: rgba(74, 222, 128, 0.1);
+  --color-warning-bg: rgba(251, 191, 36, 0.1);
+  --color-error-bg:   rgba(248, 113, 113, 0.1);
+  --color-info-bg:    rgba(34, 211, 238, 0.1);
+
+  /* Glass — the FlashFusion signature */
+  --glass-bg:     rgba(15, 6, 24, 0.6);
+  --glass-border: 1px solid rgba(168, 85, 247, 0.2);
+}
+
+html, body, #root {
+  background: var(--surface-base);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  min-height: 100%;
+}
+
+/* Base utility classes — keep custom CSS minimal; prefer Tailwind for layout */
+
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: var(--glass-border);
+  border-radius: 16px;
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.glass-card--interactive:hover {
+  border-color: var(--border-active);
+  box-shadow: var(--glow-subtle);
+}
+
+.gradient-text {
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+.gradient-fill {
+  background: var(--gradient-accent);
+}
+
+/* Focus ring — never remove, always visible on keyboard nav */
+:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Reduced motion override — honor system preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

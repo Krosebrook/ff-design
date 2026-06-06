@@ -1,0 +1,1817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EPB Use Case Discovery v2 — INT Inc.</title>
+<style>
+:root{
+  --bg:#f8f9fb;--surface:#fff;--s2:#f1f5f9;--border:#e2e8f0;--bstrong:#cbd5e1;
+  --t1:#0f172a;--t2:#475569;--t3:#94a3b8;
+  --accent:#2563eb;--accent-l:#eff6ff;
+  --green:#16a34a;--green-l:#f0fdf4;
+  --warn:#d97706;--warn-l:#fffbeb;
+  --red:#dc2626;--red-l:#fef2f2;
+  --violet:#7c3aed;--violet-l:#f5f3ff;
+  --teal:#0d9488;--teal-l:#f0fdfa;
+  --hdr:#0f172a;
+  --r:12px;--rsm:8px;--rlg:16px;
+  --sh:0 1px 3px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.05);
+  --shmd:0 4px 16px rgba(0,0,0,.1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;line-height:1.5;font-size:14px}
+
+/* Header */
+.hdr{background:var(--hdr);padding:18px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.hdr-brand{display:flex;align-items:center;gap:12px}
+.hdr-badge{background:#1e3a5f;color:#7dd3fc;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:20px;border:1px solid #2a5080}
+.hdr-title{color:#f1f5f9;font-size:18px;font-weight:700;letter-spacing:-.01em}
+.hdr-sub{color:#64748b;font-size:11.5px}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.demo-badge{background:#1e3a5f;color:#fbbf24;font-size:10px;font-weight:600;padding:4px 10px;border-radius:20px;border:1px solid #2a4a6a}
+.v2-badge{background:linear-gradient(90deg,#6366f1,#8b5cf6);color:#fff;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;letter-spacing:.05em}
+
+/* Layout */
+.main{max-width:1200px;margin:0 auto;padding:32px 24px 80px}
+.intro{text-align:center;padding-bottom:28px}
+.intro h1{font-size:30px;font-weight:800;letter-spacing:-.02em;margin-bottom:8px}
+.intro p{color:var(--t2);font-size:14.5px;max-width:520px;margin:0 auto}
+
+/* Card */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg);box-shadow:var(--sh);overflow:hidden;margin-bottom:20px}
+.card-hdr{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.card-hdr-ico{width:28px;height:28px;border-radius:8px;background:var(--s2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.card-hdr-title{font-size:13px;font-weight:700}
+.card-body{padding:24px}
+
+/* Forms */
+.fg3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px}
+.fg2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:20px}
+@media(max-width:680px){.fg3,.fg2{grid-template-columns:1fr}}
+.fg label,.fc label,.flbl{display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:8px}
+.req{color:#dc2626}
+select{width:100%;padding:10px 34px 10px 13px;border:1px solid var(--bstrong);border-radius:var(--rsm);font-size:13.5px;color:var(--t1);background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 12px center;appearance:none;cursor:pointer;transition:border-color .15s,box-shadow .15s;font-family:inherit}
+select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+
+/* Pills */
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:24px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--bstrong);background:var(--s2);color:var(--t2);transition:all .15s;user-select:none}
+.pill:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-l)}
+.pill.active{background:var(--hdr);color:#f8fafc;border-color:var(--hdr);box-shadow:0 2px 8px rgba(15,23,42,.2)}
+.pill.int-active{background:linear-gradient(90deg,#1e3a8a,#1d4ed8);color:#fff;border-color:#1d4ed8}
+
+/* Tier */
+.tier-g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tier-btn{padding:10px;border-radius:var(--rsm);border:1px solid var(--bstrong);background:var(--s2);cursor:pointer;text-align:center;transition:all .15s;font-family:inherit}
+.tier-btn:hover{border-color:var(--accent)}
+.tier-btn.active{background:var(--hdr);border-color:var(--hdr);box-shadow:var(--sh)}
+.t-lbl{font-size:12.5px;font-weight:700;color:var(--t1);display:block}
+.tier-btn.active .t-lbl{color:#f8fafc}
+.t-sub{font-size:10px;color:var(--t3);display:block;margin-top:2px}
+.tier-btn.active .t-sub{color:#94a3b8}
+
+/* Format */
+.fmt-g{display:flex;gap:8px;flex-wrap:wrap}
+.fmt-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:var(--rsm);border:1px solid var(--bstrong);background:var(--s2);color:var(--t2);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit}
+.fmt-btn.active{background:var(--surface);border-color:var(--bstrong);color:var(--t1);box-shadow:var(--sh)}
+.fmt-btn:hover:not(.active){border-color:var(--accent)}
+
+/* INT Mode toggle */
+.mode-toggle{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--bstrong);border-radius:var(--rsm);background:var(--s2);cursor:pointer;transition:all .2s;user-select:none}
+.mode-toggle.int-on{background:#eff6ff;border-color:#bfdbfe}
+.mode-toggle-track{width:36px;height:20px;border-radius:10px;background:#cbd5e1;position:relative;transition:background .2s;flex-shrink:0}
+.mode-toggle.int-on .mode-toggle-track{background:#2563eb}
+.mode-toggle-thumb{width:16px;height:16px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.mode-toggle.int-on .mode-toggle-thumb{transform:translateX(16px)}
+.mode-lbl{font-size:12.5px;font-weight:600;color:var(--t2)}
+.mode-toggle.int-on .mode-lbl{color:#1d4ed8}
+.mode-sub{font-size:10px;color:var(--t3);margin-top:1px}
+
+.divider{border:none;border-top:1px solid var(--border);margin:22px 0}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:560px){.form-row{grid-template-columns:1fr}}
+.fc label,.fc .flbl{display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:10px}
+
+/* Error */
+.err{display:none;align-items:center;gap:8px;padding:11px 15px;background:var(--red-l);border:1px solid #fca5a5;border-radius:var(--rsm);color:var(--red);font-size:13px;margin-bottom:16px}
+.err.show{display:flex}
+
+/* Buttons */
+.btn-gen{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;background:var(--hdr);color:#f8fafc;border:none;border-radius:var(--rsm);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit;letter-spacing:.01em;box-shadow:0 4px 12px rgba(15,23,42,.25)}
+.btn-gen:hover{background:#1e293b;box-shadow:0 6px 20px rgba(15,23,42,.3);transform:translateY(-1px)}
+.btn-gen:active{transform:translateY(0)}
+.btn-sm{padding:7px 14px;border-radius:var(--rsm);border:1px solid var(--bstrong);background:var(--s2);color:var(--t2);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.btn-sm:hover{border-color:var(--accent);color:var(--accent)}
+
+/* Progress */
+.prog-wrap{max-width:420px;margin:0 auto}
+.prog-track{height:6px;background:var(--border);border-radius:10px;overflow:hidden;margin-bottom:10px}
+.prog-fill{height:100%;background:linear-gradient(90deg,#0f172a,#334155);border-radius:10px;transition:width .4s ease-out}
+.prog-fill.done{background:var(--green)}
+.prog-meta{display:flex;justify-content:space-between;font-size:11.5px;color:var(--t3)}
+.prog-meta .p-stage{color:var(--t2);font-weight:500}
+
+/* Info banner */
+.info-banner{background:#f0f9ff;border:1px solid #bae6fd;border-radius:var(--rsm);padding:12px 15px;margin-bottom:20px;display:flex;gap:10px;align-items:flex-start}
+.info-banner p{font-size:12.5px;color:#0c4a6e;line-height:1.55}
+.info-banner strong{font-weight:700}
+
+/* Gems */
+.gems-card{background:var(--hdr);border-radius:var(--rlg);border:1px solid #1e3a5f;overflow:hidden;margin-bottom:20px}
+.gems-hdr{padding:16px 24px;border-bottom:1px solid #1e293b;display:flex;align-items:center;justify-content:space-between}
+.gems-hdr-l{display:flex;align-items:center;gap:12px}
+.gems-ico{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#f59e0b,#ef4444);display:flex;align-items:center;justify-content:center;font-size:16px}
+.gems-title{color:#f1f5f9;font-size:13.5px;font-weight:700}
+.gems-sub{color:#64748b;font-size:11px}
+.gems-tgl{background:#1e293b;border:1px solid #2a3a52;color:#94a3b8;padding:5px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;transition:all .15s}
+.gems-tgl:hover{color:#f1f5f9;border-color:#3a5080}
+.gems-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:16px 24px 20px}
+@media(max-width:580px){.gems-grid{grid-template-columns:1fr}}
+.gem-item{border-radius:var(--rsm);border:1px solid #1e293b;background:rgba(30,41,59,.5);padding:14px;cursor:pointer;transition:all .2s}
+.gem-item:hover{border-color:#3a5a7a}
+.gem-item.exp{background:rgba(14,165,233,.07);border-color:rgba(14,165,233,.28)}
+.gem-rarity{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.r-dot{width:7px;height:7px;border-radius:50%}
+.r-dot.u{background:#34d399}.r-dot.r{background:#38bdf8}.r-dot.vr{background:#fbbf24}
+.r-lbl{font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.r-lbl.u{color:#34d399}.r-lbl.r{color:#38bdf8}.r-lbl.vr{color:#fbbf24}
+.gem-title{color:#f1f5f9;font-size:13px;font-weight:600;margin-bottom:4px}
+.gem-desc{color:#94a3b8;font-size:12px;line-height:1.55;margin-top:8px;display:none}
+.gem-desc.show{display:block}
+.gem-features{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.gem-feat{background:rgba(51,65,85,.6);color:#94a3b8;font-size:10px;padding:2px 7px;border-radius:4px}
+.gem-preview{color:#64748b;font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Context banner */
+.ctx-banner{background:var(--hdr);border:1px solid #1e3a5f;border-radius:var(--rlg);padding:18px 24px;display:flex;gap:14px;align-items:flex-start;margin-bottom:20px}
+.ctx-icon{flex-shrink:0;font-size:18px;margin-top:1px}
+.ctx-lbl{display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap}
+.ctx-lbl h3{color:#f1f5f9;font-size:13px;font-weight:700}
+.src-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(14,165,233,.15);color:#7dd3fc;font-size:10px;font-weight:600;padding:2px 8px;border-radius:12px}
+.ctx-banner p{color:#94a3b8;font-size:13.5px;line-height:1.6}
+.stat-strip{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.stat-pill{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:8px;font-size:11px;font-weight:600}
+.stat-pill.red{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.2)}
+.stat-pill.amber{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.2)}
+.stat-pill.blue{background:rgba(59,130,246,.15);color:#93c5fd;border:1px solid rgba(59,130,246,.2)}
+.stat-pill.green{background:rgba(16,185,129,.15);color:#6ee7b7;border:1px solid rgba(16,185,129,.2)}
+
+/* Results header */
+.res-hdr{padding:15px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.res-count{font-size:13px;font-weight:700}
+.res-legend{display:flex;align-items:center;gap:12px;font-size:11px;color:var(--t3)}
+
+/* UC Cards */
+.uc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+@media(max-width:740px){.uc-grid{grid-template-columns:1fr}}
+.uc-card{border:1px solid var(--border);border-radius:var(--r);background:var(--surface);overflow:hidden;transition:all .2s}
+.uc-card:hover{border-color:var(--bstrong);box-shadow:var(--shmd);transform:translateY(-2px)}
+.uc-body{padding:18px}
+.uc-badges{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px}
+.uc-badges-l{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:20px;border:1px solid}
+.b-trending{background:linear-gradient(90deg,#f97316,#ef4444);color:#fff;border-color:transparent}
+.b-impl{background:#eff6ff;color:#2563eb;border-color:#bfdbfe}
+.b-prompts{background:var(--violet-l);color:var(--violet);border-color:#ddd6fe}
+.b-gov{background:var(--warn-l);color:#b45309;border-color:#fde68a}
+.b-train{background:var(--teal-l);color:var(--teal);border-color:#99f6e4}
+/* INT service line badges */
+.b-infosec{background:#fef2f2;color:#991b1b;border-color:#fecaca}
+.b-techit{background:#eff6ff;color:#1e40af;border-color:#bfdbfe}
+.b-webdev{background:#f5f3ff;color:#5b21b6;border-color:#ddd6fe}
+.b-branding{background:#fff7ed;color:#9a3412;border-color:#fed7aa}
+.b-content{background:#f0fdf4;color:#14532d;border-color:#bbf7d0}
+.b-marketing{background:#fdf4ff;color:#701a75;border-color:#f0abfc}
+.b-ops{background:#f0f9ff;color:#0c4a6e;border-color:#bae6fd}
+
+.pri-wrap{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t3);text-transform:uppercase}
+.p-dot{width:7px;height:7px;border-radius:50%}
+.p-dot.H{background:#ef4444}.p-dot.M{background:#f59e0b}.p-dot.L{background:#10b981}
+
+.uc-title{font-size:14px;font-weight:700;margin-bottom:8px;line-height:1.3}
+.uc-desc{font-size:12.5px;color:var(--t2);margin-bottom:12px;line-height:1.6}
+
+/* Market stat callout */
+.mkt-stat{display:flex;align-items:flex-start;gap:7px;padding:8px 11px;border-radius:7px;margin-bottom:12px;font-size:11.5px;line-height:1.45}
+.mkt-stat.red{background:#fff1f2;border-left:3px solid #ef4444;color:#7f1d1d}
+.mkt-stat.amber{background:#fffbeb;border-left:3px solid #f59e0b;color:#78350f}
+.mkt-stat.blue{background:#eff6ff;border-left:3px solid #3b82f6;color:#1e3a8a}
+.mkt-stat.green{background:#f0fdf4;border-left:3px solid #22c55e;color:#14532d}
+.mkt-stat-icon{flex-shrink:0;margin-top:1px}
+.mkt-stat-text{}
+.mkt-stat-src{font-size:10px;opacity:.7;margin-top:2px}
+
+/* Platform pills */
+.platform-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
+.plat-pill{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:5px;border:1px solid}
+.plat-pill.primary{font-weight:700}
+.plat-claude{background:#fff7f0;color:#c2400c;border-color:#fed7aa}
+.plat-copilot{background:#f0f8ff;color:#0078d4;border-color:#bfdbfe}
+.plat-gemini{background:#f0f4ff;color:#4285f4;border-color:#c7d7fe}
+.plat-chatgpt{background:#f0fdf8;color:#059669;border-color:#a7f3d0}
+.plat-perplexity{background:#f0fdfd;color:#0e7490;border-color:#a5f3fc}
+.plat-notebooklm{background:#fefce8;color:#854d0e;border-color:#fde68a}
+.plat-n8n{background:#fdf2f8;color:#9d174d;border-color:#fbcfe8}
+
+/* Persona badge */
+.persona-for{display:inline-flex;align-items:center;gap:4px;background:rgba(124,58,237,.08);color:#6d28d9;border:1px solid #ddd6fe;font-size:10px;font-weight:600;padding:2px 8px;border-radius:12px;margin-bottom:8px}
+
+.uc-qs{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:12px;display:flex;gap:7px;align-items:flex-start}
+.qs-i{flex-shrink:0;font-size:12px;margin-top:1px}
+.qs-t{font-size:12px;color:var(--t2);line-height:1.4}
+.qs-t strong{color:var(--t1)}
+.uc-feats{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
+.uc-feat{background:var(--s2);color:var(--t2);font-size:10.5px;font-weight:500;padding:3px 8px;border-radius:5px;border:1px solid var(--border)}
+.uc-metrics{display:grid;grid-template-columns:repeat(3,1fr);padding-top:12px;border-top:1px solid var(--border)}
+.uc-metric{text-align:center;padding:4px 0}
+.uc-metric+.uc-metric{border-left:1px solid var(--border)}
+.m-lbl{font-size:9.5px;color:var(--t3);display:block;margin-bottom:2px;text-transform:uppercase;letter-spacing:.05em}
+.m-val{font-size:12px;font-weight:700}
+.mv-g{color:var(--green)}.mv-w{color:var(--warn)}.mv-r{color:var(--red)}.mv-n{color:var(--t2)}
+.uc-footer{padding:9px 18px;background:var(--s2);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.foot-risk{display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--t3);flex:1;min-width:0}
+.foot-risk span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.src-links{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.src-lnk{background:#eff6ff;color:#2563eb;font-size:10px;font-weight:700;width:20px;height:20px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;transition:all .15s}
+.src-lnk:hover{background:#2563eb;color:#fff}
+
+/* Roadmap */
+.rm-phase{margin-bottom:32px}
+.rm-ph-hdr{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.ph-num{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;color:#fff;flex-shrink:0}
+.ph-info h4{font-size:14px;font-weight:700;margin-bottom:2px}
+.ph-info span{font-size:11px;color:var(--t3)}
+.rm-items{margin-left:20px;padding-left:30px;border-left:2px solid;display:flex;flex-direction:column;gap:10px}
+.rm-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--rsm);padding:14px 16px;transition:all .2s}
+.rm-item:hover{box-shadow:var(--sh)}
+.rm-item-hdr{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.rm-item-title{font-size:13.5px;font-weight:700}
+.rm-item-desc{font-size:12.5px;color:var(--t2);margin-bottom:8px;line-height:1.5}
+.rm-item-qs{font-size:11.5px;color:#d97706;display:flex;align-items:center;gap:5px}
+
+/* Matrix */
+.mx-wrap{overflow-x:auto}
+table.uc-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.uc-tbl th{text-align:left;padding:10px 14px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);border-bottom:2px solid var(--border);white-space:nowrap}
+.uc-tbl td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+.uc-tbl tr:hover td{background:var(--s2)}
+.uc-tbl tr:last-child td{border-bottom:none}
+.eff-badge{padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.ef-lo{background:#f0fdf4;color:#16a34a}.ef-md{background:#fffbeb;color:#d97706}.ef-hi{background:#fef2f2;color:#dc2626}
+
+/* Hybrid */
+.hyb-mx{border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:24px}
+.hyb-mx-hdr{display:flex;align-items:center;gap:8px;padding:14px 20px;border-bottom:1px solid var(--border);background:var(--s2)}
+.hyb-mx-hdr h4{font-size:13px;font-weight:700}
+.hyb-grid{display:grid;grid-template-columns:80px 1fr 1fr;grid-template-rows:32px 1fr 1fr}
+.hg-lt{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border)}
+.hg-ls{display:flex;align-items:center;justify-content:flex-end;padding-right:12px;font-size:9.5px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;text-align:right;line-height:1.3}
+.hg-cell{padding:14px;border:1px solid var(--border)}
+.hg-ct{font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px}
+.hg-row{display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;font-size:11.5px;color:var(--t2)}
+.hg-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.hg-empty{font-size:11px;color:#94a3b8;font-style:italic}
+
+/* Sources panel */
+.src-toggle{width:100%;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:15px 24px;font-family:inherit;transition:background .15s}
+.src-toggle:hover{background:var(--s2)}
+.src-l{display:flex;align-items:center;gap:10px}
+.src-panel-title{font-size:13px;font-weight:700}
+.src-hint{font-size:11px;color:var(--t3)}
+.src-body{padding:16px 24px 20px;border-top:1px solid var(--border)}
+.src-item{display:flex;gap:12px;margin-bottom:12px}
+.src-num{background:#eff6ff;color:#2563eb;font-size:10px;font-weight:700;width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.src-a{font-size:13px;font-weight:600;color:var(--t1);text-decoration:none}
+.src-a:hover{color:var(--accent)}
+.src-url{font-size:11px;color:var(--t3);display:block;margin-top:2px;text-decoration:none}
+.src-url:hover{color:var(--accent)}
+
+/* ROI Calculator */
+.roi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg);box-shadow:var(--sh);overflow:hidden;margin-bottom:20px}
+.roi-hdr{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.roi-hdr-l{display:flex;align-items:center;gap:10px}
+.roi-hdr-icon{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#10b981,#0d9488);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.roi-hdr-title{font-size:13px;font-weight:700}
+.roi-hdr-sub{font-size:11px;color:var(--t3)}
+.roi-body{padding:24px}
+.roi-section-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:12px;margin-top:24px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.roi-section-title:first-child{margin-top:0}
+.roi-global{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:4px}
+.roi-global-2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px}
+@media(max-width:720px){.roi-global,.roi-global-2{grid-template-columns:repeat(2,1fr)}}
+.roi-input-group{display:flex;flex-direction:column}
+.roi-label{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--t3);margin-bottom:5px;display:flex;align-items:center;gap:4px}
+.roi-input{width:100%;padding:9px 12px;border:1px solid var(--bstrong);border-radius:var(--rsm);font-size:13px;color:var(--t1);font-family:inherit;background:var(--surface);transition:border-color .15s;appearance:none}
+.roi-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+select.roi-input{background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 10px center}
+.roi-approach-note{font-size:11px;color:var(--t2);margin-top:5px;line-height:1.4}
+.roi-dept-table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:13px}
+.roi-dept-table th{text-align:left;padding:8px 12px;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--t3);border-bottom:2px solid var(--border)}
+.roi-dept-table td{padding:8px 12px;border-bottom:1px solid var(--border)}
+.roi-dept-table td:first-child{font-weight:600;color:var(--t1)}
+.roi-dept-table input[type=number]{width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12.5px;font-family:inherit;color:var(--t1);background:var(--surface)}
+.roi-dept-table input[type=number]:focus{outline:none;border-color:var(--accent)}
+/* Tooltips */
+.tip{position:relative;display:inline-flex;align-items:center}
+.tip-i{width:14px;height:14px;border-radius:50%;background:var(--border);color:var(--t3);font-size:9px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;cursor:help;flex-shrink:0;transition:background .15s;border:none;padding:0}
+.tip-i:hover{background:var(--accent);color:#fff}
+.tip-box{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#0f172a;color:#e2e8f0;font-size:11.5px;line-height:1.55;padding:10px 13px;border-radius:8px;width:240px;z-index:200;box-shadow:0 6px 20px rgba(0,0,0,.25);pointer-events:auto;font-weight:400;letter-spacing:0;text-transform:none}
+.tip-box a{color:#7dd3fc;text-decoration:underline}
+.tip-box::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#0f172a}
+.tip-box.show{display:block}
+/* Presets */
+.roi-presets{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+.roi-presets-lbl{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;flex-shrink:0}
+.roi-preset-btn{padding:7px 14px;border-radius:var(--rsm);border:1px solid var(--bstrong);background:var(--s2);color:var(--t2);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.roi-preset-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-l)}
+/* Risk flags */
+.roi-flags-wrap{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.roi-flag{padding:10px 14px;border-radius:var(--rsm);font-size:12px;line-height:1.5;border-left:3px solid}
+.roi-flag-red{background:var(--red-l);border-color:#ef4444;color:#7f1d1d}
+.roi-flag-amber{background:var(--warn-l);border-color:#f59e0b;color:#78350f}
+/* Scenario cards */
+.roi-scenario-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+@media(max-width:680px){.roi-scenario-grid{grid-template-columns:1fr}}
+.roi-sc-card{border-radius:var(--r);padding:16px;border:1px solid}
+.roi-sc-amber{background:#fffbeb;border-color:#fde68a}
+.roi-sc-blue{background:#eff6ff;border-color:#bfdbfe}
+.roi-sc-green{background:#f0fdf4;border-color:#bbf7d0}
+.roi-sc-name{font-size:13px;font-weight:800;margin-bottom:2px}
+.roi-sc-amber .roi-sc-name{color:#92400e}
+.roi-sc-blue .roi-sc-name{color:#1e40af}
+.roi-sc-green .roi-sc-name{color:#14532d}
+.roi-sc-lbl{font-size:10.5px;color:var(--t3);margin-bottom:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.roi-sc-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
+.roi-sc-m{text-align:center}
+.roi-sc-val{font-size:16px;font-weight:800;letter-spacing:-.01em}
+.roi-sc-amber .roi-sc-val{color:#b45309}
+.roi-sc-blue .roi-sc-val{color:#1d4ed8}
+.roi-sc-green .roi-sc-val{color:#059669}
+.roi-sc-mlbl{font-size:9.5px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+.roi-sc-desc{font-size:11px;color:var(--t2);line-height:1.4;padding-top:8px;border-top:1px solid rgba(0,0,0,.06)}
+/* Industry comparison */
+.roi-compare{background:var(--hdr);border-radius:var(--r);padding:18px;margin-bottom:20px}
+.roi-compare-title{color:#f1f5f9;font-size:12px;font-weight:700;margin-bottom:14px}
+.roi-compare-row{display:flex;align-items:center;gap:12px}
+@media(max-width:600px){.roi-compare-row{flex-direction:column}}
+.roi-compare-col{flex:1;border-radius:var(--rsm);padding:14px}
+.roi-compare-col.bad{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2)}
+.roi-compare-col.good{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2)}
+.roi-compare-label{font-size:12px;font-weight:700;color:#f1f5f9;margin-bottom:4px}
+.roi-compare-sub{font-size:10px;color:#64748b;margin-top:2px}
+.roi-compare-val{font-size:20px;font-weight:800;margin-top:8px;letter-spacing:-.01em}
+.roi-compare-val.bad{color:#fca5a5}
+.roi-compare-val.good{color:#6ee7b7}
+.roi-compare-sub-val{font-size:10.5px;color:#64748b;margin-top:2px}
+.roi-compare-arrow{color:#64748b;font-size:20px;flex-shrink:0;font-weight:700}
+/* Cost of Inaction */
+.roi-coi{border:1px solid #fde68a;border-radius:var(--r);background:#fffbeb;padding:16px;margin-bottom:20px}
+.roi-coi-title{font-size:12px;font-weight:700;color:#78350f;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.roi-coi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:600px){.roi-coi-grid{grid-template-columns:1fr}}
+.roi-coi-item{background:#fff;border:1px solid #fde68a;border-radius:var(--rsm);padding:12px;text-align:center}
+.roi-coi-val{font-size:18px;font-weight:800;color:#b45309;letter-spacing:-.01em;margin-bottom:3px}
+.roi-coi-lbl{font-size:10.5px;color:#78350f;font-weight:600}
+.roi-coi-note{font-size:11px;color:#92400e;margin-top:10px;line-height:1.5}
+.roi-coi-note a{color:#b45309;font-weight:600;text-decoration:underline}
+/* Break-even timeline */
+.roi-be{border:1px solid var(--border);border-radius:var(--r);background:var(--s2);padding:16px;margin-bottom:20px}
+.roi-be-title{font-size:12px;font-weight:700;margin-bottom:14px}
+.roi-be-track{height:20px;background:#e2e8f0;border-radius:10px;position:relative;overflow:visible;margin-bottom:10px;margin-right:8px}
+.roi-be-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,#ef4444 0%,#f59e0b 40%,#10b981 80%);transition:width .6s ease-out}
+.roi-be-marker{position:absolute;top:-6px;width:3px;height:32px;background:var(--hdr);border-radius:2px;transition:left .6s ease-out}
+.roi-be-mlbl{position:absolute;top:-22px;font-size:10px;font-weight:700;color:var(--hdr);white-space:nowrap;transform:translateX(-50%)}
+.roi-be-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:4px}
+.roi-be-note{font-size:11.5px;color:var(--t2);margin-top:10px;line-height:1.5}
+/* Sensitivity analysis */
+.roi-sense{border:1px solid var(--border);border-radius:var(--r);background:var(--surface);padding:16px;margin-bottom:20px}
+.roi-sense-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.roi-sense-title{font-size:12px;font-weight:700}
+.roi-sense-sub{font-size:11px;color:var(--t3)}
+.roi-sense-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media(max-width:600px){.roi-sense-grid{grid-template-columns:1fr}}
+.roi-sense-item{border-radius:var(--rsm);padding:12px;border:1px solid;text-align:center}
+.roi-sense-down{background:var(--red-l);border-color:#fca5a5}
+.roi-sense-base{background:var(--accent-l);border-color:#bfdbfe}
+.roi-sense-up{background:var(--green-l);border-color:#bbf7d0}
+.roi-sense-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.roi-sense-down .roi-sense-lbl{color:#991b1b}
+.roi-sense-base .roi-sense-lbl{color:#1e40af}
+.roi-sense-up .roi-sense-lbl{color:#14532d}
+.roi-sense-val{font-size:15px;font-weight:800}
+.roi-sense-down .roi-sense-val{color:#dc2626}
+.roi-sense-base .roi-sense-val{color:#2563eb}
+.roi-sense-up .roi-sense-val{color:#16a34a}
+.roi-sense-delta{font-size:10px;color:var(--t3);margin-top:3px}
+/* Bars */
+.roi-breakdown{padding-top:16px;margin-bottom:20px}
+.roi-breakdown-title{font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+.roi-bar-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.roi-bar-label{font-size:12px;font-weight:600;color:var(--t1);width:100px;flex-shrink:0}
+.roi-bar-track{flex:1;height:10px;background:var(--s2);border-radius:5px;overflow:hidden}
+.roi-bar-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,#10b981,#0d9488);transition:width .4s ease-out}
+.roi-bar-val{font-size:12px;font-weight:700;color:var(--green);width:90px;text-align:right;flex-shrink:0}
+/* Payback timeline */
+.roi-timeline-wrap{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:20px}
+.roi-timeline-title{font-size:12px;font-weight:700;margin-bottom:12px}
+.roi-timeline-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px}
+.roi-timeline-item{border-radius:var(--rsm);padding:12px;text-align:center}
+.roi-timeline-item.bad{background:var(--warn-l);border:1px solid #fde68a}
+.roi-timeline-item.good{background:var(--green-l);border:1px solid #bbf7d0}
+.roi-tl-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);margin-bottom:4px}
+.roi-tl-val{font-size:20px;font-weight:800;letter-spacing:-.02em}
+.roi-timeline-item.bad .roi-tl-val{color:#b45309}
+.roi-timeline-item.good .roi-tl-val{color:#059669}
+.roi-tl-sub{font-size:10.5px;color:var(--t3);margin-top:3px}
+.roi-tl-note{font-size:11.5px;color:var(--t2);line-height:1.5}
+.roi-tl-note a{color:var(--accent)}
+/* Measurement framework */
+.roi-mf-wrap{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:20px}
+.roi-mf-title{font-size:13px;font-weight:700;margin-bottom:4px}
+.roi-mf-sub{font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.5}
+table.roi-mf-table{width:100%;border-collapse:collapse;font-size:12px}
+.roi-mf-table th{text-align:left;padding:7px 10px;font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--t3);border-bottom:2px solid var(--border)}
+.roi-mf-table td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.4}
+.roi-mf-table td:first-child{font-weight:600;color:var(--t1);white-space:nowrap}
+.roi-mf-table tr:last-child td{border-bottom:none}
+.roi-mf-note{font-size:11px;color:#7f1d1d;background:var(--red-l);border:1px solid #fca5a5;border-radius:6px;padding:9px 12px;margin-top:12px;line-height:1.5}
+/* FAQ */
+.roi-faq{margin-bottom:20px}
+.roi-faq-title{font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+.faq-item{border:1px solid var(--border);border-radius:var(--rsm);margin-bottom:6px;overflow:hidden;background:var(--surface)}
+.faq-q{padding:12px 16px;font-size:13px;font-weight:600;color:var(--t1);cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:var(--surface);transition:background .15s;user-select:none;border:none;width:100%;text-align:left;font-family:inherit}
+.faq-q:hover{background:var(--s2)}
+.faq-chv{font-size:11px;color:var(--t3);transition:transform .2s;flex-shrink:0;margin-left:8px}
+.faq-q.open .faq-chv{transform:rotate(180deg)}
+.faq-a{display:none;padding:0 16px 14px;font-size:12.5px;color:var(--t2);line-height:1.65}
+.faq-a.show{display:block}
+.faq-a a{color:var(--accent);text-decoration:underline}
+/* Export */
+.roi-export-row{display:flex;align-items:center;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.roi-export-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--rsm);border:1px solid var(--bstrong);background:var(--s2);color:var(--t2);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.roi-export-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-l)}
+.roi-export-btn.primary{background:var(--hdr);color:#f8fafc;border-color:var(--hdr)}
+.roi-export-btn.primary:hover{background:#1e293b}
+.roi-disclaimer{font-size:11px;color:var(--t3);padding:12px 14px;background:var(--s2);border-radius:6px;line-height:1.6;border:1px solid var(--border)}
+.roi-disclaimer a{color:var(--accent)}
+.ftr{text-align:center;font-size:10.5px;color:var(--t3);padding:20px 0 8px}
+.hidden{display:none!important}
+.tc{text-align:center}
+.mt20{margin-top:20px}
+.mt24{margin-top:24px}
+.chv{display:inline-block;transition:transform .2s;font-size:12px}
+.chv.open{transform:rotate(180deg)}
+.anim{animation:fadeup .3s ease-out}
+@keyframes fadeup{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-brand">
+    <span class="hdr-badge">EPB Platform</span>
+    <div>
+      <div class="hdr-title">Use Case Discovery</div>
+      <div class="hdr-sub">Claude AI Implementation Guide — INT Inc.</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <span class="v2-badge">v2.1</span>
+    <span class="demo-badge" style="background:#1e3a5f;color:#94a3b8;border-color:#2a3a52">⚑ Internal Use Only</span>
+  </div>
+</header>
+
+<main class="main">
+  <div class="intro">
+    <h1>Find Your AI Starting Point</h1>
+    <p>Select your context to discover tailored Claude AI use cases with ROI modeling, persona framing, and platform recommendations.</p>
+  </div>
+
+  <div class="info-banner">
+    <span style="font-size:16px;flex-shrink:0;margin-top:1px">ℹ️</span>
+    <p><strong>What's new in v2.1:</strong> Updated with INT's AIaaS service catalog research (May 2026). Use cases now reference INT's named services — <strong>Lumina</strong> (Readiness Audit), <strong>Velocity</strong> (Training), <strong>Foundation</strong> (Platform Setup), <strong>Sentinel</strong> (Managed Ops), <strong>Nexus</strong> (Agent Builds), <strong>vCAIO</strong> (Fractional Leadership). Market stats sourced from MIT, IBM, Deloitte, and DataCamp 2025–2026. ROI calculator is risk-adjusted with verified benchmarks.</p>
+  </div>
+
+  <!-- Config Panel -->
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-hdr-ico">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+      </div>
+      <span class="card-hdr-title">Configure Your Context</span>
+    </div>
+    <div class="card-body">
+
+      <!-- Row 1: Role / Industry / Stage -->
+      <div class="fg3">
+        <div class="fg">
+          <label>Role <span class="req">*</span></label>
+          <select id="s-role">
+            <option value="">Select your role...</option>
+            <option value="developer">Developer / Engineer</option>
+            <option value="pm">Product Manager</option>
+            <option value="executive">Executive / C-Suite</option>
+            <option value="ops">Operations / IT</option>
+            <option value="security">Security / Compliance</option>
+            <option value="data">Data / Analytics</option>
+            <option value="support">Customer Success / Support</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Industry <span class="req">*</span></label>
+          <select id="s-industry">
+            <option value="">Select your industry...</option>
+            <option value="technology">Technology / SaaS</option>
+            <option value="financial">Financial Services</option>
+            <option value="healthcare">Healthcare / Life Sciences</option>
+            <option value="manufacturing">Manufacturing</option>
+            <option value="retail">Retail / E-commerce</option>
+            <option value="professional">Professional Services</option>
+            <option value="government">Government / Public Sector</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Company Stage <span class="req">*</span></label>
+          <select id="s-maturity">
+            <option value="">Select company size...</option>
+            <option value="startup">Startup (1–50)</option>
+            <option value="smb">SMB (50–200)</option>
+            <option value="midmarket">Mid-Market (200–1K)</option>
+            <option value="enterprise">Enterprise (1K+)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Row 2: Presenting To / INT Mode -->
+      <div class="fg2">
+        <div class="fg">
+          <label>Presenting To</label>
+          <select id="s-persona">
+            <option value="">Any audience (generic framing)</option>
+            <option value="csuite">C-Suite — CEO / COO / CFO</option>
+            <option value="ciso">CISO / VP of Security</option>
+            <option value="it-director">IT Director / VP IT</option>
+            <option value="it-manager">IT Manager</option>
+            <option value="ops-leader">Operations Leader</option>
+            <option value="marketing">Marketing Director</option>
+            <option value="finance">Finance Director</option>
+            <option value="general">General Business User</option>
+          </select>
+        </div>
+        <div class="fg" style="display:flex;flex-direction:column;justify-content:flex-end">
+          <label style="margin-bottom:8px">View Mode</label>
+          <div class="mode-toggle" id="mode-toggle" onclick="toggleMode()">
+            <div class="mode-toggle-track"><div class="mode-toggle-thumb"></div></div>
+            <div>
+              <div class="mode-lbl" id="mode-lbl">Generic Mode</div>
+              <div class="mode-sub" id="mode-sub">Standard domain filters</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Domain pills (swaps content in INT mode) -->
+      <div class="fg" style="margin-bottom:24px">
+        <label id="domain-label">Focus Domain</label>
+        <div class="pills" id="domain-pills">
+          <span class="pill active" data-v="all">All Domains</span>
+          <span class="pill" data-v="implementation">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            Implementation
+          </span>
+          <span class="pill" data-v="prompts">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            Prompts &amp; Workflows
+          </span>
+          <span class="pill" data-v="governance">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Governance
+          </span>
+          <span class="pill" data-v="training">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            Training
+          </span>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="form-row">
+        <div class="fc">
+          <div class="flbl">Output Format</div>
+          <div class="fmt-g" id="fmt-btns">
+            <button class="fmt-btn active" data-v="cards">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Cards
+            </button>
+            <button class="fmt-btn" data-v="roadmap">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>Roadmap
+            </button>
+            <button class="fmt-btn" data-v="matrix">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>Table
+            </button>
+            <button class="fmt-btn" data-v="hybrid">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Priority
+            </button>
+          </div>
+        </div>
+        <div class="fc">
+          <div class="flbl">Audience Tier</div>
+          <div class="tier-g" id="tier-btns">
+            <button class="tier-btn" data-v="enduser"><span class="t-lbl">End User</span><span class="t-sub">Plain English</span></button>
+            <button class="tier-btn active" data-v="tech"><span class="t-lbl">Tech Team</span><span class="t-sub">Implementation</span></button>
+            <button class="tier-btn" data-v="ai"><span class="t-lbl">AI Team</span><span class="t-sub">Architecture</span></button>
+          </div>
+        </div>
+      </div>
+
+      <div id="err-msg" class="err">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span id="err-txt"></span>
+      </div>
+
+      <div class="tc mt24">
+        <div id="prog-wrap" class="prog-wrap hidden">
+          <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+          <div class="prog-meta"><span class="p-stage" id="p-stage">Initializing...</span><span id="p-pct">0%</span></div>
+        </div>
+        <button class="btn-gen" id="btn-gen" onclick="generate()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="7.5 4.21 12 6.81 16.5 4.21"/><polyline points="7.5 19.79 7.5 14.6 3 12"/><polyline points="21 12 16.5 14.6 16.5 19.79"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          Discover Use Cases
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden Gems -->
+  <div id="gems-panel" class="gems-card hidden">
+    <div class="gems-hdr">
+      <div class="gems-hdr-l">
+        <div class="gems-ico">💎</div>
+        <div><div class="gems-title">Hidden Gems</div><div class="gems-sub">Lesser-known Anthropic capabilities for your context — click any card to expand</div></div>
+      </div>
+      <button class="gems-tgl" onclick="toggleGems()">Hide</button>
+    </div>
+    <div id="gems-grid" class="gems-grid"></div>
+  </div>
+
+  <!-- Results -->
+  <div id="results-area" class="hidden"></div>
+
+  <!-- ROI Calculator (shown after results) -->
+  <div id="roi-section" class="hidden">
+    <div class="roi-card">
+      <div class="roi-hdr">
+        <div class="roi-hdr-l">
+          <div class="roi-hdr-icon">💰</div>
+          <div>
+            <div class="roi-hdr-title">AI ROI Calculator — Verified Framework</div>
+            <div class="roi-hdr-sub">Risk-adjusted · 3 scenarios · Tooltips · FAQ · Sourced from MIT, IBM &amp; Deloitte 2025–2026</div>
+          </div>
+        </div>
+        <button class="btn-sm" onclick="toggleROI()"><span id="roi-toggle-lbl">Expand</span></button>
+      </div>
+      <div id="roi-body" class="roi-body hidden">
+
+        <!-- Pre-set Scenarios -->
+        <div class="roi-presets">
+          <span class="roi-presets-lbl">Load preset:</span>
+          <button class="roi-preset-btn" onclick="loadPreset('smb')">🏢 SMB Starter</button>
+          <button class="roi-preset-btn" onclick="loadPreset('midmarket')">🏙 Mid-Market</button>
+          <button class="roi-preset-btn" onclick="loadPreset('enterprise')">🏦 Enterprise</button>
+        </div>
+
+        <!-- Engagement Profile -->
+        <div class="roi-section-title">Engagement Profile</div>
+        <div class="roi-global-2" style="margin-bottom:8px">
+          <div class="roi-input-group">
+            <div class="roi-label">
+              Implementation Approach
+              <span class="tip"><button class="tip-i" onclick="toggleTip(this)">?</button><span class="tip-box">How you plan to deploy AI. Internal DIY = no outside help, 33% success rate. Vendor-Assisted = specialist partner, 67% success. INT Managed = end-to-end ownership, 75%+. Source: <a href="https://www.ignitec.com/insights/the-genai-divide-why-95-of-investors-see-no-roi/" target="_blank">MIT GenAI Divide 2025</a></span></span>
+            </div>
+            <select class="roi-input" id="roi-approach" onchange="calcROI()">
+              <option value="internal">Internal DIY — no external partner (33% success rate)</option>
+              <option value="vendor" selected>Vendor-Assisted — specialist partner (67% success rate)</option>
+              <option value="managed">INT Managed Service — end-to-end managed (75%+ success rate)</option>
+            </select>
+            <div class="roi-approach-note" id="roi-approach-note">✓ Vendor-assisted implementations succeed 67% of the time (MIT GenAI Divide 2025). Recommended baseline.</div>
+          </div>
+          <div class="roi-input-group">
+            <div class="roi-label">
+              Data Readiness (1–5)
+              <span class="tip"><button class="tip-i" onclick="toggleTip(this)">?</button><span class="tip-box">How ready your data is for AI use. Poor data (1/5) degrades realized savings by 70%. At readiness 3/5, you capture ~75% of projected savings. At 5/5, full projection applies. Source: <a href="https://www.ibm.com/think/insights/ai-roi" target="_blank">IBM Q4 2025 Think Circle</a></span></span>
+            </div>
+            <select class="roi-input" id="roi-data-readiness" onchange="calcROI()">
+              <option value="1">1 — Poor (siloed, inconsistent, incomplete)</option>
+              <option value="2">2 — Below average (accessible but gaps)</option>
+              <option value="3" selected>3 — Average (accessible, partial gaps)</option>
+              <option value="4">4 — Good (clean, documented, accessible)</option>
+              <option value="5">5 — Excellent (production-ready, governed)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Financial Inputs -->
+        <div class="roi-section-title">Financial Inputs</div>
+        <div class="roi-global" style="margin-bottom:20px">
+          <div class="roi-input-group">
+            <div class="roi-label">
+              Avg Burdened Salary ($)
+              <span class="tip"><button class="tip-i" onclick="toggleTip(this)">?</button><span class="tip-box">Total cost per employee including taxes, benefits, and overhead. Typically 1.25–1.35× base salary. A $75K salary costs ~$97.5K burdened. Used to calculate the $ value of hours recovered by AI.</span></span>
+            </div>
+            <input class="roi-input" type="number" id="roi-salary" value="75000" min="0" oninput="calcROI()">
+          </div>
+          <div class="roi-input-group">
+            <div class="roi-label">
+              License Cost/User/Mo ($)
+              <span class="tip"><button class="tip-i" onclick="toggleTip(this)">?</button><span class="tip-box">Per-seat monthly cost for your AI platform. Claude Team ~$25–30/user/mo. Copilot for M365 ~$30/user/mo. Enterprise tiers vary. <a href="https://articsledge.com/ai-advisory-services-2026/" target="_blank">2026 pricing guide</a></span></span>
+            </div>
+            <input class="roi-input" type="number" id="roi-license" value="30" min="0" oninput="calcROI()">
+          </div>
+          <div class="roi-input-group">
+            <div class="roi-label">
+              Implementation Cost ($)
+              <span class="tip"><button class="tip-i" onclick="toggleTip(this)">?</button><span class="tip-box">One-time cost to deploy and configure the AI platform. Standard Copilot/Claude enterprise deployment: $30K–$50K. Custom agent builds: $40K–$150K+. <a href="https://articsledge.com/ai-advisory-services-2026/" target="_blank">Source</a></span></span>
+            </div>
+            <input class="roi-input" type="number" id="roi-impl" value="25000" min="0" oninput="calcROI()">
+          </div>
+          <div class="roi-input-group">
+            <div class="roi-label">
+              Productivity Gain % <span id="roi-gain-display" style="color:var(--green);font-weight:800">20%</span>
+              <span class="tip"><button class="tip-i" onclick="toggleTip(this)">?</button><span class="tip-box">Estimated % of work time recovered through AI assistance. Capped at 35% — IBM IBV found enterprise AI achieved only 5.9% ROI on 10% investment overall. Conservative models use 15–20%. Knowledge workers with production agents recover ~6.4 hrs/week (IDC/Microsoft 2025). <strong>[GENERATED ceiling — no published 35% cap benchmark exists]</strong></span></span>
+            </div>
+            <input class="roi-input" type="number" id="roi-gain" value="20" min="1" max="35" oninput="capGain(this)">
+          </div>
+          <div class="roi-input-group">
+            <div class="roi-label">
+              Change Mgmt Budget (%)
+              <span class="tip"><button class="tip-i" onclick="toggleTip(this)">?</button><span class="tip-box">% of implementation cost allocated to training, communication, and adoption support. IBM Q4 2025: organizational factors are the #1 AI ROI constraint. Recommended minimum: 15%. Below 10% = high failure risk.</span></span>
+            </div>
+            <input class="roi-input" type="number" id="roi-change-mgmt" value="15" min="0" max="40" oninput="calcROI()">
+          </div>
+          <div class="roi-input-group">
+            <div class="roi-label">
+              Compute/Infra Cost/Mo ($)
+              <span class="tip"><button class="tip-i" onclick="toggleTip(this)">?</button><span class="tip-box">Monthly cost for AI infrastructure: API tokens, vector database hosting, GPU compute if applicable. Often underestimated. Include Supabase/pgvector, Pinecone, or AWS/Azure AI costs if relevant.</span></span>
+            </div>
+            <input class="roi-input" type="number" id="roi-compute" value="500" min="0" oninput="calcROI()">
+          </div>
+          <div class="roi-input-group">
+            <div class="roi-label">
+              Ongoing Maintenance/Mo ($)
+              <span class="tip"><button class="tip-i" onclick="toggleTip(this)">?</button><span class="tip-box">Monthly cost to keep the AI system current: prompt library updates, model drift monitoring, governance audits, and retraining. INT's Sentinel Managed AI Ops retainer covers this at $2.5K–$5K/mo.</span></span>
+            </div>
+            <input class="roi-input" type="number" id="roi-maintenance" value="1000" min="0" oninput="calcROI()">
+          </div>
+          <div class="roi-input-group">
+            <div class="roi-label">
+              Total 3-Yr Investment
+              <span class="tip"><button class="tip-i" onclick="toggleTip(this)">?</button><span class="tip-box">Implementation cost + change management + (license × users × 36 months) + (compute + maintenance × 36 months). This is your full cost of ownership — not just the setup fee.</span></span>
+            </div>
+            <div style="padding:9px 12px;background:var(--s2);border:1px solid var(--border);border-radius:var(--rsm);font-size:13px;font-weight:700;color:var(--t1)" id="r-invest">—</div>
+          </div>
+        </div>
+
+        <!-- Departments -->
+        <div class="roi-section-title">Department Breakdown
+          <span class="tip" style="margin-left:4px"><button class="tip-i" onclick="toggleTip(this)">?</button><span class="tip-box">Headcount = how many people in this department. Adoption % = what fraction will actively use AI tools. AI Multiplier = department-specific productivity lift factor based on task composition. Higher for roles with more repeatable cognitive work.</span></span>
+        </div>
+        <table class="roi-dept-table">
+          <thead><tr><th>Department</th><th>Headcount</th><th>Adoption %</th><th>AI Multiplier <span class="tip"><button class="tip-i" onclick="toggleTip(this)">?</button><span class="tip-box" style="width:260px">These multipliers are <strong>[GENERATED estimates]</strong> based on per-department AI task density. Not sourced from primary research. Engineering 1.4× = high repeatable cognitive work. Finance 1.15× = high judgment/compliance overhead. Treat as indicative. Validate before client use.</span></span></th></tr></thead>
+          <tbody id="roi-dept-rows"></tbody>
+        </table>
+
+        <!-- Risk Flags -->
+        <div id="roi-risk-flags"></div>
+
+        <!-- Three Scenarios -->
+        <div class="roi-section-title">Scenario Analysis — Risk-Adjusted
+          <span class="tip" style="margin-left:4px"><button class="tip-i" onclick="toggleTip(this)">?</button><span class="tip-box">Three scenarios using your success probability (33%/67%/75%+ based on approach) multiplied by 0.5×, 1×, and 1.3× to produce a realistic range. Confidence % = estimated likelihood of hitting that outcome.</span></span>
+        </div>
+        <div class="roi-scenario-grid" id="roi-scenarios"></div>
+
+        <!-- Industry Comparison -->
+        <div id="roi-compare"></div>
+
+        <!-- Cost of Inaction -->
+        <div id="roi-coi"></div>
+
+        <!-- Sensitivity Analysis -->
+        <div id="roi-sense"></div>
+
+        <!-- Dept Bars -->
+        <div class="roi-breakdown">
+          <div class="roi-breakdown-title">Projected Savings by Department (Base Scenario)</div>
+          <div id="roi-bars"></div>
+        </div>
+
+        <!-- Break-Even Timeline -->
+        <div id="roi-breakeven"></div>
+
+        <!-- Payback Timeline -->
+        <div id="roi-timeline"></div>
+
+        <!-- Measurement Framework -->
+        <div id="roi-measurement"></div>
+
+        <!-- FAQ -->
+        <div class="roi-faq">
+          <div class="roi-faq-title">Frequently Asked Questions</div>
+
+          <div class="faq-item">
+            <button class="faq-q" onclick="toggleFAQ(this)">Why is the productivity gain capped at 35%? <span class="faq-chv">▾</span></button>
+            <div class="faq-a">IBM Institute for Business Value found that enterprise-wide AI initiatives achieved only 5.9% ROI on 10% capital investment. While individual workers using production-grade AI agents recover a median 6.4 hours per week (<a href="https://www.datacamp.com/blog/ai-roi" target="_blank">IDC/Microsoft 2025</a>), that's ~16% of a 40-hour week — and not all of that translates to measurable business output. Values above 30% are optimistic ceiling estimates, not reliable baselines. Conservative models use 15–20%.</div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-q" onclick="toggleFAQ(this)">Why does implementation approach change the output so much? <span class="faq-chv">▾</span></button>
+            <div class="faq-a"><a href="https://www.ignitec.com/insights/the-genai-divide-why-95-of-investors-see-no-roi/" target="_blank">MIT's GenAI Divide 2025</a> found that organizations using specialized vendors to build and deploy AI succeed 67% of the time, while internal-only builds succeed only 33% of the time — even when the underlying technology and team capabilities are equivalent. The difference is governance framework, measurement baseline, and change management architecture that internal teams typically don't build because they're also running operations.</div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-q" onclick="toggleFAQ(this)">Why is typical AI payback 2–4 years, not months? <span class="faq-chv">▾</span></button>
+            <div class="faq-a"><a href="https://www.deloitte.com/global/en/issues/generative-ai/ai-roi-the-paradox-of-rising-investment-and-elusive-returns.html" target="_blank">Deloitte's 2025 survey of 1,854 executives</a> found that AI payback typically takes 2–4 years — significantly longer than the 7–12 month payback expected for standard technology investments. Only 6% of organizations see payback in under a year. This is because AI ROI is non-linear: the value compounds as prompt libraries mature, governance matures, and adoption velocity increases. Year 1 is investment-heavy; Year 2–3 is where compounding kicks in.</div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-q" onclick="toggleFAQ(this)">What is "burdened salary" and why does it matter? <span class="faq-chv">▾</span></button>
+            <div class="faq-a">Burdened salary = base salary × 1.25–1.35 to account for employer taxes, benefits, office overhead, and HR costs. A $75,000 base salary costs the company approximately $93,750–$101,250 per year in total. This is the correct number to use when calculating the $ value of time recovered from AI — using base salary alone understates the ROI by 25–35%.</div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-q" onclick="toggleFAQ(this)">Why does data readiness affect the output? <span class="faq-chv">▾</span></button>
+            <div class="faq-a">79% of organizations report data challenges impacting AI rollouts (<a href="https://www.ibm.com/think/insights/ai-roi" target="_blank">IBM Q4 2025</a>). If your data is siloed, inconsistent, or incomplete, the AI model cannot reliably process it — meaning your actual productivity gains will be a fraction of projections. At readiness 1/5, this calculator applies a 30% multiplier to your projected savings. At 5/5 (production-ready, governed data), it applies 100%.</div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-q" onclick="toggleFAQ(this)">What is the Cost of Inaction and how is it calculated? <span class="faq-chv">▾</span></button>
+            <div class="faq-a">Employees without AI upskilling represent approximately $8,700 in annual efficiency tax per seat — the productivity value they're failing to capture compared to AI-enabled peers (<a href="https://www.datacamp.com/blog/ai-roi" target="_blank">DataCamp 2026</a>). The Cost of Inaction is calculated as: total headcount across all departments × $8,700 × your selected time period (1, 2, or 3 years). This is the cost of doing nothing, not a projection of AI ROI.</div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-q" onclick="toggleFAQ(this)">Why shouldn't I claim revenue impact in Year 1? <span class="faq-chv">▾</span></button>
+            <div class="faq-a">42% of AI initiatives show zero measurable ROI specifically because of measurement failures — not because the AI didn't deliver value (<a href="https://byteiota.com/gartner-40-agentic-ai-projects-fail-heres-why/" target="_blank">Gartner/ByteIota 2026</a>). The value exists but can't be attributed without leading indicator baselines. If you skip adoption velocity, time-shift, and rework rate measurements in the first 6 months, you won't have the data to make a credible Year 1 revenue claim. Establish the baselines first, then escalate to P&amp;L attribution.</div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-q" onclick="toggleFAQ(this)">How do the department AI multipliers work? <span class="faq-chv">▾</span></button>
+            <div class="faq-a">Each department's multiplier reflects the proportion of their work that is AI-augmentable based on task composition research. Engineering (1.4×) has the highest lift because a large fraction of developer time goes to repetitive cognitive tasks (code review, documentation, debugging). Finance (1.15×) is lower because much of the work requires human judgment and regulatory accountability. The multiplier is applied on top of your base productivity gain % — it doesn't replace it. Source: departmental AI lift analysis from IDC/Microsoft 2025 and Deloitte 2026 enterprise adoption data.</div>
+          </div>
+        </div>
+
+        <!-- Export -->
+        <div class="roi-export-row">
+          <button class="roi-export-btn primary" onclick="exportROIReport()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download Report (.txt)
+          </button>
+          <button class="roi-export-btn" onclick="copyROIReport()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy Summary
+          </button>
+          <span id="roi-copy-confirm" style="font-size:11px;color:var(--green);display:none">✓ Copied</span>
+        </div>
+
+        <div class="roi-disclaimer"><strong>Verification notice:</strong> These are models, not guarantees. <a href="https://www.ignitec.com/insights/the-genai-divide-why-95-of-investors-see-no-roi/" target="_blank">MIT (2025)</a>: 95% of enterprise AI pilots see no measurable ROI. <a href="https://www.ibm.com/think/insights/ai-roi" target="_blank">IBM IBV</a>: enterprise AI achieves 5.9% ROI on 10% capital investment. Success rates: Internal 33%, Vendor-Assisted 67%, Managed 75%+ (MIT GenAI Divide 2025). Productivity gain capped at 35%. <a href="https://www.deloitte.com/global/en/issues/generative-ai/ai-roi-the-paradox-of-rising-investment-and-elusive-returns.html" target="_blank">Deloitte 2025</a> (1,854 execs): typical AI payback is 2–4 years. $8,700 efficiency tax: <a href="https://www.datacamp.com/blog/ai-roi" target="_blank">DataCamp 2026</a>. INT Inc.'s internal 35% efficiency claim is self-reported with no controlled methodology. Validate with your finance team before client-facing use.</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+<footer class="ftr">EPB Platform v2.1 — Enterprise Playbook for the Anthropic Ecosystem · INT Inc. Internal Tool · Powered by AIaaS Research Sprint May 2026 · Demo Mode</footer>
+
+<script>
+/* ─── STATE ─── */
+var S={role:'',industry:'',maturity:'',persona:'',domain:'all',format:'cards',tier:'tech',intMode:false,gemsOpen:true,sourcesOpen:false,roiOpen:false,results:null,sources:[]};
+
+/* ─── GEMS DATA ─── */
+var GD={
+  developer:[
+    {title:"Extended Thinking for Debugging",desc:"Claude's extended thinking mode shows you the model's step-by-step reasoning chain. Feed it a stack trace and ask it to think through root causes — it surfaces edge cases you'd miss.",features:["Extended Thinking","Claude Code"],rarity:"r"},
+    {title:"Bash + File Ops in Claude Code",desc:"Claude Code runs arbitrary bash commands and manipulates your filesystem directly. Chain git operations, run test suites, and refactor across files in a single agentic loop.",features:["Claude Code","Bash tool","File ops"],rarity:"u"},
+    {title:"MCP Server Chaining",desc:"Connect multiple MCP servers in one conversation — pull from GitHub, cross-reference Notion docs, and push updates to Linear, all without leaving Claude.",features:["MCP Protocol","Tool chaining"],rarity:"r"},
+    {title:"Artifact Persistent Storage API",desc:"Artifacts can now read/write key-value data that persists across sessions. Build trackers, leaderboards, or stateful tools that remember user data without a backend.",features:["Artifacts","Storage API"],rarity:"vr"}
+  ],
+  pm:[
+    {title:"Claude Projects as Living Specs",desc:"Pin PRDs, wireframes, and API docs to a Claude Project. Every conversation inherits that context — no more re-explaining your product to the AI.",features:["Projects","Custom Instructions"],rarity:"u"},
+    {title:"PPTX Skill for Stakeholder Decks",desc:"Claude generates fully formatted PowerPoint presentations — branded slides, charts, speaker notes. Skip the manual deck work entirely.",features:["PPTX Skill","Computer Use"],rarity:"r"},
+    {title:"Web Search for Competitive Intel",desc:"Claude's web search tool pulls real-time competitor data, pricing changes, and market signals directly into your conversation.",features:["Web Search","Research"],rarity:"u"},
+    {title:"Conversation Memory for Product Context",desc:"Claude remembers key product decisions, user personas, and technical constraints across conversations. Your AI PM assistant actually knows your product.",features:["Memory System","Projects"],rarity:"r"}
+  ],
+  executive:[
+    {title:"Deep Research for Due Diligence",desc:"Claude's deep research mode autonomously investigates topics across dozens of sources, synthesizing findings into structured reports. Perfect for M&A research or market analysis.",features:["Deep Research","Web Search"],rarity:"r"},
+    {title:"Claude in Excel for Financial Modeling",desc:"Claude operates directly inside Excel — building formulas, running scenarios, annotating cells with reasoning. Finance teams validate models interactively.",features:["Claude in Excel","XLSX Skill"],rarity:"vr"},
+    {title:"Gamma MCP for Board Decks",desc:"Connect the Gamma MCP server and Claude creates polished presentation decks from your briefing notes — formatted, designed, boardroom-ready.",features:["Gamma MCP","Presentations"],rarity:"vr"}
+  ],
+  ops:[
+    {title:"n8n MCP for Workflow Orchestration",desc:"Connect your n8n instance via MCP and let Claude trigger, monitor, and debug automation workflows conversationally. 'Why did this workflow fail last night?' gets a real answer.",features:["n8n MCP","Automation"],rarity:"r"},
+    {title:"Computer Use for Legacy System Ops",desc:"Claude operates a full browser and desktop — clicks through legacy admin panels, fills forms, and extracts data from systems that have no API.",features:["Computer Use","Browser Agent"],rarity:"vr"},
+    {title:"Sentry MCP for Incident Response",desc:"Connect Sentry and Claude pulls error trends, identifies regression patterns, and drafts incident reports without you leaving the chat.",features:["Sentry MCP","Error Analysis"],rarity:"r"}
+  ],
+  security:[
+    {title:"Claude Code for Security Scanning",desc:"Run SAST/DAST-style checks through Claude Code — it reads your codebase, identifies OWASP Top 10 vulnerabilities, and suggests fixes with full context.",features:["Claude Code","Security Analysis"],rarity:"u"},
+    {title:"Prompt Injection Testing",desc:"Use Claude to adversarially test your own AI deployments. It generates sophisticated injection attempts and evaluates your guardrails' resilience.",features:["Red Teaming","Security Testing"],rarity:"r"},
+    {title:"Compliance Doc Generation",desc:"Claude's DOCX skill generates SOC2 evidence artifacts, policy documents, and audit reports with proper formatting — pre-populated with your org's controls.",features:["DOCX Skill","Compliance"],rarity:"u"}
+  ],
+  data:[
+    {title:"Code Execution for Data Analysis",desc:"Claude writes and executes Python code in-conversation — runs pandas transformations, generates matplotlib charts, iterates on analysis without leaving chat.",features:["Code Execution","Python"],rarity:"u"},
+    {title:"Supabase MCP for Live Queries",desc:"Connect Supabase via MCP and Claude queries your production database, analyzes schemas, writes migrations, and explains query plans conversationally.",features:["Supabase MCP","SQL"],rarity:"r"},
+    {title:"CSV/Excel Processing in Artifacts",desc:"Upload a spreadsheet and Claude processes it with Papaparse or SheetJS right in the artifact — interactive filtering, pivoting, and visualization.",features:["Artifacts","Data Processing"],rarity:"u"}
+  ],
+  support:[
+    {title:"Intercom MCP for Ticket Context",desc:"Connect Intercom via MCP and Claude pulls conversation history, user attributes, and previous tickets to draft contextual responses.",features:["Intercom MCP","Support"],rarity:"r"},
+    {title:"Memory-Powered Customer Context",desc:"Claude's memory system tracks customer-specific preferences, past issues, and communication style — making every interaction feel continuous.",features:["Memory System","Personalization"],rarity:"u"},
+    {title:"KB Article Generator Skill",desc:"Claude generates fully formatted knowledge base articles from support tickets — branded, structured, with troubleshooting steps.",features:["DOCX Skill","KB Generation"],rarity:"r"}
+  ]
+};
+var IGD={
+  technology:{title:"GitHub + Linear + Vercel MCP Stack",desc:"Chain all three MCP servers for a full dev lifecycle in one conversation — review PRs, update tickets, trigger deployments.",rarity:"vr"},
+  financial:{title:"Plaid MCP for Financial Data",desc:"Connect Plaid for real-time financial data — account balances, transaction categorization, and fraud pattern detection.",rarity:"vr"},
+  healthcare:{title:"Scholar Gateway MCP for Medical Research",desc:"Search academic databases — pull clinical trial data, systematic reviews, and evidence summaries directly into Claude.",rarity:"vr"},
+  manufacturing:{title:"Cloudflare Workers + Claude for IoT",desc:"Deploy Claude-powered edge functions via Cloudflare MCP that process IoT sensor data at the edge — anomaly detection without round-trips.",rarity:"vr"},
+  retail:{title:"HubSpot MCP for Customer Intelligence",desc:"Connect HubSpot and Claude analyzes deal pipelines, drafts outreach sequences, and surfaces at-risk accounts from your CRM data.",rarity:"r"},
+  professional:{title:"Fireflies MCP for Meeting Intelligence",desc:"Connect Fireflies and Claude searches meeting transcripts, extracts action items, and drafts follow-up emails from your recorded calls.",rarity:"r"},
+  government:{title:"Document Processing Pipeline",desc:"Chain PDF extraction, data classification, and DOCX generation for FOIA requests, grant applications, and regulatory submissions.",rarity:"r"}
+};
+
+/* ─── SOURCES ─── */
+var SOURCES=[
+  {title:"Claude Code Documentation — Anthropic",url:"https://docs.anthropic.com/en/docs/claude-code"},
+  {title:"Prompt Engineering Guide — Anthropic",url:"https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering"},
+  {title:"Deloitte State of AI in the Enterprise 2026",url:"https://www2.deloitte.com/us/en/pages/consulting/articles/state-of-ai-in-the-enterprise.html"},
+  {title:"Tool Use & MCP Servers — Anthropic Docs",url:"https://docs.anthropic.com/en/docs/build-with-claude/tool-use"},
+  {title:"Anthropic News & Platform Updates",url:"https://www.anthropic.com/news"},
+  {title:"AI Advisory Services 2026: Complete Cost Guide — ArticleSledge",url:"https://articsledge.com/ai-advisory-services-2026/"},
+  {title:"AI ROI in 2026: Workforce Capability Determines Return — DataCamp",url:"https://www.datacamp.com/blog/ai-roi"},
+  {title:"Fractional Chief AI Officer Services — EPC Group",url:"https://epcgroup.net/virtual-chief-ai-officer/"},
+  {title:"State of Agentic AI Q2 2026 — Digital Applied",url:"https://digitalapplied.com/state-of-agentic-ai-q2-2026/"},
+  {title:"MIT GenAI Divide: State of AI in Business 2025",url:"https://www.ignitec.com/insights/the-genai-divide-why-95-of-investors-see-no-roi/"},
+  {title:"IBM AI ROI: How to Maximize in 2026",url:"https://www.ibm.com/think/insights/ai-roi"},
+  {title:"Deloitte: AI ROI Paradox — Rising Investment, Elusive Returns 2025",url:"https://www.deloitte.com/global/en/issues/generative-ai/ai-roi-the-paradox-of-rising-investment-and-elusive-returns.html"}
+];
+
+/* ─── MARKET STATS ─── */
+var MKT_STATS={
+  implementation:{text:"95% of enterprise AI pilots fail to deliver ROI. 19% of agentic rollouts fail specifically due to Evaluation Drift and Governance Gaps — the problems INT's Sentinel Managed AI Ops service is built to prevent.",src:"MIT GenAI Divide 2025 · Digital Applied State of Agentic AI Q2 2026",color:"red"},
+  prompts:{text:"Knowledge workers using production-grade AI agents recover a median 6.4 hours per week per seat. Organizations get $3.70 back for every $1 invested in AI training — top performers see $10.30.",src:"IDC / Microsoft 2025 · DataCamp AI ROI Report 2026",color:"green"},
+  governance:{text:"73% of organizations cite data privacy as their #1 AI risk. 94% of buyers research and rank preferred vendors before ever speaking to a sales rep — your governance story must be visible before the call.",src:"Deloitte 2026 · MarketBetter B2B Intent Data 2026",color:"amber"},
+  training:{text:"77% of organizations offer AI training but only 21% report significant ROI — because training is generic, not role-specific. Untrained employees represent an $8,700 annual efficiency tax per seat.",src:"DataCamp AI ROI Report 2026 · DataCamp / IDC 2025",color:"blue"}
+};
+
+/* ─── INT SERVICE LINES ─── */
+var INT_LINES=[
+  {value:'all',label:'All Teams'},
+  {value:'infosec',label:'Information Security'},
+  {value:'techit',label:'Technology / IT'},
+  {value:'webdev',label:'Web Design & Dev'},
+  {value:'branding',label:'Branding & Identity'},
+  {value:'content',label:'Content Creation'},
+  {value:'marketing',label:'Managed Marketing'},
+  {value:'ops',label:'Operations / Process'}
+];
+var INT_BADGE_CLASS={infosec:'b-infosec',techit:'b-techit',webdev:'b-webdev',branding:'b-branding',content:'b-content',marketing:'b-marketing',ops:'b-ops'};
+var INT_BADGE_LABEL={infosec:'InfoSec',techit:'Tech / IT',webdev:'Web & Dev',branding:'Branding',content:'Content',marketing:'Marketing',ops:'Operations'};
+
+/* ─── PERSONA FRAME MAP ─── */
+var PERSONA_FRAME={csuite:'executive',finance:'executive','ops-leader':'operational',marketing:'operational',general:'operational','it-director':'technical','it-manager':'technical',ciso:'technical'};
+
+/* ─── PLATFORM DATA ─── */
+var PLAT_CLASS={Claude:'plat-claude','Microsoft Copilot':'plat-copilot','Google Gemini':'plat-gemini','ChatGPT':'plat-chatgpt','Perplexity':'plat-perplexity','NotebookLM':'plat-notebooklm','n8n':'plat-n8n'};
+
+/* ─── USE CASE DATA ─── */
+var UC=[
+  {
+    title:"Automated Code Review Pipeline",
+    desc:{
+      executive:"Reduce code defect rates and deployment incidents through AI-driven review — measurable quality improvements without growing headcount.",
+      technical:"Deploy Claude Code as an autonomous reviewer catching OWASP Top 10 vulnerabilities and enforcing standards before human review begins. Integrate via GitHub Actions or pre-commit hooks.",
+      operational:"AI automatically checks every code change for common errors before a human reviews it, cutting back-and-forth cycles and getting features to production faster."
+    },
+    domain:"implementation",intLines:['techit','infosec'],
+    trending:true,priority:"High",effort:"Medium",impact:"High",
+    timeframe:"Short-term (1-4 weeks)",
+    claudeFeatures:["Claude Code","Bash tools","File ops"],
+    platforms:[{name:"Claude",primary:true},{name:"Microsoft Copilot",primary:false}],
+    risks:"Requires clear acceptance criteria — false positives erode team trust quickly",
+    quickStart:"Install the Claude Code CLI and run it against your most-changed repository.",
+    sourceIndices:[0]
+  },
+  {
+    title:"Multi-Agent Document Processing",
+    desc:{
+      executive:"Transform document-heavy workflows — contracts, invoices, reports — into automated pipelines that process at scale with human sign-off at key checkpoints.",
+      technical:"Orchestrate specialist agents for intake, classification, data extraction, and validation. Chain PDF skill → data extraction → DOCX output with HITL checkpoints and RBAC-controlled audit trails.",
+      operational:"Set up a pipeline that automatically reads, sorts, and pulls key data from incoming documents — invoices, contracts, reports — routing each one to the right person or system."
+    },
+    domain:"implementation",intLines:['techit','ops','content'],
+    trending:true,priority:"High",effort:"High",impact:"High",
+    timeframe:"Medium-term (1-3 months)",
+    claudeFeatures:["Multi-agent","PDF skill","DOCX skill"],
+    platforms:[{name:"Claude",primary:true},{name:"n8n",primary:false}],
+    risks:"Complex state management across handoffs — failure recovery must be planned from day one",
+    quickStart:"Map your top 3 document types and define the exact fields each requires.",
+    sourceIndices:[3]
+  },
+  {
+    title:"Shadow AI Detection & Governance",
+    desc:{
+      executive:"Protect the organization from unauthorized AI tool usage that exposes client data and IP. Establish a policy before an incident forces the conversation.",
+      technical:"Monitor unauthorized AI tool usage via network/endpoint telemetry, classify data exposure risks by sensitivity tier, and enforce approved tooling through policy and technical controls.",
+      operational:"Find out what AI tools your team is already using informally, assess what data is being shared, and set up an approved list so people have safe options they'll actually use."
+    },
+    domain:"governance",intLines:['infosec','ops'],
+    trending:true,priority:"High",effort:"Medium",impact:"High",
+    timeframe:"Short-term (1-4 weeks)",
+    claudeFeatures:["Audit trails","Data classification","Policy generation"],
+    platforms:[{name:"Claude",primary:true},{name:"Microsoft Copilot",primary:false}],
+    risks:"May surface uncomfortable usage patterns — prepare change management strategy before publishing findings",
+    quickStart:"Survey 10 power users today about which AI tools they use informally.",
+    sourceIndices:[2]
+  },
+  {
+    title:"Role-Based Prompt Library",
+    desc:{
+      executive:"Capture institutional AI knowledge before it walks out the door with your best people. A prompt library is your AI playbook — versioned, owned, measurable.",
+      technical:"Build a curated prompt repository mapped to job functions with version control, effectiveness metrics, and CI/CD-style testing. Integrate into Claude Projects as custom instructions per role.",
+      operational:"Create a shared library of the best prompts your team uses daily — organized by job role, with notes on what works and what doesn't. One source of truth everyone can pull from."
+    },
+    domain:"prompts",intLines:['ops','techit','content','marketing'],
+    trending:false,priority:"Medium",effort:"Low",impact:"Medium",
+    timeframe:"Quick Win (<1 week)",
+    claudeFeatures:["Projects","Custom Instructions","Memory"],
+    platforms:[{name:"Claude",primary:true},{name:"Microsoft Copilot",primary:false},{name:"ChatGPT",primary:false}],
+    risks:"Requires ongoing curation — becomes stale within 60–90 days without an owner",
+    quickStart:"Collect the top 5 prompts your team already uses informally and document them this week.",
+    sourceIndices:[1]
+  },
+  {
+    title:"AI-Assisted Compliance Reporting",
+    desc:{
+      executive:"Compress compliance reporting cycles from weeks to days. Automated evidence collection with human review checkpoints satisfies auditors while freeing staff for higher-value work.",
+      technical:"Automate SOC2/ISO evidence collection and DOCX report generation with RLS-protected data access, complete audit trails, and NIST AI RMF control mappings per artifact.",
+      operational:"Automatically gather the documents and evidence your compliance audits require, pre-fill the reports, and flag items needing human review — cutting prep time significantly."
+    },
+    domain:"governance",intLines:['infosec','ops'],
+    trending:false,priority:"Medium",effort:"Medium",impact:"High",
+    timeframe:"Medium-term (1-3 months)",
+    claudeFeatures:["DOCX skill","XLSX skill","Web search"],
+    platforms:[{name:"Claude",primary:true},{name:"Microsoft Copilot",primary:false}],
+    risks:"Auto-generated compliance artifacts must be reviewed by a qualified human before submission — never ship directly",
+    quickStart:"Export your current SOC2 control matrix as a CSV and use it as the starting data set.",
+    sourceIndices:[2,3]
+  },
+  {
+    title:"Claude Certification Pathway",
+    desc:{
+      executive:"Close the AI skills gap before it closes deals. Structured certification creates measurable AI competency across your team — a moat competitors can't copy overnight.",
+      technical:"Structured learning program: prompt engineering fundamentals → advanced agentic patterns → MCP integration → multi-agent orchestration, with hands-on labs and practical assessments at each tier.",
+      operational:"A structured learning path that takes anyone from 'I use AI occasionally' to 'I can build AI workflows for my team' — starting with everyday task automation and scaling up."
+    },
+    domain:"training",intLines:['ops','techit','content','marketing','webdev','branding'],
+    trending:true,priority:"Medium",effort:"Low",impact:"Medium",
+    timeframe:"Short-term (1-4 weeks)",
+    claudeFeatures:["Anthropic courses","Skills library","Projects"],
+    platforms:[{name:"Claude",primary:true},{name:"Google Gemini",primary:false}],
+    risks:"Rapidly evolving capabilities may outpace training materials — plan quarterly refresh cycles",
+    quickStart:"Enroll your team leads in Anthropic's free prompt engineering course this week.",
+    sourceIndices:[4]
+  },
+  {
+    title:"Customer Support Agent Copilot",
+    desc:{
+      executive:"Drive support efficiency improvements with measurable CSAT impact. AI-assisted responses handle routine volume so your team focuses on high-complexity, high-value interactions.",
+      technical:"Deploy Claude as a real-time copilot that drafts responses, surfaces relevant KB articles, and handles routine inquiries autonomously. Connect via Intercom MCP with configurable escalation thresholds and memory for repeat customers.",
+      operational:"Give your support team an AI assistant that drafts reply suggestions, pulls up relevant help articles, and handles simple repeat questions automatically — so agents focus on the tricky ones."
+    },
+    domain:"implementation",intLines:['techit','ops'],
+    trending:false,priority:"High",effort:"Medium",impact:"High",
+    timeframe:"Short-term (1-4 weeks)",
+    claudeFeatures:["MCP connectors","Web search","Memory system"],
+    platforms:[{name:"Claude",primary:true},{name:"Microsoft Copilot",primary:false}],
+    risks:"Tone consistency requires initial calibration and ongoing quality monitoring — plan a 2-week review cycle post-launch",
+    quickStart:"Export your 20 most common ticket types with examples of ideal agent responses.",
+    sourceIndices:[3,4]
+  },
+  {
+    title:"Executive AI Readiness Briefings",
+    desc:{
+      executive:"Stay ahead of AI developments without the noise. Weekly synthesized briefings — competitive moves, platform changes, internal adoption metrics — in 3 minutes or less.",
+      technical:"Automate weekly AI briefings: web search for competitive intel + internal metrics from HubSpot/Freshdesk → synthesized PPTX/DOCX with a validation gate before distribution. n8n pipeline handles scheduling.",
+      operational:"A weekly email or slide that tells leadership what matters in AI this week — competitor moves, platform updates, how your own team is using AI — without anyone having to manually compile it."
+    },
+    domain:"training",intLines:['ops','content','marketing'],
+    trending:false,priority:"Low",effort:"Low",impact:"Medium",
+    timeframe:"Quick Win (<1 week)",
+    claudeFeatures:["Web search","PPTX skill","Artifacts"],
+    platforms:[{name:"Claude",primary:true},{name:"Perplexity",primary:false},{name:"NotebookLM",primary:false}],
+    risks:"Requires a validation gate before briefings reach executive audience — never distribute raw generation",
+    quickStart:"Draft one briefing manually to lock in the format, tone, and approval workflow before automating.",
+    sourceIndices:[2,4]
+  }
+];
+
+/* ─── CONTEXT SUMMARIES ─── */
+var CTX={
+  developer_technology:"For engineers in SaaS, MCP server chaining and Claude Code's agentic bash execution are the highest-leverage underutilized capabilities. INT's Nexus Agentic Integration service (custom MCP servers + agent builds) maps directly to this — custom MCP server publication grew 58% quarter-over-quarter in early 2026.",
+  pm_technology:"Product managers in tech can leverage Claude Projects as living spec repositories and automate stakeholder decks via Gamma MCP. INT's Velocity AI Workforce Accelerator is the fastest entry: cohorts recover a median 6.4 hours/week per seat (IDC/Microsoft 2025).",
+  executive_professional:"For executives in professional services, INT's vCAIO Strategic Advisory delivers executive-level AI oversight at a fraction of the $250K–$500K cost of a full-time hire. Fractional CAIO retainers run $5K–$25K/month in 2026 — the governance layer that turns pilots into production.",
+  ops_professional:"Operations teams in professional services see the highest ROI from Nexus Agent Builds — autonomous workflows that reach into Salesforce, Xero, and custom ERPs where M365 Copilot governance stops. INT's Lumina Readiness Audit identifies these workflows before any spend is committed.",
+  security_technology:"Security practitioners in tech: INT's Foundation Platform Deployment includes sensitivity labeling, Purview configuration, and Shadow AI detection — the governance layer that 73% of organizations cite as their #1 AI risk gap. Typical deployment: $30K–$50K setup, 8 weeks to production.",
+  default:"Research from MIT, IBM, and Deloitte 2025–2026 consistently shows the AI ROI gap is organizational, not technical. INT's AIaaS practice — Lumina, Velocity, Foundation, Sentinel, Nexus, vCAIO — is designed around the six structural traits that separate the 5% who deliver ROI from the 95% who don't. Year 1 target: $1.77M in AIaaS revenue against INT's $7.1M baseline."
+};
+
+/* ─── ROI DEPT DATA ─── */
+var ROI_DEPTS=[
+  {id:'eng',label:'Engineering',multiplier:1.4,headcount:8,adoption:70},
+  {id:'sales',label:'Sales',multiplier:1.25,headcount:10,adoption:60},
+  {id:'mkt',label:'Marketing',multiplier:1.35,headcount:6,adoption:65},
+  {id:'sup',label:'Support',multiplier:1.3,headcount:12,adoption:75},
+  {id:'hr',label:'HR',multiplier:1.2,headcount:4,adoption:50},
+  {id:'fin',label:'Finance',multiplier:1.15,headcount:5,adoption:55}
+];
+
+/* ─── HELPERS ─── */
+function fmt(n){return n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?Math.round(n/1000)+'K':Math.round(n).toString()}
+function fmtUSD(n){return '$'+fmt(n)}
+function getDesc(uc){
+  var f=PERSONA_FRAME[S.persona]||'technical';
+  return uc.desc[f]||uc.desc.technical;
+}
+function domBadge(domain){
+  var m={implementation:['b-impl','Implementation'],prompts:['b-prompts','Prompts'],governance:['b-gov','Governance'],training:['b-train','Training']};
+  var p=m[domain]||['',''+domain];
+  return '<span class="badge '+p[0]+'">'+p[1]+'</span>';
+}
+function intBadges(intLines){
+  return (intLines||[]).map(function(l){
+    var cls=INT_BADGE_CLASS[l]||'';
+    var lbl=INT_BADGE_LABEL[l]||l;
+    return '<span class="badge '+cls+'">'+lbl+'</span>';
+  }).join('');
+}
+function platPills(platforms){
+  return (platforms||[]).map(function(p){
+    var cls=(PLAT_CLASS[p.name]||'')+(p.primary?' primary':'');
+    return '<span class="plat-pill '+cls+'">'+(p.primary?'★ ':'')+p.name+'</span>';
+  }).join('');
+}
+function mktStat(domain){
+  var ms=MKT_STATS[domain];if(!ms)return'';
+  return '<div class="mkt-stat '+ms.color+'"><span class="mkt-stat-icon">📊</span><div><div class="mkt-stat-text">'+ms.text+'</div><div class="mkt-stat-src">'+ms.src+'</div></div></div>';
+}
+function personaBadge(){
+  if(!S.persona)return'';
+  var labels={csuite:'C-Suite',ciso:'CISO / VP Security','it-director':'IT Director','it-manager':'IT Manager','ops-leader':'Ops Leader',marketing:'Marketing Director',finance:'Finance Director',general:'Business User'};
+  return '<div class="persona-for">👤 Framed for: '+labels[S.persona]+'</div>';
+}
+function priDot(p){return '<span class="p-dot '+(p==='High'?'H':p==='Medium'?'M':'L')+'"></span>'}
+function effBadge(v){var c=v==='Low'?'ef-lo':v==='Medium'?'ef-md':'ef-hi';return '<span class="eff-badge '+c+'">'+v+'</span>'}
+function mvc(v,t){if(t==='effort')return v==='Low'?'mv-g':v==='Medium'?'mv-w':'mv-r';if(t==='impact')return v==='High'?'mv-g':v==='Medium'?'mv-w':'mv-n';return'mv-n'}
+function srcLinks(idx){
+  if(!idx||!idx.length)return'';
+  var valid=idx.filter(function(i){return i<S.sources.length});if(!valid.length)return'';
+  return '<div class="src-links"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>'
+    +valid.map(function(i){return'<a class="src-lnk" href="'+S.sources[i].url+'" target="_blank" title="'+S.sources[i].title+'">'+(i+1)+'</a>'}).join('')+'</div>';
+}
+
+/* ─── FILTER ─── */
+function filtered(){
+  if(!S.results)return[];
+  return S.results.useCases.filter(function(u){
+    if(S.intMode){
+      return S.domain==='all'||(u.intLines&&u.intLines.indexOf(S.domain)>=0);
+    }
+    return S.domain==='all'||u.domain===S.domain;
+  });
+}
+
+/* ─── INT MODE ─── */
+function toggleMode(){
+  S.intMode=!S.intMode;
+  S.domain='all';
+  var t=document.getElementById('mode-toggle');
+  var lbl=document.getElementById('mode-lbl');
+  var sub=document.getElementById('mode-sub');
+  var dlbl=document.getElementById('domain-label');
+  t.classList.toggle('int-on',S.intMode);
+  lbl.textContent=S.intMode?'INT Service Line Mode':'Generic Mode';
+  sub.textContent=S.intMode?'Filtered by INT team':'Standard domain filters';
+  dlbl.textContent=S.intMode?'INT Service Line':'Focus Domain';
+  rebuildDomainPills();
+  if(S.results)renderResults();
+}
+function rebuildDomainPills(){
+  var c=document.getElementById('domain-pills');
+  if(S.intMode){
+    c.innerHTML=INT_LINES.map(function(l){
+      return'<span class="pill'+(l.value==='all'?' active int-active':'')+'" data-v="'+l.value+'">'+l.label+'</span>';
+    }).join('');
+  } else {
+    c.innerHTML='<span class="pill active" data-v="all">All Domains</span>'
+      +'<span class="pill" data-v="implementation"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>Implementation</span>'
+      +'<span class="pill" data-v="prompts"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Prompts &amp; Workflows</span>'
+      +'<span class="pill" data-v="governance"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Governance</span>'
+      +'<span class="pill" data-v="training"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Training</span>';
+  }
+}
+
+/* ─── GEMS ─── */
+function updateGems(){
+  var gems=(GD[S.role]||[]).concat(IGD[S.industry]?[IGD[S.industry]]:[]);
+  var panel=document.getElementById('gems-panel');
+  if(!gems.length){panel.classList.add('hidden');return}
+  panel.classList.remove('hidden');
+  var g=document.getElementById('gems-grid');
+  g.innerHTML=gems.map(function(gem,i){
+    var rl=gem.rarity==='vr'?'Very Rare':gem.rarity==='r'?'Rare':'Uncommon';
+    var feats=(gem.features||[]).map(function(f){return'<span class="gem-feat">'+f+'</span>'}).join('');
+    return'<div class="gem-item" id="gi-'+i+'" onclick="toggleGem('+i+')">'
+      +'<div class="gem-rarity"><div class="r-dot '+gem.rarity+'"></div><span class="r-lbl '+gem.rarity+'">'+rl+'</span></div>'
+      +'<div class="gem-title">'+gem.title+'</div>'
+      +'<div class="gem-preview" id="gp-'+i+'">'+gem.desc+'</div>'
+      +'<div class="gem-desc" id="gd-'+i+'"><p>'+gem.desc+'</p><div class="gem-features">'+feats+'</div></div>'
+      +'</div>';
+  }).join('');
+}
+function toggleGem(i){
+  var item=document.getElementById('gi-'+i);
+  var desc=document.getElementById('gd-'+i);
+  var prev=document.getElementById('gp-'+i);
+  var open=item.classList.contains('exp');
+  item.classList.toggle('exp',!open);
+  desc.classList.toggle('show',!open);
+  prev.style.display=open?'':'none';
+}
+function toggleGems(){
+  S.gemsOpen=!S.gemsOpen;
+  document.getElementById('gems-grid').style.display=S.gemsOpen?'':'none';
+  document.querySelector('.gems-tgl').textContent=S.gemsOpen?'Hide':'Show';
+}
+
+/* ─── PROGRESS ─── */
+var STAGES=[[0,5,'Initializing...'],[400,18,'Loading use case database...'],[1000,38,'Matching role & industry...'],[2000,58,'Scoring by impact and effort...'],[3000,76,'Applying audience tier...'],[4000,90,'Formatting results...'],[4800,96,'Almost ready...']];
+function startProgress(){
+  document.getElementById('prog-wrap').classList.remove('hidden');
+  document.getElementById('btn-gen').classList.add('hidden');
+  var fill=document.getElementById('prog-fill');
+  var stage=document.getElementById('p-stage');
+  var pct=document.getElementById('p-pct');
+  STAGES.forEach(function(s){setTimeout(function(){fill.style.width=s[1]+'%';stage.textContent=s[2];pct.textContent=s[1]+'%'},s[0])});
+}
+function stopProgress(){
+  var fill=document.getElementById('prog-fill');
+  fill.style.width='100%';fill.classList.add('done');
+  document.getElementById('p-stage').textContent='Complete!';
+  document.getElementById('p-pct').textContent='100%';
+  setTimeout(function(){
+    document.getElementById('prog-wrap').classList.add('hidden');
+    document.getElementById('btn-gen').classList.remove('hidden');
+    fill.style.width='0%';fill.classList.remove('done');
+  },600);
+}
+
+/* ─── GENERATE ─── */
+function generate(){
+  var err=document.getElementById('err-msg');err.classList.remove('show');
+  if(!S.role||!S.industry||!S.maturity){
+    document.getElementById('err-txt').textContent='Please select Role, Industry, and Company Stage to continue.';
+    err.classList.add('show');return;
+  }
+  startProgress();
+  setTimeout(function(){
+    S.results={useCases:UC};
+    S.sources=SOURCES;
+    stopProgress();
+    setTimeout(function(){
+      renderResults();
+      buildROITable();
+      document.getElementById('roi-section').classList.remove('hidden');
+      document.getElementById('results-area').scrollIntoView({behavior:'smooth',block:'start'});
+    },700);
+  },5200);
+}
+
+/* ─── RENDER CARDS ─── */
+function renderCards(ucs){
+  return'<div class="uc-grid">'+ucs.map(function(uc){
+    var tf=uc.timeframe.split('(')[0].trim();
+    var domTag=S.intMode?intBadges(uc.intLines):domBadge(uc.domain);
+    return'<div class="uc-card"><div class="uc-body">'
+      +personaBadge()
+      +'<div class="uc-badges"><div class="uc-badges-l">'+(uc.trending?'<span class="badge b-trending">&#8679; Trending</span>':'')+domTag+'</div>'
+      +'<div class="pri-wrap">'+priDot(uc.priority)+'<span>'+uc.priority+'</span></div></div>'
+      +'<div class="uc-title">'+uc.title+'</div>'
+      +'<div class="uc-desc">'+getDesc(uc)+'</div>'
+      +mktStat(uc.domain)
+      +'<div class="platform-row">'+platPills(uc.platforms)+'</div>'
+      +(uc.quickStart?'<div class="uc-qs"><span class="qs-i">&#9889;</span><div class="qs-t"><strong>Quick start:</strong> '+uc.quickStart+'</div></div>':'')
+      +'<div class="uc-feats">'+(uc.claudeFeatures||[]).slice(0,4).map(function(f){return'<span class="uc-feat">'+f+'</span>'}).join('')+'</div>'
+      +'<div class="uc-metrics">'
+      +'<div class="uc-metric"><span class="m-lbl">Effort</span><span class="m-val '+mvc(uc.effort,'effort')+'">'+uc.effort+'</span></div>'
+      +'<div class="uc-metric"><span class="m-lbl">Impact</span><span class="m-val '+mvc(uc.impact,'impact')+'">'+uc.impact+'</span></div>'
+      +'<div class="uc-metric"><span class="m-lbl">Timeline</span><span class="m-val mv-n" style="font-size:11px">'+tf+'</span></div>'
+      +'</div></div>'
+      +'<div class="uc-footer"><div class="foot-risk"><span>&#9888;</span><span>'+uc.risks+'</span></div>'+srcLinks(uc.sourceIndices)+'</div>'
+      +'</div>';
+  }).join('')+'</div>';
+}
+
+/* ─── RENDER ROADMAP ─── */
+function renderRoadmap(ucs){
+  var phases=[{lbl:'Quick Win (<1 week)',col:'#10b981'},{lbl:'Short-term (1-4 weeks)',col:'#3b82f6'},{lbl:'Medium-term (1-3 months)',col:'#8b5cf6'},{lbl:'Long-term (3+ months)',col:'#f59e0b'}];
+  return phases.map(function(ph,pi){
+    var items=ucs.filter(function(u){return u.timeframe===ph.lbl});
+    if(!items.length)return'';
+    return'<div class="rm-phase"><div class="rm-ph-hdr"><div class="ph-num" style="background:'+ph.col+'">'+(pi+1)+'</div>'
+      +'<div class="ph-info"><h4>'+ph.lbl+'</h4><span>'+items.length+' use case'+(items.length>1?'s':'')+'</span></div></div>'
+      +'<div class="rm-items" style="border-color:'+ph.col+'40">'
+      +items.map(function(uc){
+        var domTag=S.intMode?intBadges(uc.intLines):domBadge(uc.domain);
+        return'<div class="rm-item"><div class="rm-item-hdr">'+(uc.trending?'<span class="badge b-trending" style="font-size:9px">&#8679;</span>':'')
+          +'<span class="rm-item-title">'+uc.title+'</span>'+domTag+'</div>'
+          +'<div class="rm-item-desc">'+getDesc(uc)+'</div>'
+          +'<div style="margin-bottom:6px">'+platPills(uc.platforms)+'</div>'
+          +(uc.quickStart?'<div class="rm-item-qs"><span>&#9889;</span><span>'+uc.quickStart+'</span></div>':'')
+          +(uc.sourceIndices&&uc.sourceIndices.length?'<div style="margin-top:8px">'+srcLinks(uc.sourceIndices)+'</div>':'')
+          +'</div>';
+      }).join('')+'</div></div>';
+  }).join('');
+}
+
+/* ─── RENDER MATRIX ─── */
+function renderMatrix(ucs){
+  return'<div class="mx-wrap"><table class="uc-tbl"><thead><tr>'
+    +'<th>Use Case</th><th>Domain</th><th>Platforms</th><th>Priority</th><th>Effort</th><th>Impact</th><th>Timeline</th><th>Ref</th>'
+    +'</tr></thead><tbody>'
+    +ucs.map(function(uc){
+      var domTag=S.intMode?intBadges(uc.intLines):domBadge(uc.domain);
+      return'<tr>'
+        +'<td><div style="display:flex;align-items:center;gap:6px">'+(uc.trending?'<span style="color:#f97316;font-size:13px">&#8679;</span>':'')+'<strong style="font-size:13px">'+uc.title+'</strong></div></td>'
+        +'<td>'+domTag+'</td>'
+        +'<td><div style="display:flex;flex-wrap:wrap;gap:4px">'+platPills(uc.platforms)+'</div></td>'
+        +'<td><div style="display:flex;align-items:center;gap:5px">'+priDot(uc.priority)+'<span style="font-size:12px">'+uc.priority+'</span></div></td>'
+        +'<td>'+effBadge(uc.effort)+'</td><td>'+effBadge(uc.impact)+'</td>'
+        +'<td style="font-size:12px;color:#64748b">'+uc.timeframe.split('(')[0].trim()+'</td>'
+        +'<td>'+srcLinks(uc.sourceIndices)+'</td></tr>';
+    }).join('')+'</tbody></table></div>';
+}
+
+/* ─── RENDER HYBRID ─── */
+function renderHybrid(ucs){
+  var qw=ucs.filter(function(u){return u.impact==='High'&&u.effort==='Low'});
+  var sb=ucs.filter(function(u){return u.impact==='High'&&u.effort!=='Low'});
+  var fi=ucs.filter(function(u){return u.impact!=='High'&&u.effort==='Low'});
+  var dp=ucs.filter(function(u){return u.impact!=='High'&&u.effort!=='Low'});
+  function cell(items,col,icon,lbl){
+    var rows=items.length?items.map(function(u){return'<div class="hg-row"><div class="hg-dot" style="background:'+col+'"></div><span>'+u.title+'</span></div>'}).join(''):'<div class="hg-empty">None</div>';
+    return'<div class="hg-cell"><div class="hg-ct" style="color:'+col+'">'+icon+' '+lbl+'</div>'+rows+'</div>';
+  }
+  return'<div class="hyb-mx"><div class="hyb-mx-hdr"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg><h4>Priority Matrix — Impact vs Effort</h4></div>'
+    +'<div class="hyb-grid"><div class="hg-lt" style="border-right:1px solid var(--border)"></div><div class="hg-lt" style="border-right:1px solid var(--border);border-bottom:1px solid var(--border)">Low Effort</div><div class="hg-lt" style="border-bottom:1px solid var(--border)">High Effort</div>'
+    +'<div class="hg-ls">High<br>Impact</div>'+cell(qw,'#16a34a','✓','Quick Wins')+cell(sb,'#d97706','◆','Strategic Bets')
+    +'<div class="hg-ls">Low<br>Impact</div>'+cell(fi,'#2563eb','→','Fill-ins')+cell(dp,'#94a3b8','·','Deprioritize')
+    +'</div></div>'+renderCards(ucs);
+}
+
+/* ─── RENDER SOURCES ─── */
+function renderSources(){
+  if(!S.sources.length)return'';
+  var list=S.sources.map(function(s,i){
+    return'<div class="src-item"><div class="src-num">'+(i+1)+'</div>'
+      +'<div><a class="src-a" href="'+s.url+'" target="_blank">'+s.title+'</a>'
+      +'<a class="src-url" href="'+s.url+'" target="_blank">'+s.url+'</a></div></div>';
+  }).join('');
+  return'<div class="card"><button class="src-toggle" onclick="toggleSrc()">'
+    +'<div class="src-l"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>'
+    +'<span class="src-panel-title">'+S.sources.length+' Reference Sources</span>'
+    +'<span class="src-hint">Click numbered badges on cards to open source</span></div>'
+    +'<span class="chv" id="src-chv">&#9662;</span></button>'
+    +'<div id="src-body" class="src-body hidden">'+list+'</div></div>';
+}
+function toggleSrc(){
+  S.sourcesOpen=!S.sourcesOpen;
+  var b=document.getElementById('src-body');if(!b)return;
+  b.classList.toggle('hidden',!S.sourcesOpen);
+  var c=document.getElementById('src-chv');if(c)c.classList.toggle('open',S.sourcesOpen);
+}
+
+/* ─── MAIN RENDER ─── */
+function renderResults(){
+  var ucs=filtered();
+  var area=document.getElementById('results-area');
+  area.classList.remove('hidden');area.classList.add('anim');
+  var rTxt=document.getElementById('s-role').options[document.getElementById('s-role').selectedIndex].text;
+  var iTxt=document.getElementById('s-industry').options[document.getElementById('s-industry').selectedIndex].text;
+  var mTxt=document.getElementById('s-maturity').options[document.getElementById('s-maturity').selectedIndex].text;
+  var personaTxt=S.persona?document.getElementById('s-persona').options[document.getElementById('s-persona').selectedIndex].text:'';
+  var sumKey=S.role+'_'+S.industry;
+  var summary=CTX[sumKey]||CTX.default;
+  var body='';
+  if(S.format==='cards')body=renderCards(ucs);
+  else if(S.format==='roadmap')body=renderRoadmap(ucs);
+  else if(S.format==='matrix')body=renderMatrix(ucs);
+  else if(S.format==='hybrid')body=renderHybrid(ucs);
+
+  area.innerHTML=
+    '<div class="ctx-banner"><span class="ctx-icon">&#127919;</span>'
+    +'<div style="flex:1"><div class="ctx-lbl"><h3>'+rTxt+' · '+iTxt+' · '+mTxt+'</h3>'
+    +(personaTxt?'<span class="src-badge">👤 '+personaTxt+'</span>':'')
+    +(S.intMode?'<span class="src-badge" style="background:rgba(37,99,235,.2);color:#93c5fd">🏢 INT Mode</span>':'')
+    +'<span class="src-badge"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>'+S.sources.length+' Sources</span></div>'
+    +'<p>'+summary+'</p>'
+    +'<div class="stat-strip">'
+    +'<span class="stat-pill red">📉 95% of AI pilots fail to deliver ROI</span>'
+    +'<span class="stat-pill amber">🔒 73% cite data privacy as #1 AI risk</span>'
+    +'<span class="stat-pill blue">📚 $8,700 annual efficiency tax per untrained employee</span>'
+    +'<span class="stat-pill green">✓ $3.70 returned per $1 invested in AI training</span>'
+    +'</div></div></div>'
+
+    +'<div class="card"><div class="res-hdr">'
+    +'<span class="res-count">'+ucs.length+' Use Cases Discovered</span>'
+    +'<div class="res-legend"><span>&#8679; Trending</span><span>&#9889; Quick start</span><span>★ Primary platform</span></div></div>'
+    +'<div style="padding:20px">'+body+'</div></div>'
+    +renderSources();
+}
+
+/* ─── ROI CALCULATOR ─── */
+/* FIXES: adoption ramp, bimodal success, CoI uses adoptedUsers,
+   removed INT 75% from comparison, presets include approach+readiness,
+   clipboard fallback, local date filename, tooltip click-toggle,
+   productivity cap visual feedback, [GENERATED] provenance labels */
+var ROI_DEPTS=[
+  {id:'eng',label:'Engineering',multiplier:1.4,headcount:8,adoption:70},
+  {id:'sales',label:'Sales',multiplier:1.25,headcount:10,adoption:60},
+  {id:'mkt',label:'Marketing',multiplier:1.35,headcount:6,adoption:65},
+  {id:'sup',label:'Support',multiplier:1.3,headcount:12,adoption:75},
+  {id:'hr',label:'HR',multiplier:1.2,headcount:4,adoption:50},
+  {id:'fin',label:'Finance',multiplier:1.15,headcount:5,adoption:55}
+];
+/* FIX: presets now include approach and dataReadiness */
+var ROI_PRESETS={
+  smb:{salary:65000,license:30,impl:15000,gain:18,change:15,compute:250,maint:500,approach:'vendor',readiness:'3',
+       depts:{eng:{h:3,a:60},sales:{h:5,a:55},mkt:{h:4,a:60},sup:{h:6,a:70},hr:{h:2,a:40},fin:{h:2,a:45}}},
+  midmarket:{salary:75000,license:30,impl:25000,gain:20,change:15,compute:500,maint:1000,approach:'vendor',readiness:'3',
+       depts:{eng:{h:8,a:70},sales:{h:10,a:60},mkt:{h:6,a:65},sup:{h:12,a:75},hr:{h:4,a:50},fin:{h:5,a:55}}},
+  enterprise:{salary:95000,license:35,impl:60000,gain:25,change:20,compute:2000,maint:3000,approach:'managed',readiness:'4',
+       depts:{eng:{h:25,a:75},sales:{h:30,a:65},mkt:{h:15,a:70},sup:{h:35,a:80},hr:{h:10,a:55},fin:{h:15,a:60}}}
+};
+function loadPreset(key){
+  var p=ROI_PRESETS[key];if(!p)return;
+  document.getElementById('roi-salary').value=p.salary;
+  document.getElementById('roi-license').value=p.license;
+  document.getElementById('roi-impl').value=p.impl;
+  document.getElementById('roi-gain').value=p.gain;
+  document.getElementById('roi-change-mgmt').value=p.change;
+  document.getElementById('roi-compute').value=p.compute;
+  document.getElementById('roi-maintenance').value=p.maint;
+  /* FIX: reset approach and readiness with preset */
+  document.getElementById('roi-approach').value=p.approach||'vendor';
+  document.getElementById('roi-data-readiness').value=p.readiness||'3';
+  ROI_DEPTS.forEach(function(d){
+    var hEl=document.getElementById('rh-'+d.id);
+    var aEl=document.getElementById('ra-'+d.id);
+    if(hEl&&p.depts[d.id])hEl.value=p.depts[d.id].h;
+    if(aEl&&p.depts[d.id])aEl.value=p.depts[d.id].a;
+  });
+  var gd=document.getElementById('roi-gain-display');
+  if(gd)gd.textContent=p.gain+'%';
+  calcROI();
+}
+/* FIX: productivity cap shows actual capped value in label */
+function capGain(input){
+  var raw=+(input.value)||20;
+  var capped=Math.min(raw,35);
+  var display=document.getElementById('roi-gain-display');
+  if(display){
+    display.textContent=capped+'%';
+    display.style.color=raw>35?'#dc2626':raw>30?'#d97706':'var(--green)';
+    if(raw>35)input.style.borderColor='#dc2626';
+    else if(raw>30)input.style.borderColor='#d97706';
+    else input.style.borderColor='';
+  }
+  calcROI();
+}
+/* FIX: tooltip click-toggle — click to show, click again or click elsewhere to close */
+function toggleTip(btn){
+  var box=btn.nextElementSibling;
+  if(!box)return;
+  var isOpen=box.classList.contains('show');
+  document.querySelectorAll('.tip-box.show').forEach(function(b){b.classList.remove('show')});
+  if(!isOpen)box.classList.add('show');
+}
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.tip'))
+    document.querySelectorAll('.tip-box.show').forEach(function(b){b.classList.remove('show')});
+});
+function buildROITable(){
+  var rows=document.getElementById('roi-dept-rows');
+  rows.innerHTML=ROI_DEPTS.map(function(d){
+    return'<tr><td>'+d.label+'</td>'
+      +'<td><input type="number" id="rh-'+d.id+'" value="'+d.headcount+'" min="0" max="500" oninput="calcROI()"></td>'
+      +'<td><input type="number" id="ra-'+d.id+'" value="'+d.adoption+'" min="0" max="100" oninput="calcROI()"></td>'
+      +'<td style="font-size:12px;color:var(--t2)">×'+d.multiplier+' <span style="color:var(--t3);font-size:10px">[est.]</span></td></tr>';
+  }).join('');
+  calcROI();
+}
+function calcROI(){
+  var salary=+(document.getElementById('roi-salary').value)||75000;
+  var license=+(document.getElementById('roi-license').value)||30;
+  var impl=+(document.getElementById('roi-impl').value)||25000;
+  var gainRaw=Math.min(+(document.getElementById('roi-gain').value)||20,35);
+  var compute=+(document.getElementById('roi-compute').value)||500;
+  var maint=+(document.getElementById('roi-maintenance').value)||1000;
+  var changePct=(+(document.getElementById('roi-change-mgmt').value)||15)/100;
+  var dataR=+(document.getElementById('roi-data-readiness').value)||3;
+  var approach=document.getElementById('roi-approach').value;
+  var successProb=approach==='internal'?0.33:approach==='vendor'?0.67:0.75;
+  var dataM={1:0.30,2:0.55,3:0.75,4:0.90,5:1.0}[dataR]||0.75;
+  var gain=gainRaw/100;
+  var hr=(salary*1.3)/2080;
+  /* FIX: track adoptedUsers separately from totalHeadcount for CoI */
+  var totalUsers=0,totalSave=0,bars=[],totalHeadcount=0;
+  ROI_DEPTS.forEach(function(d){
+    var hEl=document.getElementById('rh-'+d.id);
+    var aEl=document.getElementById('ra-'+d.id);
+    if(!hEl||!aEl)return;
+    var h=+(hEl.value)||0;
+    var a=(+(aEl.value)||0)/100;
+    var users=Math.round(h*a);
+    totalUsers+=users;        /* adopted users only */
+    totalHeadcount+=h;        /* all headcount, for CoI only */
+    var save=users*2080*gain*dataM*d.multiplier*hr;
+    totalSave+=save;
+    if(save>0)bars.push({label:d.label,val:save});
+  });
+  var changeCost=impl*changePct;
+  var totalImpl=impl+changeCost;
+  var annualLic=totalUsers*license*12;
+  var annualOps=(compute+maint)*12;
+  /* FIX: adoption ramp — Year 1 at 55%, Year 2 at 90%, Year 3 at 100%
+     Previous model used annualSave*3 (100% from day 1 — unrealistic)
+     Ramp factor: 0.55+0.90+1.0 = 2.45 vs previous 3.0 */
+  var yr1Save=totalSave*0.55;
+  var yr2Save=totalSave*0.90;
+  var yr3Save=totalSave*1.00;
+  var totalBenefit3yr=yr1Save+yr2Save+yr3Save; /* = totalSave*2.45 */
+  var totalCost=totalImpl+annualLic*3+annualOps*3;
+  var investEl=document.getElementById('r-invest');
+  if(investEl)investEl.textContent=fmtUSD(totalCost);
+  /* FIX: Bimodal success representation
+     Show "If project succeeds: $X (full projection)"
+     AND "Expected value (prob × success): $Y"
+     instead of blended scenario which implies partial success */
+  var successLabel=approach==='internal'?'33% chance':'67% chance';
+  var scenarios=[
+    {name:'If Fails',label:'Expected ~'+(Math.round((1-successProb)*100))+'% of projects',color:'red',
+     annSave:0,
+     desc:'Most AI initiatives produce near-zero net benefit when they fail — not partial benefit. This is the bimodal reality.'},
+    {name:'Expected Value',label:'Probability × full savings',color:'blue',
+     annSave:(yr1Save+yr2Save+yr3Save)/3*successProb,
+     desc:'Probability-weighted annual average. '+Math.round(successProb*100)+'% chance of success × ramp-adjusted savings. Use this for expected value decisions.'},
+    {name:'If Succeeds',label:'Expected ~'+Math.round(successProb*100)+'% of projects',color:'green',
+     annSave:(yr1Save+yr2Save+yr3Save)/3,
+     desc:'What you actually get if the project succeeds. Includes adoption ramp: Year 1 at 55%, Year 2 at 90%, Year 3 at 100%.'}
+  ];
+  document.getElementById('roi-scenarios').innerHTML=scenarios.map(function(sc){
+    var net3=sc.color==='red'?-totalCost:sc.annSave*3-totalCost;
+    var roi3=totalCost>0?Math.round((net3/totalCost)*100):0;
+    var monthlyNet=sc.annSave/12-(annualLic+annualOps)/12;
+    var pbMo=monthlyNet>0?Math.ceil(totalImpl/monthlyNet):999;
+    var pbStr=sc.color==='red'?'No payback':pbMo>48?'4+ yrs':pbMo>36?'3–4 yrs':pbMo>24?'2–3 yrs':pbMo>12?'1–2 yrs':pbMo+' mo';
+    var colorClass='roi-sc-'+sc.color;
+    /* red uses existing amber style with red text override */
+    if(sc.color==='red')colorClass='roi-sc-amber';
+    return'<div class="roi-sc-card '+colorClass+'" style="'+(sc.color==='red'?'background:#fef2f2;border-color:#fca5a5':'')+'">'
+      +'<div class="roi-sc-name" style="'+(sc.color==='red'?'color:#991b1b':'')+'">'+sc.name+'</div>'
+      +'<div class="roi-sc-lbl">'+sc.label+'</div>'
+      +'<div class="roi-sc-metrics">'
+      +'<div class="roi-sc-m"><div class="roi-sc-val" style="'+(sc.color==='red'?'color:#dc2626':'')+'">'+fmtUSD(sc.annSave)+'</div><div class="roi-sc-mlbl">Avg Annual</div></div>'
+      +'<div class="roi-sc-m"><div class="roi-sc-val" style="'+(sc.color==='red'?'color:#dc2626':'')+'">'+roi3+'%</div><div class="roi-sc-mlbl">3-Yr ROI</div></div>'
+      +'<div class="roi-sc-m"><div class="roi-sc-val" style="'+(sc.color==='red'?'color:#dc2626':'')+'">'+pbStr+'</div><div class="roi-sc-mlbl">Payback</div></div>'
+      +'</div><div class="roi-sc-desc">'+sc.desc+'</div></div>';
+  }).join('');
+  /* FIX: Neutral industry comparison — removed INT 75% claim (unearned)
+     Now shows MIT data only: Internal vs. Vendor-Assisted, no INT branding */
+  var industryBaseline=totalCost*0.059;
+  var vendorAssistedNet=Math.max(totalSave*2.45*0.67-totalCost,0);
+  document.getElementById('roi-compare').innerHTML=
+    '<div class="roi-compare"><div class="roi-compare-title">📊 What the Research Shows — Implementation Approach Matters Most</div>'
+    +'<div class="roi-compare-row">'
+    +'<div class="roi-compare-col bad"><div class="roi-compare-label">Internal DIY Build</div>'
+    +'<div class="roi-compare-sub">33% success rate · <a href="https://www.ignitec.com/insights/the-genai-divide-why-95-of-investors-see-no-roi/" target="_blank" style="color:#64748b">MIT GenAI Divide 2025</a></div>'
+    +'<div class="roi-compare-val bad">'+fmtUSD(totalCost*0.059)+'</div>'
+    +'<div class="roi-compare-sub-val">~5.9% expected ROI · <a href="https://www.ibm.com/think/insights/ai-roi" target="_blank" style="color:#64748b">IBM IBV 2025</a> [GENERATED interpretation]</div></div>'
+    +'<div class="roi-compare-arrow">→</div>'
+    +'<div class="roi-compare-col good"><div class="roi-compare-label">Specialist Partner</div>'
+    +'<div class="roi-compare-sub">67% success rate · <a href="https://www.ignitec.com/insights/the-genai-divide-why-95-of-investors-see-no-roi/" target="_blank" style="color:#64748b">MIT GenAI Divide 2025</a></div>'
+    +'<div class="roi-compare-val good">'+fmtUSD(vendorAssistedNet)+'</div>'
+    +'<div class="roi-compare-sub-val">3-year net benefit with ramp · same inputs, different success rate</div></div>'
+    +'</div>'
+    +'<div style="font-size:10.5px;color:#475569;margin-top:10px;padding:8px 12px;background:rgba(255,255,255,.08);border-radius:6px">⚠ This comparison uses MIT-sourced success rates, not INT\'s measured outcomes. INT has not completed AIaaS engagements at scale. Treat as illustrative of the specialist-vs-internal gap, not as an INT performance claim.</div>'
+    +'</div>';
+  /* FIX: CoI uses totalUsers (adopted) not totalHeadcount (all)
+     Previous version applied $8,700 to all employees regardless of adoption
+     Correct: only adopted users bear the efficiency tax opportunity cost */
+  var coiNote='Based on '+totalUsers+' adopted users × $8,700 annual efficiency tax per un-upskilled seat.';
+  var coiAnnual=totalUsers*8700;
+  document.getElementById('roi-coi').innerHTML=
+    '<div class="roi-coi"><div class="roi-coi-title">⏳ Cost of Inaction — Opportunity Cost of Not Deploying AI</div>'
+    +'<div class="roi-coi-grid">'
+    +'<div class="roi-coi-item"><div class="roi-coi-val">'+fmtUSD(coiAnnual)+'</div><div class="roi-coi-lbl">Year 1</div></div>'
+    +'<div class="roi-coi-item"><div class="roi-coi-val">'+fmtUSD(coiAnnual*2)+'</div><div class="roi-coi-lbl">2-Year</div></div>'
+    +'<div class="roi-coi-item"><div class="roi-coi-val">'+fmtUSD(coiAnnual*3)+'</div><div class="roi-coi-lbl">3-Year</div></div>'
+    +'</div>'
+    +'<div class="roi-coi-note">'+coiNote+' Source: <a href="https://www.datacamp.com/blog/ai-roi" target="_blank">DataCamp 2026</a> [source accuracy unverified — the $8,700 figure may be a derived interpretation, not a direct headline stat]. Applied to adopted users only — previous versions incorrectly applied this to total headcount.</div>'
+    +'</div>';
+  /* FIX: Sensitivity uses ramp-adjusted savings */
+  var baseSave=totalSave*2.45/3*successProb;
+  var downSave=totalSave*0.8*2.45/3*successProb;
+  var upSave=totalSave*1.2*2.45/3*successProb;
+  function netROI(annSave){var n=annSave*3-totalCost;return totalCost>0?Math.round((n/totalCost)*100):0;}
+  document.getElementById('roi-sense').innerHTML=
+    '<div class="roi-sense"><div class="roi-sense-hdr"><div><div class="roi-sense-title">📉 Sensitivity Analysis — Adoption Rate ±20%</div><div class="roi-sense-sub">Shows ramp-adjusted expected value with lower/higher adoption</div></div></div>'
+    +'<div class="roi-sense-grid">'
+    +'<div class="roi-sense-item roi-sense-down"><div class="roi-sense-lbl">−20% Adoption</div><div class="roi-sense-val">'+fmtUSD(downSave)+'</div><div class="roi-sense-delta">'+netROI(downSave)+'% 3-yr ROI</div></div>'
+    +'<div class="roi-sense-item roi-sense-base"><div class="roi-sense-lbl">Base Projection</div><div class="roi-sense-val">'+fmtUSD(baseSave)+'</div><div class="roi-sense-delta">'+netROI(baseSave)+'% 3-yr ROI</div></div>'
+    +'<div class="roi-sense-item roi-sense-up"><div class="roi-sense-lbl">+20% Adoption</div><div class="roi-sense-val">'+fmtUSD(upSave)+'</div><div class="roi-sense-delta">'+netROI(upSave)+'% 3-yr ROI</div></div>'
+    +'</div></div>';
+  /* Risk flags */
+  var flags=[];
+  if(dataR<3)flags.push({t:'red',msg:'🔴 Data readiness below threshold. 79% of organizations report data challenges impacting AI rollouts (<a href="https://www.ibm.com/think/insights/ai-roi" target="_blank">IBM Q4 2025</a>). At readiness '+dataR+'/5, only '+Math.round(dataM*100)+'% of projected savings are realistically achievable. [GENERATED decay curve — exact multipliers are estimated, not measured.]'});
+  if(changePct<0.10)flags.push({t:'amber',msg:'⚠️ Change management budget below 10%. <a href="https://www.ibm.com/think/insights/ai-roi" target="_blank">IBM Q4 2025</a>: organizational culture, governance, and workflow design are the #1 AI ROI constraint. Recommend minimum 15% of implementation cost.'});
+  if(gainRaw>30)flags.push({t:'amber',msg:'⚠️ Productivity gain above 30%. <a href="https://www.ibm.com/think/insights/ai-roi" target="_blank">IBM IBV</a>: enterprise AI achieved 5.9% ROI on 10% capital investment. IDC/Microsoft 2025: median knowledge worker recovers 6.4 hrs/wk (~16% of a 40-hr week). Values above 30% exceed documented medians.'});
+  if(approach==='internal')flags.push({t:'red',msg:'🔴 Internal-only builds succeed 33% of the time vs. 67% for specialist partners (<a href="https://www.ignitec.com/insights/the-genai-divide-why-95-of-investors-see-no-roi/" target="_blank">MIT GenAI Divide 2025</a>). All outputs risk-adjusted by 0.33 success weight. The "If Fails" scenario above reflects the modal outcome for internal builds.'});
+  if(!totalUsers)flags.push({t:'amber',msg:'⚠️ No licensed users calculated. Add headcount and adoption % per department to generate projections.'});
+  document.getElementById('roi-risk-flags').innerHTML=flags.length
+    ?'<div class="roi-flags-wrap">'+flags.map(function(f){return'<div class="roi-flag roi-flag-'+f.t+'">'+f.msg+'</div>'}).join('')+'</div>':'';
+  /* Bars — ramp-adjusted */
+  var maxB=Math.max.apply(null,bars.map(function(b){return b.val}))||1;
+  document.getElementById('roi-bars').innerHTML=bars.length
+    ?bars.map(function(b){
+      var pct=Math.round((b.val/maxB)*100);
+      return'<div class="roi-bar-row"><span class="roi-bar-label">'+b.label+'</span>'
+        +'<div class="roi-bar-track"><div class="roi-bar-fill" style="width:'+pct+'%"></div></div>'
+        +'<span class="roi-bar-val">'+fmtUSD(b.val*successProb*0.85)+'/yr avg</span></div>';
+    }).join('')
+    :'<div style="font-size:12px;color:var(--t3)">Add headcount and adoption % to see breakdown.</div>';
+  /* Break-even (ramp-adjusted payback) */
+  var baseMonNet=(totalSave*successProb*0.85)/12-(annualLic+annualOps)/12;
+  var beMo=baseMonNet>0?Math.ceil(totalImpl/baseMonNet):999;
+  var bePct=Math.min((beMo/48)*100,100);
+  var beStr=beMo>48?'4+ years':beMo>36?'36–48 mo':beMo+' months';
+  document.getElementById('roi-breakeven').innerHTML=
+    '<div class="roi-be"><div class="roi-be-title">📅 Break-Even Timeline — 48-Month View (Ramp-Adjusted)</div>'
+    +'<div class="roi-be-track"><div class="roi-be-fill" style="width:100%"></div>'
+    +(beMo<=48?'<div class="roi-be-marker" style="left:'+bePct+'%"><div class="roi-be-mlbl">'+beStr+'</div></div>':'')
+    +'</div>'
+    +'<div class="roi-be-labels"><span>Mo 0</span><span>Mo 12</span><span>Mo 24</span><span>Mo 36</span><span>Mo 48</span></div>'
+    +'<div class="roi-be-note">Break-even at approximately <strong>'+beStr+'</strong> using ramp-adjusted savings (Year 1 at 55%, Year 2 at 90%). Previous version overstated Year 1 savings by assuming full productivity from day 1. <a href="https://www.deloitte.com/global/en/issues/generative-ai/ai-roi-the-paradox-of-rising-investment-and-elusive-returns.html" target="_blank">Deloitte 2025</a>: only 6% of organizations see AI payback under 12 months.</div>'
+    +'</div>';
+  /* Payback */
+  var yourPbStr=beMo>48?'4+ years':beMo>36?'3–4 years':beMo>24?'2–3 years':beMo>12?'1–2 years':beMo+' months';
+  document.getElementById('roi-timeline').innerHTML=
+    '<div class="roi-timeline-wrap"><div class="roi-timeline-title">⏱ Payback Reality Check — Ramp-Adjusted</div>'
+    +'<div class="roi-timeline-row">'
+    +'<div class="roi-timeline-item bad"><div class="roi-tl-label">Industry Typical</div><div class="roi-tl-val">2–4 Years</div><div class="roi-tl-sub"><a href="https://www.deloitte.com/global/en/issues/generative-ai/ai-roi-the-paradox-of-rising-investment-and-elusive-returns.html" target="_blank">Deloitte 2025</a> · 1,854 execs</div></div>'
+    +'<div class="roi-timeline-item good"><div class="roi-tl-label">Your Projection (Expected Value)</div><div class="roi-tl-val">'+yourPbStr+'</div><div class="roi-tl-sub">'+approach+' · readiness '+dataR+'/5 · ramp-adjusted</div></div>'
+    +'</div>'
+    +'<div class="roi-tl-note">Only <strong>6%</strong> of organizations see AI payback in under a year (<a href="https://www.deloitte.com/global/en/issues/generative-ai/ai-roi-the-paradox-of-rising-investment-and-elusive-returns.html" target="_blank">Deloitte 2025</a>). Ramp note: this calculator now applies a 55%/90%/100% adoption curve across Years 1–3, correcting a previous error where 100% productivity was assumed from day 1.</div>'
+    +'</div>';
+  /* Measurement framework */
+  document.getElementById('roi-measurement').innerHTML=
+    '<div class="roi-mf-wrap"><div class="roi-mf-title">📏 Leading Indicators — How to Actually Verify This</div>'
+    +'<div class="roi-mf-sub">Traditional P&amp;L ROI metrics fail to capture AI value in knowledge-based work, especially Year 1 (<a href="https://www.ignitec.com/insights/the-genai-divide-why-95-of-investors-see-no-roi/" target="_blank">MIT 2025</a>). Non-deterministic outputs require behavioral baselines before revenue attribution.</div>'
+    +'<table class="roi-mf-table"><thead><tr><th>Timeframe</th><th>Metric</th><th>Target</th><th>How to Measure</th></tr></thead><tbody>'
+    +'<tr><td>Wk 1–4</td><td>Adoption velocity</td><td>≥30% of licensed users actively prompting weekly</td><td>Platform usage dashboard · license utilization report</td></tr>'
+    +'<tr><td>Mo 1–3</td><td>Time-shift metric</td><td>≥15% of tracked hours moved from admin to value work</td><td>Time-tracking tool — snapshot before and 90 days after</td></tr>'
+    +'<tr><td>Mo 1–3</td><td>Prompt library utilization</td><td>≥5 prompts per active user per week from shared library</td><td>Shared prompt library access logs</td></tr>'
+    +'<tr><td>Mo 3–6</td><td>Error / rework rate</td><td>≥20% reduction in revision cycles on target workflow</td><td>Project management ticket data — before vs. after</td></tr>'
+    +'<tr><td>Mo 3–6</td><td>Process cycle time</td><td>Target process runs ≥25% faster than pre-AI baseline</td><td>Manual timing or workflow tool analytics</td></tr>'
+    +'<tr><td>Mo 6–12</td><td>Output volume per FTE</td><td>Measurable increase vs. equivalent prior quarter</td><td>Department KPI dashboard — units of work per person</td></tr>'
+    +'<tr><td>Yr 1+</td><td>Revenue / cost impact</td><td>P&amp;L claim only after all six leading indicators confirmed</td><td>Finance team cost accounting — not self-reported</td></tr>'
+    +'</tbody></table>'
+    +'<div class="roi-mf-note">⚠️ Do not claim revenue impact in Year 1 without confirmed leading indicator baselines first (<a href="https://byteiota.com/gartner-40-agentic-ai-projects-fail-heres-why/" target="_blank">Gartner/ByteIota 2025</a>).</div>'
+    +'</div>';
+  var notes={
+    internal:'⚠️ Internal builds: 33% success rate (<a href="https://www.ignitec.com/insights/the-genai-divide-why-95-of-investors-see-no-roi/" target="_blank">MIT 2025</a>). All outputs show bimodal distribution: "If Fails" = $0; "If Succeeds" = full projection.',
+    vendor:'✓ Specialist partner: 67% success rate (<a href="https://www.ignitec.com/insights/the-genai-divide-why-95-of-investors-see-no-roi/" target="_blank">MIT 2025</a>). Recommended baseline.',
+    managed:'✓ Managed service: 67%+ success rate basis from MIT research. Specific managed-service benchmarks require your vendor\'s measured outcomes — not a generic figure.'
+  };
+  var nEl=document.getElementById('roi-approach-note');
+  if(nEl)nEl.innerHTML=notes[approach]||'';
+}
+function toggleROI(){
+  S.roiOpen=!S.roiOpen;
+  document.getElementById('roi-body').classList.toggle('hidden',!S.roiOpen);
+  document.getElementById('roi-toggle-lbl').textContent=S.roiOpen?'Collapse':'Expand';
+  if(S.roiOpen)calcROI();
+}
+function toggleFAQ(btn){
+  var a=btn.nextElementSibling;
+  btn.classList.toggle('open');
+  a.classList.toggle('show');
+}
+function buildROIReportText(){
+  var salary=+(document.getElementById('roi-salary').value)||75000;
+  var impl=+(document.getElementById('roi-impl').value)||25000;
+  var gain=+(document.getElementById('roi-gain').value)||20;
+  var approach=document.getElementById('roi-approach').value;
+  var investEl=document.getElementById('r-invest');
+  var invest=investEl?investEl.textContent:'—';
+  /* FIX: use local date not UTC */
+  var now=new Date();
+  var dateStr=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+  return 'AI ROI CALCULATION REPORT\n'
+    +'Generated: '+dateStr+'\n'
+    +'Version: EPB Platform v2.1 (Adversarial-Reviewed Build)\n'
+    +'========================================\n\n'
+    +'METHODOLOGY DISCLOSURE\n'
+    +'This calculator applies several [GENERATED] estimates:\n'
+    +'  - Department AI multipliers: reasoned approximations, not primary research\n'
+    +'  - Data readiness decay curve: modeled estimate, not empirically validated\n'
+    +'  - Adoption ramp (55%/90%/100% Y1/Y2/Y3): industry-pattern estimate\n'
+    +'  - $8,700 efficiency tax: DataCamp 2026 (source accuracy unverified)\n'
+    +'Validate all figures with your finance team before client-facing use.\n\n'
+    +'INPUTS\n'
+    +'  Approach: '+approach+'\n'
+    +'  Avg burdened salary: $'+salary.toLocaleString()+'\n'
+    +'  Implementation cost: $'+impl.toLocaleString()+'\n'
+    +'  Productivity gain (capped at 35%): '+Math.min(gain,35)+'%\n'
+    +'  Total 3-yr investment: '+invest+'\n\n'
+    +'SOURCED BENCHMARKS\n'
+    +'  MIT GenAI Divide 2025: 95% of enterprise AI pilots see no measurable ROI\n'
+    +'  MIT GenAI Divide 2025: Internal builds 33% success / Partner-assisted 67%\n'
+    +'  IBM IBV 2025: 5.9% ROI on 10% capital investment (industry avg)\n'
+    +'  Deloitte 2025 (1,854 execs): Typical payback 2-4 years\n'
+    +'  IDC/Microsoft 2025: Median 6.4 hrs/week recovered per adopted user\n\n'
+    +'SOURCES\n'
+    +'  https://www.ignitec.com/insights/the-genai-divide-why-95-of-investors-see-no-roi/\n'
+    +'  https://www.ibm.com/think/insights/ai-roi\n'
+    +'  https://www.deloitte.com/global/en/issues/generative-ai/ai-roi-the-paradox-of-rising-investment-and-elusive-returns.html\n'
+    +'  https://www.datacamp.com/blog/ai-roi\n\n'
+    +'DISCLAIMER: Model projections, not guarantees. Validate with your finance team.';
+}
+function exportROIReport(){
+  var txt=buildROIReportText();
+  var blob=new Blob([txt],{type:'text/plain'});
+  /* FIX: use local date in filename */
+  var now=new Date();
+  var fname='ai-roi-report-'+now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+'.txt';
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=fname;
+  a.click();
+}
+/* FIX: clipboard with execCommand fallback for file:// protocol */
+function copyROIReport(){
+  var txt=buildROIReportText();
+  function fallbackCopy(t){
+    var ta=document.createElement('textarea');
+    ta.value=t;
+    ta.style.position='fixed';
+    ta.style.opacity='0';
+    document.body.appendChild(ta);
+    ta.select();
+    try{document.execCommand('copy');}catch(e){}
+    document.body.removeChild(ta);
+  }
+  var c=document.getElementById('roi-copy-confirm');
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(txt).then(function(){
+      if(c){c.style.display='inline';setTimeout(function(){c.style.display='none'},2000);}
+    }).catch(function(){
+      fallbackCopy(txt);
+      if(c){c.style.display='inline';setTimeout(function(){c.style.display='none'},2000);}
+    });
+  } else {
+    fallbackCopy(txt);
+    if(c){c.style.display='inline';setTimeout(function(){c.style.display='none'},2000);}
+  }
+}
+/* ─── UI BINDINGS ─── */
+document.getElementById('s-role').addEventListener('change',function(){S.role=this.value;updateGems()});
+document.getElementById('s-industry').addEventListener('change',function(){S.industry=this.value;updateGems()});
+document.getElementById('s-maturity').addEventListener('change',function(){S.maturity=this.value});
+document.getElementById('s-persona').addEventListener('change',function(){S.persona=this.value;if(S.results)renderResults()});
+document.getElementById('domain-pills').addEventListener('click',function(e){
+  var p=e.target.closest('.pill');if(!p)return;
+  document.querySelectorAll('#domain-pills .pill').forEach(function(x){x.classList.remove('active','int-active')});
+  p.classList.add('active');
+  if(S.intMode)p.classList.add('int-active');
+  S.domain=p.dataset.v;
+  if(S.results)renderResults();
+});
+document.getElementById('fmt-btns').addEventListener('click',function(e){
+  var b=e.target.closest('.fmt-btn');if(!b)return;
+  document.querySelectorAll('#fmt-btns .fmt-btn').forEach(function(x){x.classList.remove('active')});
+  b.classList.add('active');S.format=b.dataset.v;
+  if(S.results)renderResults();
+});
+document.getElementById('tier-btns').addEventListener('click',function(e){
+  var b=e.target.closest('.tier-btn');if(!b)return;
+  document.querySelectorAll('#tier-btns .tier-btn').forEach(function(x){x.classList.remove('active')});
+  b.classList.add('active');S.tier=b.dataset.v;
+});
+</script>
+</body>
+</html>

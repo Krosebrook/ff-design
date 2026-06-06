@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Forge Workbench</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#070612;--surf:rgba(255,255,255,0.04);--surf2:rgba(255,255,255,0.07);--brd:rgba(255,255,255,0.09);--brd2:rgba(255,255,255,0.15);--txt:#e8eaf0;--mut:#8a8fa3;--cyan:#22d3ee;--fuch:#d946ef;--vio:#7c3aed;--em:#10b981;--am:#f59e0b;--rose:#f43f5e;--grid:rgba(255,255,255,0.025)}
+html,body,#root{height:100%;background:var(--bg);color:var(--txt)}
+body{font-family:'Space Grotesk',sans-serif;overflow-y:auto;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:40px 40px;background-attachment:fixed}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:3px}
+button{cursor:pointer;border:none;background:none;color:inherit;font-family:inherit}
+button:focus-visible,*:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;font-weight:700;font-size:12px;transition:all .12s;border:1px solid transparent}
+.btn:hover:not(:disabled){transform:translateY(-1px)}
+.btn-w{background:#fff;color:#0a0614}.btn-c{background:var(--cyan);color:#06121a}.btn-f{background:var(--fuch);color:#fff}
+.btn-v{background:var(--vio);color:#fff}.btn-e{background:var(--em);color:#04150f}
+.btn-g{background:var(--surf);color:var(--txt);border-color:var(--brd)}.btn-g:hover:not(:disabled){background:var(--surf2)}
+.card{background:var(--surf);border:1px solid var(--brd);border-radius:14px}
+.card-2{background:rgba(0,0,0,0.25);border:1px solid var(--brd);border-radius:12px}
+.lbl{display:block;font-weight:700;font-size:10px;margin-bottom:8px;color:var(--mut);letter-spacing:0.08em;text-transform:uppercase}
+.ta{width:100%;background:rgba(0,0,0,0.3);border:1px solid var(--brd);border-radius:10px;padding:12px;color:var(--txt);font-size:13px;line-height:1.6;outline:none;resize:vertical;font-family:inherit}
+.ta:focus{border-color:var(--cyan)}.ta-mono{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#a5f3fc}
+.sel{width:100%;background:rgba(0,0,0,0.4);border:1px solid var(--brd);border-radius:8px;padding:9px 11px;color:var(--txt);font-size:12px;outline:none;cursor:pointer;appearance:none;padding-right:28px}
+.chip{border:1px solid var(--brd);background:rgba(0,0,0,0.2);border-radius:999px;padding:5px 11px;font-size:11px;font-weight:600;cursor:pointer;transition:all .12s;color:var(--mut)}
+.chip:hover{border-color:var(--brd2);background:rgba(255,255,255,0.06);color:var(--txt)}
+.chip.active{border-color:var(--fuch);background:rgba(217,70,239,0.12);color:#f0abfc}
+.tab-bar{display:inline-flex;background:rgba(0,0,0,0.3);border:1px solid var(--brd);border-radius:10px;padding:3px;gap:2px}
+.tab-btn{padding:8px 16px;border-radius:7px;font-size:12px;font-weight:700;color:var(--mut);transition:all .12s;display:flex;align-items:center;gap:6px}
+.tab-btn:hover:not(.act){color:var(--txt);background:rgba(255,255,255,0.04)}
+.tab-btn.act{background:var(--surf2);color:var(--txt)}
+.tab-icon{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--cyan);font-weight:900}
+.gradtxt{background:linear-gradient(135deg,#fff 20%,#22d3ee 60%,#d946ef 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.muted{color:var(--mut)}.mono{font-family:'JetBrains Mono',monospace}
+.between{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.alert{border-radius:8px;padding:9px 12px;font-size:11.5px;display:flex;gap:8px;align-items:flex-start;line-height:1.5;margin-bottom:8px}
+.alert-info{background:rgba(34,211,238,0.06);border:1px solid rgba(34,211,238,0.18);color:#a5f3fc}
+.alert-am{background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.22);color:#fde68a}
+.alert-em{background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.22);color:#6ee7b7}
+.alert-rose{background:rgba(244,63,94,0.07);border:1px solid rgba(244,63,94,0.22);color:#fda4af}
+.alert-ic{font-family:'JetBrains Mono',monospace;font-weight:900;flex-shrink:0;width:16px;text-align:center}
+.step{display:flex;gap:12px;padding:14px;border-radius:12px;border:1px solid var(--brd);background:rgba(255,255,255,0.02);cursor:pointer;transition:all .12s}
+.step:hover{border-color:var(--brd2)}
+.step.active{border-color:var(--cyan);background:rgba(34,211,238,0.05)}
+.step-num{flex-shrink:0;width:28px;height:28px;border-radius:50%;background:var(--surf2);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;color:var(--mut)}
+.step.active .step-num{background:var(--cyan);color:#06121a}
+.step-done .step-num{background:var(--em);color:#04150f}
+.pre{max-height:380px;overflow:auto;white-space:pre-wrap;background:rgba(0,0,0,0.4);border:1px solid var(--brd);border-radius:10px;padding:14px;font-size:11.5px;line-height:1.7;color:#a5f3fc;font-family:'JetBrains Mono',monospace}
+.usecase{padding:12px;border-radius:10px;background:rgba(255,255,255,0.025);border:1px solid var(--brd);transition:all .12s;cursor:pointer}
+.usecase:hover{border-color:var(--brd2)}
+.usecase.picked{border-color:var(--em);background:rgba(16,185,129,0.06)}
+.uc-title{font-weight:800;font-size:13px;margin-bottom:4px}
+.uc-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.tag{font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;letter-spacing:0.04em;text-transform:uppercase}
+.tag-h{background:rgba(244,63,94,0.12);color:#fb7185}
+.tag-m{background:rgba(245,158,11,0.12);color:#fbbf24}
+.tag-l{background:rgba(16,185,129,0.12);color:#6ee7b7}
+@media(max-width:880px){.grid2{grid-template-columns:1fr!important}.g3c{grid-template-columns:1fr 1fr!important}}
+</style>
+</head>
+<body><div id="root"></div>
+<script type="text/babel" data-presets="env,react">
+const{useState,useMemo,useEffect}=React;
+const STORAGE_KEY="ff-workbench-v1";
+const safeStorage=()=>{try{if(!window?.localStorage)return null;window.localStorage.setItem("__t","1");window.localStorage.removeItem("__t");return window.localStorage}catch{return null}};
+const tokenEstimate=(s)=>Math.ceil((String(s||"").length)/4);
+
+const ROLES=["Developer","PM","Executive","Ops","Security","Data","Support"];
+const INDUSTRIES=["Technology","Financial","Healthcare","Manufacturing","Retail","Professional Services","Government"];
+const MATURITIES=["Startup (1-50)","SMB (50-200)","Mid-Market (200-1000)","Enterprise (1000+)"];
+
+const USE_CASES=[
+  {id:"uc01",title:"Customer support triage",role:"Support",industry:"any",maturity:"any",priority:"High",effort:"Low",impact:"High",cost:4800,
+    forge:{topic:"Build an AI triage layer that classifies inbound support tickets by category and severity, drafts a first-response, and routes high-confidence categories to auto-resolution.",mode:"agentic",platforms:["Claude","ChatGPT"]}},
+  {id:"uc02",title:"Code review assistant",role:"Developer",industry:"any",maturity:"any",priority:"High",effort:"Medium",impact:"High",cost:8000,
+    forge:{topic:"Build a code review bot that comments on PRs flagging: missing tests, untyped functions, security smells (OWASP Top 10), and unjustified `any`. Skip cosmetic nits.",mode:"coding",platforms:["Claude Code","Cursor"]}},
+  {id:"uc03",title:"Sales call coaching",role:"PM",industry:"any",maturity:"SMB (50-200)",priority:"Medium",effort:"Medium",impact:"High",cost:3200,
+    forge:{topic:"Analyze sales call transcripts and produce a coaching summary: deal stage, objections raised, next steps committed, talk-to-listen ratio, and 3 specific improvements for the rep.",mode:"business",platforms:["Claude","ChatGPT"]}},
+  {id:"uc04",title:"Compliance evidence collection",role:"Security",industry:"any",maturity:"Mid-Market (200-1000)",priority:"High",effort:"High",impact:"High",cost:12000,
+    forge:{topic:"Design an automated evidence collector for SOC2 Type II that pulls access reviews, change logs, and security scan results into a structured evidence catalog mapped to controls. Output: audit-ready evidence per control with primary source.",mode:"technical",platforms:["Claude"]}},
+  {id:"uc05",title:"Internal knowledge search",role:"Ops",industry:"any",maturity:"any",priority:"High",effort:"Medium",impact:"Medium",cost:6000,
+    forge:{topic:"Build internal knowledge search over Notion + Slack + GDrive. Every answer must cite source documents. Mark unverified claims [unverified]. Refuse if confidence is low.",mode:"research",platforms:["Claude","ChatGPT"]}},
+  {id:"uc06",title:"PR description generator",role:"Developer",industry:"any",maturity:"any",priority:"Medium",effort:"Low",impact:"Medium",cost:2400,
+    forge:{topic:"Generate a PR description from a git diff. Sections: What, Why (link issue), Approach, Files touched, Files NOT touched, How to test, Risks, Self-check checklist. Skip if diff is < 5 lines.",mode:"coding",platforms:["Claude Code","Cursor"]}},
+  {id:"uc07",title:"Customer onboarding agent",role:"Support",industry:"Technology",maturity:"any",priority:"High",effort:"Medium",impact:"High",cost:7200,
+    forge:{topic:"Design an in-app onboarding agent that adapts to user role (developer / PM / exec). Tracks completion of 5 milestones. Surfaces stuck users to support after 48h inactive.",mode:"agentic",platforms:["Claude","Lovable"]}},
+  {id:"uc08",title:"Vendor risk assessment",role:"Security",industry:"any",maturity:"Enterprise (1000+)",priority:"Medium",effort:"High",impact:"Medium",cost:9600,
+    forge:{topic:"Vendor security questionnaire reviewer. Parse vendor SOC2 + DPA + responses. Flag: gaps vs our requirements, expired certs, sub-processor changes. Output: risk score 1-5 per dimension.",mode:"technical",platforms:["Claude"]}},
+];
+
+const FORGE_MODES=[{id:"basic",lbl:"General"},{id:"coding",lbl:"Coding"},{id:"technical",lbl:"Architecture"},{id:"research",lbl:"Research"},{id:"creative",lbl:"Creative"},{id:"business",lbl:"Business"},{id:"agentic",lbl:"Agentic"}];
+
+function buildPrompt(o){
+  const role={coding:"You are a senior software engineer. You ship production-ready code with input validation, error handling, and minimal-surface diffs.",technical:"You are a staff platform engineer. You compare options, name tradeoffs, and produce decision matrices.",research:"You are a research analyst. You synthesize evidence, cite sources, and label confidence.",creative:"You are a creative director and prompt designer. You commit to aesthetic choices and avoid clichés.",business:"You are a strategy advisor. You identify decision-makers, surface risks, and recommend an action.",agentic:"You are an agent architect. You design reliable multi-step workflows with checkpoints and recovery.",basic:"You are a careful, direct assistant. You ask one clarifying question only when correctness is at stake."}[o.mode]||"";
+  const fmtNote={Markdown:"Use Markdown headings.",JSON:"Return a single valid JSON object.",Table:"Return a compact table.",Checklist:"Return a checklist with completion criteria."}[o.fmt]||"Use Markdown headings.";
+  const lenNote={compact:"Keep under ~200 tokens.",standard:"Aim for ~500 tokens.",detailed:"Aim for ~900 tokens.",exhaustive:"Cover edge cases (~1500 tokens)."}[o.length]||"";
+  let body=`# Role\n${role}\n\n# Task\n${o.topic||"[Specify the task]"}\n\n# Output\n${fmtNote}\n${lenNote} Tone: ${o.tone}.\n\n# Constraints\n- Do not invent facts, sources, or user preferences.\n- Avoid filler and hedging.`;
+  if(o.inclVal)body+=`\n- Verify internal consistency before responding.`;
+  if(o.inclEx)body+=`\n\n# Example\nInclude one short, concrete example.`;
+  if(o.inclCit)body+=`\n\n# Citations\nCite factual claims. Mark unverified claims [unverified].`;
+  if(o.inclQ)body+=`\n\n# On ambiguity\nAsk one clarifying question only if a wrong assumption would waste user time. Otherwise state assumptions and proceed.`;
+  if(o.platforms?.length)body+=`\n\n# Platform notes\nOptimized for: ${o.platforms.join(", ")}.`;
+  if(o.extra)body+=`\n\n# Extra context\n${o.extra}`;
+  return body;
+}
+
+function buildDeckPrompt(o){
+  const slides=o.deckTime==="15 min"?"10 slides":o.deckTime==="30 min"?"15-20 slides":"25-30 slides";
+  return `# Role\nYou are an expert C-suite presentation architect. You verify every quantitative claim with web search. You cite sources inline. You red-team your own work.\n\n# Topic\n${o.deckTopic||"[Specify the deck topic]"}\n\n# Audience & Decision\n- Audience: ${o.deckAudience}\n- Decision asked: ${o.deckDecision}\n- Tech level: ${o.deckTechLevel}\n- Time: ${o.deckTime}\n\n# Proof we have today\n${o.deckProof||"[List traction, customer count, metrics, etc.]"}\n\n# Strongest counterargument\n${o.deckCounter||"[State the smartest objection in one sentence]"}\n\n# Required output\n1. Slide deck in Markdown (1 idea per slide, visual > text, TL;DR first)\n2. Inline source citations with hyperlinks\n3. Speaker notes per slide\n4. Risks & Mitigations slide (3+ real risks from web research)\n5. "What Could Prove Us Wrong" appendix (steelman opposition)\n6. One-page handout (problem, solution, proof, ask)\n7. Q&A prep (10-15 likely questions with sourced answers)\n\n# Verification rules\n- Every percentage cited with source\n- Every market size cited with source\n- Every competitor claim verified via web search\n- Every projection labeled "projection" or "estimate"\n- Unverified claims marked [unverified]\n\n# Slide count target\n${slides}\n\n# Self-check\n- Did I include "What Could Prove Us Wrong"?\n- Is every number sourced?\n- Did I price-tag the ask?\n- Did I include a "do nothing" option?`;
+}
+
+function lintPrompt(text){
+  const issues=[];const s=String(text||"");
+  if(!s.trim())return{issues:[{sev:"info",msg:"Paste a prompt above to lint."}],summary:{e:0,w:0,i:0}};
+  const secrets=[/\bsk-[A-Za-z0-9]{20,}/,/\bsk-ant-[A-Za-z0-9_\-]{20,}/,/\bghp_[A-Za-z0-9]{20,}/,/\bAKIA[0-9A-Z]{16}\b/,/-----BEGIN [A-Z ]*PRIVATE KEY-----/];
+  secrets.forEach(re=>{if(re.test(s))issues.push({sev:"error",msg:"Possible secret detected",fix:"Replace with {{ENV_VAR}} placeholder."});});
+  if(!/^#|<role>|^role:|^you are/im.test(s))issues.push({sev:"warn",msg:"No role/persona statement",fix:"Add '# Role\\nYou are…' line."});
+  if(!/format|json|markdown|table|checklist|list|paragraph/i.test(s))issues.push({sev:"warn",msg:"No output format specified",fix:"Tell the model what shape the response should take."});
+  if(!/constraint|do not|don.?t|avoid|never/i.test(s))issues.push({sev:"warn",msg:"No constraints",fix:"Constraints often beat positive instructions."});
+  ["help me","make it good","do something"].forEach(v=>{if(s.toLowerCase().includes(v))issues.push({sev:"warn",msg:`Vague phrase: "${v}"`,fix:"Replace with specific verb + measurable outcome."});});
+  const hedges=s.match(/\b(maybe|perhaps|kind of|sort of|try to|if possible)\b/gi);
+  if(hedges&&hedges.length>=2)issues.push({sev:"info",msg:`Hedge language used ${hedges.length} times`,fix:"Hedging signals negotiable requirements."});
+  const tok=tokenEstimate(s);
+  if(tok<30)issues.push({sev:"info",msg:`Very short (~${tok} tok)`,fix:"Add: who, what, why, output shape."});
+  if(tok>3000)issues.push({sev:"warn",msg:`Very long (~${tok} tok)`,fix:"Long single prompts compete with themselves."});
+  if(/\b(strategy|decision|recommend|pitch)\b/i.test(s)&&!/\b(pre-?mortem|prove us wrong|6 months from now|counterargument)\b/i.test(s))
+    issues.push({sev:"info",msg:"Strategic prompt without pre-mortem",fix:"Add: 'What would prove us wrong?'"});
+  if(/\b(architecture|ADR|compare options|tradeoff)\b/i.test(s)&&!/\b(do nothing|status quo|no change)\b/i.test(s))
+    issues.push({sev:"info",msg:"Architecture prompt missing 'do nothing'",fix:"Always include 'do nothing' as a valid option."});
+  if(/\b(build|implement|ship|deploy)\b/i.test(s)&&!/\b(acceptance|done when|criteria|verify)\b/i.test(s))
+    issues.push({sev:"info",msg:"Build prompt without acceptance criteria",fix:"Add 'Acceptance: …' so done is observable."});
+  if(/\b(research|synthesize|investigate)\b/i.test(s)&&!/\b(confidence|HIGH|MEDIUM|LOW|verified|unverified)\b/i.test(s))
+    issues.push({sev:"info",msg:"Research prompt without confidence labels",fix:"Require HIGH/MEDIUM/LOW or [unverified]."});
+  const sum={e:issues.filter(i=>i.sev==="error").length,w:issues.filter(i=>i.sev==="warn").length,i:issues.filter(i=>i.sev==="info").length};
+  if(!issues.length)issues.push({sev:"info",msg:"No issues found. Prompt looks well-formed."});
+  return{issues,summary:sum};
+}
+
+function App(){
+  const[tab,setTab]=useState("discover");
+  const[topic,setTopic]=useState("");
+  const[selectedUseCase,setSelectedUseCase]=useState(null);
+  const[filterRole,setFilterRole]=useState("");
+  const[filterIndustry,setFilterIndustry]=useState("");
+  const[filterMaturity,setFilterMaturity]=useState("");
+  const[mode,setMode]=useState("basic");
+  const[platforms,setPlatforms]=useState(["Claude","ChatGPT"]);
+  const[tone,setTone]=useState("Direct");
+  const[length,setLength]=useState("standard");
+  const[fmt,setFmt]=useState("Markdown");
+  const[extra,setExtra]=useState("");
+  const[inclVal,setInclVal]=useState(true);
+  const[inclQ,setInclQ]=useState(true);
+  const[inclEx,setInclEx]=useState(false);
+  const[inclCit,setInclCit]=useState(false);
+  const[deckTopic,setDeckTopic]=useState("");
+  const[deckAudience,setDeckAudience]=useState("Internal leadership");
+  const[deckDecision,setDeckDecision]=useState("Approve budget");
+  const[deckTime,setDeckTime]=useState("30 min");
+  const[deckTechLevel,setDeckTechLevel]=useState("Mixed");
+  const[deckProof,setDeckProof]=useState("");
+  const[deckCounter,setDeckCounter]=useState("");
+  const[lintInput,setLintInput]=useState("");
+  const[saved,setSaved]=useState("");
+  const[hydrated,setHydrated]=useState(false);
+
+  useEffect(()=>{
+    const ls=safeStorage();
+    if(ls){try{const raw=ls.getItem(STORAGE_KEY);
+      if(raw){const p=JSON.parse(raw);
+        setTopic(p.topic||"");setMode(p.mode||"basic");setPlatforms(p.platforms||["Claude","ChatGPT"]);
+        setTone(p.tone||"Direct");setLength(p.length||"standard");setFmt(p.fmt||"Markdown");setExtra(p.extra||"");
+        setInclVal(p.inclVal??true);setInclQ(p.inclQ??true);setInclEx(!!p.inclEx);setInclCit(!!p.inclCit);
+        setDeckTopic(p.deckTopic||"");setDeckAudience(p.deckAudience||"Internal leadership");
+        setDeckDecision(p.deckDecision||"Approve budget");setDeckTime(p.deckTime||"30 min");
+        setDeckTechLevel(p.deckTechLevel||"Mixed");setDeckProof(p.deckProof||"");setDeckCounter(p.deckCounter||"");
+        setLintInput(p.lintInput||"");setSelectedUseCase(p.selectedUseCase||null);
+      }}catch{}}
+    setHydrated(true);
+  },[]);
+
+  useEffect(()=>{
+    if(!hydrated)return;
+    const ls=safeStorage();if(!ls)return;
+    const t=setTimeout(()=>{try{ls.setItem(STORAGE_KEY,JSON.stringify({topic,mode,platforms,tone,length,fmt,extra,inclVal,inclQ,inclEx,inclCit,deckTopic,deckAudience,deckDecision,deckTime,deckTechLevel,deckProof,deckCounter,lintInput,selectedUseCase}));setSaved("Saved");setTimeout(()=>setSaved(""),900)}catch{}},600);
+    return()=>clearTimeout(t);
+  },[hydrated,topic,mode,platforms,tone,length,fmt,extra,inclVal,inclQ,inclEx,inclCit,deckTopic,deckAudience,deckDecision,deckTime,deckTechLevel,deckProof,deckCounter,lintInput,selectedUseCase]);
+
+  const filteredUseCases=useMemo(()=>USE_CASES.filter(u=>(!filterRole||u.role===filterRole||u.role==="any")&&(!filterIndustry||u.industry===filterIndustry||u.industry==="any")&&(!filterMaturity||u.maturity===filterMaturity||u.maturity==="any")),[filterRole,filterIndustry,filterMaturity]);
+  const forgePrompt=useMemo(()=>buildPrompt({topic,mode,platforms,tone,length,fmt,extra,inclVal,inclQ,inclEx,inclCit}),[topic,mode,platforms,tone,length,fmt,extra,inclVal,inclQ,inclEx,inclCit]);
+  const deckPrompt=useMemo(()=>buildDeckPrompt({deckTopic,deckAudience,deckDecision,deckTime,deckTechLevel,deckProof,deckCounter}),[deckTopic,deckAudience,deckDecision,deckTime,deckTechLevel,deckProof,deckCounter]);
+  const lint=useMemo(()=>lintPrompt(lintInput),[lintInput]);
+
+  const pickUseCase=(uc)=>{setSelectedUseCase(uc);setTopic(uc.forge.topic);setMode(uc.forge.mode);setPlatforms(uc.forge.platforms);setTab("forge")};
+  const sendForgeToDeck=()=>{setDeckTopic(topic);setTab("deck")};
+  const sendForgeToLint=()=>{setLintInput(forgePrompt);setTab("lint")};
+  const sendDeckToLint=()=>{setLintInput(deckPrompt);setTab("lint")};
+  const copyText=async(t)=>{try{await navigator.clipboard.writeText(t);setSaved("Copied");setTimeout(()=>setSaved(""),900)}catch{}};
+  const exportText=(t,name)=>{const b=new Blob([t],{type:"text/markdown"});const u=URL.createObjectURL(b);const a=document.createElement("a");a.href=u;a.download=name;a.click();URL.revokeObjectURL(u)};
+  const togglePlat=(p)=>setPlatforms(c=>c.includes(p)?c.filter(x=>x!==p):[...c,p]);
+
+  return (
+    <div style={{position:"relative",minHeight:"100vh",padding:"0 0 48px"}}>
+      <div style={{position:"relative",zIndex:1,maxWidth:1280,margin:"0 auto",padding:"20px 16px"}}>
+        <header className="between" style={{marginBottom:18,gap:12,flexWrap:"wrap"}}>
+          <div>
+            <div style={{display:"flex",gap:8,alignItems:"center",marginBottom:8}}>
+              <span className="mono" style={{fontSize:11,color:"var(--cyan)",fontWeight:700,padding:"3px 8px",background:"rgba(34,211,238,0.08)",border:"1px solid rgba(34,211,238,0.2)",borderRadius:6}}>v1</span>
+              <span className="muted mono" style={{fontSize:11}}>forge-workbench</span>
+              {saved&&<span style={{fontSize:10,color:"var(--em)",fontWeight:700}}>{saved}</span>}
+            </div>
+            <h1 className="gradtxt" style={{fontSize:"clamp(22px,3.2vw,32px)",fontWeight:900,lineHeight:1.05,letterSpacing:"-0.025em"}}>Forge Workbench</h1>
+            <p className="muted" style={{fontSize:12.5,marginTop:6,maxWidth:680,lineHeight:1.55}}>Discover use cases → forge a prompt → optionally turn it into a C-suite deck → lint before sending. Cross-tab state autosaves.</p>
+          </div>
+          <nav className="tab-bar" role="tablist">
+            <button role="tab" aria-selected={tab==="discover"} className={`tab-btn${tab==="discover"?" act":""}`} onClick={()=>setTab("discover")}><span className="tab-icon">1.</span>Discover</button>
+            <button role="tab" aria-selected={tab==="forge"} className={`tab-btn${tab==="forge"?" act":""}`} onClick={()=>setTab("forge")}><span className="tab-icon">2.</span>Forge</button>
+            <button role="tab" aria-selected={tab==="deck"} className={`tab-btn${tab==="deck"?" act":""}`} onClick={()=>setTab("deck")}><span className="tab-icon">3.</span>Deck</button>
+            <button role="tab" aria-selected={tab==="lint"} className={`tab-btn${tab==="lint"?" act":""}`} onClick={()=>setTab("lint")}><span className="tab-icon">4.</span>Lint</button>
+          </nav>
+        </header>
+
+        <div className="between" style={{marginBottom:16,gap:8,flexWrap:"wrap"}}>
+          {[{k:"discover",lbl:"Discover use case",done:!!selectedUseCase},{k:"forge",lbl:"Forge prompt",done:topic.trim().length>20},{k:"deck",lbl:"Deck (optional)",done:deckTopic.trim().length>20},{k:"lint",lbl:"Lint before send",done:lintInput.length>0}].map((s,i)=>(
+            <div key={s.k} onClick={()=>setTab(s.k)} className={`step ${tab===s.k?"active":""} ${s.done?"step-done":""}`} style={{flex:"1 1 200px",minWidth:160}}>
+              <div className="step-num">{s.done?"✓":i+1}</div>
+              <div><div style={{fontWeight:700,fontSize:12}}>{s.lbl}</div><div className="muted" style={{fontSize:10,marginTop:2}}>{s.done?"Complete":"Pending"}</div></div>
+            </div>
+          ))}
+        </div>
+
+        {tab==="discover"&&(
+          <div className="grid2" style={{display:"grid",gridTemplateColumns:"280px minmax(0,1fr)",gap:14,alignItems:"start"}}>
+            <div className="card" style={{padding:18}}>
+              <div style={{fontWeight:900,fontSize:14,marginBottom:14}}>Filter use cases</div>
+              <div style={{marginBottom:14}}><label className="lbl">Role</label><select className="sel" value={filterRole} onChange={e=>setFilterRole(e.target.value)}><option value="">All roles</option>{ROLES.map(r=><option key={r}>{r}</option>)}</select></div>
+              <div style={{marginBottom:14}}><label className="lbl">Industry</label><select className="sel" value={filterIndustry} onChange={e=>setFilterIndustry(e.target.value)}><option value="">All industries</option>{INDUSTRIES.map(r=><option key={r}>{r}</option>)}</select></div>
+              <div style={{marginBottom:14}}><label className="lbl">Maturity</label><select className="sel" value={filterMaturity} onChange={e=>setFilterMaturity(e.target.value)}><option value="">All sizes</option>{MATURITIES.map(r=><option key={r}>{r}</option>)}</select></div>
+              <div className="alert alert-info"><span className="alert-ic">i</span><span>Pick a use case → it pre-fills the Forge tab.</span></div>
+              <div className="muted mono" style={{fontSize:10,marginTop:10}}>{filteredUseCases.length} of {USE_CASES.length} match</div>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+              {filteredUseCases.map(uc=>(
+                <div key={uc.id} className={`usecase ${selectedUseCase?.id===uc.id?"picked":""}`} onClick={()=>pickUseCase(uc)}>
+                  <div className="uc-title">{uc.title}</div>
+                  <div className="muted" style={{fontSize:11,lineHeight:1.5}}>{uc.forge.topic.slice(0,140)}{uc.forge.topic.length>140?"…":""}</div>
+                  <div className="uc-meta">
+                    <span className={`tag tag-${uc.priority==="High"?"h":uc.priority==="Medium"?"m":"l"}`}>{uc.priority}</span>
+                    <span className={`tag tag-${uc.effort==="High"?"h":uc.effort==="Medium"?"m":"l"}`}>Eff: {uc.effort}</span>
+                    <span className={`tag tag-${uc.impact==="High"?"l":"m"}`}>Imp: {uc.impact}</span>
+                    <span className="muted mono" style={{fontSize:9}}>~${uc.cost.toLocaleString()}/mo</span>
+                  </div>
+                </div>
+              ))}
+              {filteredUseCases.length===0&&<div className="alert alert-am" style={{gridColumn:"1/-1"}}><span className="alert-ic">!</span><span>No use cases match those filters.</span></div>}
+            </div>
+          </div>
+        )}
+
+        {tab==="forge"&&(
+          <div className="grid2" style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) minmax(0,1.05fr)",gap:14,alignItems:"start"}}>
+            <div className="card" style={{padding:18}}>
+              {selectedUseCase&&<div className="alert alert-em" style={{marginBottom:14}}><span className="alert-ic">✓</span><span>Pre-filled from <b>{selectedUseCase.title}</b>. Edit topic to customize.</span></div>}
+              <label className="lbl" htmlFor="topic">Topic / Task</label>
+              <textarea id="topic" className="ta" rows={5} placeholder="What do you actually need?" value={topic} onChange={e=>setTopic(e.target.value)} maxLength={4000}/>
+              <div className="between" style={{marginTop:6}}><span className="mono muted" style={{fontSize:10}}>{topic.length}/4000</span><span className="mono muted" style={{fontSize:10}}>~{tokenEstimate(topic)} tok</span></div>
+              <div style={{marginTop:14}}><label className="lbl">Mode</label><select className="sel" value={mode} onChange={e=>setMode(e.target.value)}>{FORGE_MODES.map(m=><option key={m.id} value={m.id}>{m.lbl}</option>)}</select></div>
+              <div style={{marginTop:14}}><label className="lbl">Platforms</label><div style={{display:"flex",flexWrap:"wrap",gap:5}}>{["Claude","ChatGPT","Gemini","Claude Code","Cursor","Lovable"].map(p=><button key={p} className={`chip${platforms.includes(p)?" active":""}`} onClick={()=>togglePlat(p)}>{p}</button>)}</div></div>
+              <div className="g3c" style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginTop:14}}>
+                <div><label className="lbl">Tone</label><select className="sel" value={tone} onChange={e=>setTone(e.target.value)}>{["Direct","Concise","Friendly","Professional","Staff-level"].map(t=><option key={t}>{t}</option>)}</select></div>
+                <div><label className="lbl">Length</label><select className="sel" value={length} onChange={e=>setLength(e.target.value)}><option value="compact">Compact (~200t)</option><option value="standard">Standard (~500t)</option><option value="detailed">Detailed (~900t)</option><option value="exhaustive">Exhaustive (~1500t)</option></select></div>
+                <div><label className="lbl">Format</label><select className="sel" value={fmt} onChange={e=>setFmt(e.target.value)}>{["Markdown","JSON","Table","Checklist"].map(f=><option key={f}>{f}</option>)}</select></div>
+              </div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginTop:14}}>
+                {[[inclVal,setInclVal,"Validation"],[inclQ,setInclQ,"Clarify on ambiguity"],[inclEx,setInclEx,"Include example"],[inclCit,setInclCit,"Require citations"]].map(([v,s,l])=>(
+                  <button key={l} className="chip" style={{justifyContent:"space-between",display:"flex",padding:"8px 12px"}} onClick={()=>s(!v)}><span>{l}</span><span style={{color:v?"var(--em)":"var(--mut)"}}>{v?"✓":"○"}</span></button>
+                ))}
+              </div>
+              <div style={{marginTop:14}}><label className="lbl">Extra context</label><textarea className="ta" rows={3} placeholder="Stack, audience, constraints…" value={extra} onChange={e=>setExtra(e.target.value)} maxLength={4000}/></div>
+            </div>
+            <div className="card" style={{padding:18}}>
+              <div className="between" style={{marginBottom:12}}>
+                <div><div style={{fontWeight:900,fontSize:14}}>Live prompt</div><div className="muted mono" style={{fontSize:10,marginTop:2}}>~{tokenEstimate(forgePrompt)} tok</div></div>
+                <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+                  <button className="btn btn-w" onClick={()=>copyText(forgePrompt)}>Copy</button>
+                  <button className="btn btn-v" onClick={()=>exportText(forgePrompt,"prompt.md")}>Export</button>
+                </div>
+              </div>
+              <pre className="pre">{forgePrompt}</pre>
+              <div style={{display:"flex",gap:6,marginTop:12,flexWrap:"wrap"}}>
+                <button className="btn btn-f" onClick={sendForgeToDeck}>→ Send to Deck</button>
+                <button className="btn btn-c" onClick={sendForgeToLint}>→ Lint this</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {tab==="deck"&&(
+          <div className="grid2" style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) minmax(0,1.05fr)",gap:14,alignItems:"start"}}>
+            <div className="card" style={{padding:18}}>
+              <div className="alert alert-info" style={{marginBottom:14}}><span className="alert-ic">i</span><span>Generates a C-suite deck meta-prompt. Verifies claims via web search, cites inline, includes "What Could Prove Us Wrong" appendix.</span></div>
+              <label className="lbl" htmlFor="dt">Deck topic</label>
+              <textarea id="dt" className="ta" rows={3} placeholder="What's the deck about? E.g. 'Pitch our AI compliance tool to Acme Corp leadership'" value={deckTopic} onChange={e=>setDeckTopic(e.target.value)}/>
+              <div className="g3c" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginTop:14}}>
+                <div><label className="lbl">Audience</label><select className="sel" value={deckAudience} onChange={e=>setDeckAudience(e.target.value)}>{["Internal leadership","Customer execs","Investor execs","Partner execs","Board"].map(a=><option key={a}>{a}</option>)}</select></div>
+                <div><label className="lbl">Decision asked</label><select className="sel" value={deckDecision} onChange={e=>setDeckDecision(e.target.value)}>{["Approve budget","Strategic direction","Purchase / contract","Investment","Partnership","Awareness only"].map(d=><option key={d}>{d}</option>)}</select></div>
+                <div><label className="lbl">Time</label><select className="sel" value={deckTime} onChange={e=>setDeckTime(e.target.value)}>{["15 min","30 min","60 min","90+ min"].map(t=><option key={t}>{t}</option>)}</select></div>
+                <div><label className="lbl">Tech level</label><select className="sel" value={deckTechLevel} onChange={e=>setDeckTechLevel(e.target.value)}>{["Non-technical","Mixed","Technical"].map(t=><option key={t}>{t}</option>)}</select></div>
+              </div>
+              <div style={{marginTop:14}}><label className="lbl">Proof we have today</label><textarea className="ta" rows={3} placeholder="Live product / prototype / market research / projections / team credentials…" value={deckProof} onChange={e=>setDeckProof(e.target.value)}/></div>
+              <div style={{marginTop:14}}><label className="lbl">Strongest counterargument</label><textarea className="ta" rows={2} placeholder="In one sentence: what would a smart skeptic say to kill this idea?" value={deckCounter} onChange={e=>setDeckCounter(e.target.value)}/></div>
+            </div>
+            <div className="card" style={{padding:18}}>
+              <div className="between" style={{marginBottom:12}}>
+                <div><div style={{fontWeight:900,fontSize:14}}>Deck meta-prompt</div><div className="muted mono" style={{fontSize:10,marginTop:2}}>~{tokenEstimate(deckPrompt)} tok</div></div>
+                <div style={{display:"flex",gap:6}}>
+                  <button className="btn btn-w" onClick={()=>copyText(deckPrompt)}>Copy</button>
+                  <button className="btn btn-v" onClick={()=>exportText(deckPrompt,"deck-prompt.md")}>Export</button>
+                </div>
+              </div>
+              <pre className="pre">{deckPrompt}</pre>
+              <div style={{display:"flex",gap:6,marginTop:12}}>
+                <button className="btn btn-c" onClick={sendDeckToLint}>→ Lint this</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {tab==="lint"&&(
+          <div className="grid2" style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) minmax(0,1fr)",gap:14,alignItems:"start"}}>
+            <div className="card" style={{padding:18}}>
+              <label className="lbl" htmlFor="li">Paste any prompt</label>
+              <textarea id="li" className="ta ta-mono" rows={20} placeholder="Paste a prompt. Lint scans for secrets, vague verbs, hedges, missing structure, and length issues." value={lintInput} onChange={e=>setLintInput(e.target.value)} maxLength={20000}/>
+              <div className="between" style={{marginTop:8}}>
+                <span className="mono muted" style={{fontSize:10}}>{lintInput.length}/20000 · ~{tokenEstimate(lintInput)} tok</span>
+                <button className="btn btn-g" onClick={()=>setLintInput("")}>Clear</button>
+              </div>
+              <div className="alert alert-info" style={{marginTop:12}}><span className="alert-ic">i</span><span>Lint runs entirely in your browser. Don't paste real secrets to test the secret detector.</span></div>
+            </div>
+            <div className="card" style={{padding:18}}>
+              <div className="between" style={{marginBottom:14}}>
+                <div style={{fontWeight:900,fontSize:14}}>Lint report</div>
+                <div style={{display:"flex",gap:6}}>
+                  <span className="mono" style={{fontSize:10,padding:"3px 8px",borderRadius:5,background:"rgba(244,63,94,0.1)",color:"#fb7185",border:"1px solid rgba(244,63,94,0.2)"}}>{lint.summary.e||0} err</span>
+                  <span className="mono" style={{fontSize:10,padding:"3px 8px",borderRadius:5,background:"rgba(245,158,11,0.1)",color:"#fbbf24",border:"1px solid rgba(245,158,11,0.2)"}}>{lint.summary.w||0} warn</span>
+                  <span className="mono" style={{fontSize:10,padding:"3px 8px",borderRadius:5,background:"rgba(34,211,238,0.08)",color:"#67e8f9",border:"1px solid rgba(34,211,238,0.2)"}}>{lint.summary.i||0} info</span>
+                </div>
+              </div>
+              <div style={{display:"flex",flexDirection:"column",gap:7,maxHeight:560,overflow:"auto"}}>
+                {lint.issues.map((i,idx)=>(
+                  <div key={idx} className={`alert ${i.sev==="error"?"alert-rose":i.sev==="warn"?"alert-am":"alert-info"}`} style={{marginBottom:0}}>
+                    <span className="alert-ic">{i.sev==="error"?"X":i.sev==="warn"?"!":"i"}</span>
+                    <div>
+                      <div style={{fontWeight:700,marginBottom:i.fix?3:0}}>{i.msg}</div>
+                      {i.fix&&<div style={{fontSize:11,opacity:0.85,fontWeight:500}}>→ {i.fix}</div>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        <footer style={{marginTop:24,paddingTop:14,borderTop:"1px solid var(--brd)",display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
+          <div className="mono muted" style={{fontSize:10}}>forge-workbench v1 · {hydrated?"hydrated":"loading"}</div>
+          <div className="mono muted" style={{fontSize:10}}>4-tab pipeline · runs locally · no telemetry</div>
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+</script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>FF — Proposal Builder</title><style>*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0F0618;color:#f1f5f9;font-family:'Inter',system-ui,sans-serif;padding:2rem 1rem}
+.w{max-width:800px;margin:0 auto}
+.brand{font-size:12px;color:#A855F7;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem}
+h1{font-size:24px;font-weight:600;margin-bottom:.4rem}
+.sub{font-size:14px;color:#94a3b8;margin-bottom:1.75rem}
+.card{background:#1A0B2E;border:1px solid rgba(168,85,247,.25);border-radius:12px;padding:1.5rem;margin-bottom:1rem}
+.ct{font-size:11px;color:#A855F7;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:1rem}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem}
+.field{margin-bottom:.75rem}
+label{font-size:12px;color:#94a3b8;display:block;margin-bottom:.4rem}
+input,select,textarea{width:100%;background:#0A0414;border:1px solid rgba(168,85,247,.3);border-radius:6px;color:#f1f5f9;padding:.5rem .75rem;font-size:13px;font-family:system-ui}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#A855F7}
+.btn{padding:.75rem 1.5rem;background:#A855F7;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer}
+.btn:hover{background:#9333EA}
+.btn-ghost{background:transparent;border:1px solid rgba(168,85,247,.4);color:#C99BFF}
+.badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:500}
+.badge-purple{background:rgba(168,85,247,.2);color:#C99BFF;border:1px solid rgba(168,85,247,.3)}
+.badge-green{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.25)}
+.badge-amber{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.25)}
+.badge-red{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.25)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.06em;padding:.5rem .75rem;border-bottom:1px solid rgba(168,85,247,.15)}
+td{padding:.6rem .75rem;border-bottom:1px solid rgba(255,255,255,.05);color:#cbd5e1}
+tr:hover td{background:rgba(168,85,247,.05)}
+.score-ring{display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;border:3px solid;font-size:16px;font-weight:700}
+#output{background:#0A0414;border:1px solid rgba(168,85,247,.3);border-radius:10px;padding:1.5rem;white-space:pre-wrap;font-size:13px;color:#cbd5e1;line-height:1.7;font-family:system-ui;display:none;margin-top:1rem}
+.section-label{font-size:11px;color:#A855F7;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:.5rem;margin-top:1rem}
+
+/* ---- FlashFusion elevated layer ---- */
+body{font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;position:relative}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background:radial-gradient(620px 380px at 16% -8%,rgba(168,85,247,.16),transparent 70%),radial-gradient(520px 340px at 94% 2%,rgba(34,211,238,.08),transparent 70%)}
+h1{font-family:'Poppins',sans-serif;letter-spacing:-.02em}
+.brand{font-family:'JetBrains Mono',monospace;color:#A855F7;font-weight:500}
+.ct,.section-label{font-family:'JetBrains Mono',monospace}
+.card{border-color:rgba(168,85,247,.18);box-shadow:0 1px 0 rgba(255,255,255,.02) inset}
+.btn{background:linear-gradient(135deg,#A855F7,#9333EA);box-shadow:0 4px 16px rgba(168,85,247,.24);transition:filter .15s,box-shadow .15s}
+.btn:hover{background:linear-gradient(135deg,#A855F7,#9333EA);filter:brightness(1.09);box-shadow:0 6px 22px rgba(168,85,247,.34)}
+.btn-ghost{background:transparent;box-shadow:none}
+input:focus,select:focus,textarea:focus{box-shadow:0 0 0 3px rgba(168,85,247,.16)}
+code{font-family:'JetBrains Mono',monospace}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(168,85,247,.22);border-radius:10px}::-webkit-scrollbar-thumb:hover{background:rgba(168,85,247,.36)}
+@media(prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style></head><body><div class="w">
+<div class="brand">FlashFusion AI Enablement</div>
+<h1>Proposal Builder</h1>
+<p class="sub">Fill from discovery notes — generates a formatted proposal draft.</p>
+<div class="card"><div class="ct">Client Info</div>
+<div class="g2">
+<div class="field"><label>Company name</label><input id="co" placeholder="Acme Corp"></div>
+<div class="field"><label>Contact name and title</label><input id="ct" placeholder="Jane Smith, VP Engineering"></div>
+</div>
+<div class="field"><label>Industry / company type</label><input id="ind" placeholder="Healthcare SaaS, 400 employees"></div>
+</div>
+<div class="card"><div class="ct">Problem (their words)</div>
+<div class="field"><label>Pain point — what they said</label><textarea id="pain" rows="3" placeholder="e.g. Our auditor asked for AI agent documentation and we had nothing to show them."></textarea></div>
+<div class="field"><label>Timeline pressure</label><input id="tl" placeholder="e.g. SOC 2 renewal in Q3, board review in June"></div>
+<div class="field"><label>Current state</label><textarea id="curr" rows="2" placeholder="What they're doing now — manual, nothing, partial solution"></textarea></div>
+</div>
+<div class="card"><div class="ct">Recommended Engagement</div>
+<div class="g2">
+<div class="field"><label>Primary service</label>
+<select id="svc"><option value="audit">AI Setup Audit — $4,500</option><option value="sprint">Enablement Sprint — $5,000</option><option value="retainer">Managed Retainer — $2,000/mo</option></select>
+</div>
+<div class="field"><label>Engagement duration</label>
+<select id="dur"><option value="1 week">1 week (Audit)</option><option value="4-5 weeks">4-5 weeks (Sprint)</option><option value="ongoing">Ongoing (Retainer)</option></select>
+</div>
+</div>
+<div class="field"><label>Key deliverables (one per line)</label><textarea id="dels" rows="3" placeholder="AI Setup Audit report&#10;Gap analysis and priority matrix&#10;Top 5 skill pack deployment&#10;Team training session"></textarea></div>
+</div>
+<button class="btn" style="width:100%;margin-bottom:1rem" onclick="generate()">Generate Proposal Draft</button>
+<div id="output"></div>
+<button class="btn btn-ghost" id="copy-btn" style="width:100%;display:none;margin-top:.75rem" onclick="copyProposal()">Copy Proposal to Clipboard</button>
+</div>
+<script>
+var SVC_MAP={audit:"AI Setup Audit",sprint:"Enablement Sprint",retainer:"Managed Retainer"};
+var PRICE_MAP={audit:"$4,500",sprint:"$5,000",retainer:"$2,000/month"};
+function generate(){
+var co=document.getElementById("co").value||"[Company]";
+var ct=document.getElementById("ct").value||"[Contact]";
+var ind=document.getElementById("ind").value||"[Industry]";
+var pain=document.getElementById("pain").value||"[Pain point]";
+var tl=document.getElementById("tl").value||"[Timeline]";
+var curr=document.getElementById("curr").value||"[Current state]";
+var svc=document.getElementById("svc").value;
+var dur=document.getElementById("dur").value;
+var dels=document.getElementById("dels").value.split("\n").filter(Boolean);
+var d=new Date();var dateStr=d.toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"});
+var validDate=new Date(d.getTime()+30*86400000).toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"});
+var delStr=dels.map(function(x){return "  • "+x}).join("\n")||"  • [Define deliverables]";
+var out="FLASHFUSION — "+SVC_MAP[svc].toUpperCase()+" PROPOSAL\n";
+out+="══════════════════════════════════════════════════\n\n";
+out+="Prepared for: "+ct+" — "+co+"\n";
+out+="Prepared by: Kyle Rosebrook — FlashFusion\n";
+out+="Date: "+dateStr+"\nValid through: "+validDate+"\n\n";
+out+="──────────────────────────────────────────────────\n";
+out+="EXECUTIVE SUMMARY\n";
+out+="──────────────────────────────────────────────────\n\n";
+out+=co+" is deploying AI tools across "+ind+". As those deployments scale, \nthe question of governance, auditability, and measurable ROI becomes unavoidable.\n\n";
+out+='This proposal outlines a '+dur+' '+SVC_MAP[svc]+' to help '+co+' answer that question — \nwith a clear picture of what's working, what's missing, and what to do next.\n\n';
+out+="──────────────────────────────────────────────────\n";
+out+="THE PROBLEM WE'RE SOLVING\n";
+out+="──────────────────────────────────────────────────\n\n";
+out+='"'+pain+'"\n\n';
+out+="Current state: "+curr+"\n";
+out+="Timeline pressure: "+tl+"\n\n";
+out+="──────────────────────────────────────────────────\n";
+out+="SCOPE OF WORK\n";
+out+="──────────────────────────────────────────────────\n\n";
+out+="Service: "+SVC_MAP[svc]+"\n";
+out+="Duration: "+dur+"\n";
+out+="Investment: "+PRICE_MAP[svc]+"\n\n";
+out+="Deliverables:\n"+delStr+"\n\n";
+out+="──────────────────────────────────────────────────\n";
+out+="INVESTMENT AND NEXT STEPS\n";
+out+="──────────────────────────────────────────────────\n\n";
+out+="To move forward:\n";
+out+="  1. Reply with approval or questions\n";
+out+="  2. FlashFusion sends SOW for signature\n";
+out+="  3. Kickoff scheduled within 5 business days\n\n";
+out+="Questions: kyle@flashfusion.co\n";
+out+="Audit: audit.flashfusion.co";
+document.getElementById("output").textContent=out;
+document.getElementById("output").style.display="block";
+document.getElementById("copy-btn").style.display="block";
+}
+function copyProposal(){
+navigator.clipboard.writeText(document.getElementById("output").textContent).then(function(){
+document.getElementById("copy-btn").textContent="Copied!";
+setTimeout(function(){document.getElementById("copy-btn").textContent="Copy Proposal to Clipboard"},2000);
+});
+}
+</script></body></html>

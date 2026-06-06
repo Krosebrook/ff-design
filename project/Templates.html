@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>1:1 Templates — ManagerPlatform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  :root {
+    --bg: #0B1220;
+    --bg-elev: #111A2E;
+    --bg-elev-2: #16213B;
+    --border: #1E2A44;
+    --border-strong: #2A3A5C;
+    --text: #E8ECF5;
+    --text-2: #A8B2C8;
+    --text-3: #6B7896;
+    --accent: #3B82F6;
+    --accent-soft: rgba(59, 130, 246, 0.15);
+    --accent-2: #F5A524; /* outcome signal */
+    --success: #10B981;
+    --danger: #EF4444;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    -webkit-font-smoothing: antialiased;
+  }
+  .serif { font-family: 'Instrument Serif', serif; font-weight: 400; letter-spacing: -0.01em; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 10px; }
+  ::-webkit-scrollbar-thumb:hover { background: #3a4a72; }
+
+  /* Top nav */
+  .nav {
+    height: 60px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center;
+    padding: 0 32px;
+    gap: 32px;
+    background: rgba(11, 18, 32, 0.85);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 50;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 14px; }
+  .brand-logo {
+    width: 26px; height: 26px;
+    background: linear-gradient(135deg, #3B82F6, #1E40AF);
+    border-radius: 7px;
+    display: grid; place-items: center;
+    color: #fff; font-weight: 800; font-size: 13px;
+  }
+  .search {
+    flex: 0 0 320px;
+    height: 36px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0 14px;
+    display: flex; align-items: center; gap: 10px;
+    color: var(--text-3); font-size: 13px;
+  }
+  .search input {
+    background: transparent; border: 0; outline: 0;
+    color: var(--text); font: inherit; flex: 1;
+  }
+  .search kbd {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 6px;
+    color: var(--text-3);
+  }
+  .nav-spacer { flex: 1; }
+  .nav-links { display: flex; gap: 28px; font-size: 14px; }
+  .nav-links a { color: var(--text-2); text-decoration: none; padding: 8px 0; position: relative; }
+  .nav-links a.active { color: var(--accent); }
+  .nav-links a.active::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: -19px;
+    height: 2px; background: var(--accent); border-radius: 2px;
+  }
+  .icon-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--bg-elev); border: 1px solid var(--border);
+    display: grid; place-items: center;
+    color: var(--text-2); cursor: pointer;
+  }
+  .avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, #f5a524, #d97706);
+    display: grid; place-items: center;
+    color: #fff; font-weight: 600; font-size: 13px;
+  }
+
+  /* Layout */
+  .page {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 40px;
+    padding: 32px 40px 80px;
+    max-width: 1640px;
+    margin: 0 auto;
+  }
+  @media (max-width: 1280px) {
+    .page { grid-template-columns: 1fr; }
+    .rail { order: -1; }
+  }
+
+  /* Header */
+  .page-header { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: 28px; }
+  .page-title h1 {
+    font-size: 32px; font-weight: 700; letter-spacing: -0.02em;
+    margin: 0 0 8px;
+  }
+  .page-title h1 .serif { font-style: italic; color: var(--text-2); font-size: 32px; font-weight: 400; }
+  .page-title p { color: var(--text-2); margin: 0; font-size: 14px; max-width: 520px; line-height: 1.5; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    height: 40px; padding: 0 18px;
+    border-radius: 10px;
+    font: 500 14px/1 'Inter', sans-serif;
+    cursor: pointer; border: 0;
+    text-decoration: none; white-space: nowrap;
+    transition: transform 0.06s ease, background 0.15s ease;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #2563EB; }
+  .btn-ghost { background: var(--bg-elev); color: var(--text); border: 1px solid var(--border); }
+  .btn-ghost:hover { background: var(--bg-elev-2); border-color: var(--border-strong); }
+
+  /* Filter bar */
+  .filter-bar {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .seg {
+    display: flex; gap: 2px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 3px;
+  }
+  .seg button {
+    background: transparent; border: 0; color: var(--text-2);
+    padding: 6px 12px; border-radius: 6px;
+    font: 500 13px 'Inter', sans-serif; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .seg button.active { background: var(--bg-elev-2); color: var(--text); }
+  .seg button:hover:not(.active) { color: var(--text); }
+  .chip {
+    height: 32px; padding: 0 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text-2);
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; cursor: pointer;
+  }
+  .chip:hover { border-color: var(--border-strong); color: var(--text); }
+  .chip.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+  .filter-divider { width: 1px; height: 22px; background: var(--border); }
+  .filter-spacer { flex: 1; }
+
+  .select-wrap { position: relative; }
+  .select-wrap select {
+    appearance: none;
+    height: 32px; padding: 0 32px 0 12px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text);
+    font: 500 13px 'Inter', sans-serif; cursor: pointer;
+  }
+  .select-wrap::after {
+    content: ''; position: absolute; right: 12px; top: 50%;
+    width: 6px; height: 6px;
+    border-right: 1.5px solid var(--text-2);
+    border-bottom: 1.5px solid var(--text-2);
+    transform: translateY(-75%) rotate(45deg);
+    pointer-events: none;
+  }
+
+  /* Section header */
+  .section-head {
+    display: flex; align-items: center; gap: 10px;
+    margin: 8px 0 16px;
+  }
+  .section-head h2 { font-size: 18px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
+  .section-head .pill {
+    font-size: 11px; padding: 3px 8px; border-radius: 999px;
+    background: var(--bg-elev-2); color: var(--text-2);
+    font-weight: 500;
+  }
+  .section-head.outcome h2 .serif { font-style: italic; color: var(--accent-2); font-size: 22px; font-weight: 400; padding: 0 4px; }
+
+  /* Card grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  @media (max-width: 1100px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    position: relative;
+    cursor: pointer;
+  }
+  .card:hover {
+    border-color: var(--border-strong);
+    transform: translateY(-2px);
+    box-shadow: 0 14px 40px -16px rgba(0,0,0,0.6);
+  }
+
+  .thumb {
+    aspect-ratio: 16 / 9;
+    position: relative;
+    overflow: hidden;
+  }
+  .thumb svg { width: 100%; height: 100%; display: block; }
+
+  .badge-row {
+    position: absolute; top: 12px; left: 12px;
+    display: flex; gap: 6px;
+  }
+  .badge {
+    font-size: 10.5px; font-weight: 600;
+    padding: 4px 8px; border-radius: 6px;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    backdrop-filter: blur(10px);
+  }
+  .badge.popular { background: var(--accent); color: #fff; }
+  .badge.new { background: rgba(16, 185, 129, 0.9); color: #052E22; }
+  .badge.outcome { background: rgba(245, 165, 36, 0.95); color: #2A1A00; }
+
+  .card-body { padding: 18px 18px 16px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .card-title { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; margin: 0; }
+  .card-outcome {
+    font-size: 13.5px; color: var(--text-2);
+    line-height: 1.5;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .card-meta {
+    display: flex; align-items: center; gap: 14px;
+    font-size: 12px; color: var(--text-3);
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px dashed var(--border);
+  }
+  .card-meta .meta-item { display: inline-flex; align-items: center; gap: 5px; }
+  .usage {
+    margin-left: auto;
+    color: var(--text-2);
+    font-feature-settings: 'tnum';
+  }
+
+  /* Hover preview */
+  .preview {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(11,18,32,0.5) 0%, rgba(11,18,32,0.97) 45%);
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+    pointer-events: none;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    color: var(--text);
+  }
+  .card:hover .preview { opacity: 1; }
+  .preview h4 { margin: 0 0 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); font-weight: 600; }
+  .preview ol {
+    margin: 0; padding: 0; list-style: none;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .preview ol li {
+    display: flex; gap: 8px; align-items: flex-start;
+    font-size: 12.5px; color: var(--text);
+    background: rgba(30, 42, 68, 0.6);
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    border-radius: 6px;
+    backdrop-filter: blur(6px);
+  }
+  .preview ol li .num {
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    flex-shrink: 0;
+  }
+
+  /* Custom card */
+  .card-create {
+    border: 1.5px dashed var(--border-strong);
+    background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center;
+    padding: 32px 24px;
+    min-height: 280px;
+  }
+  .card-create:hover { background: var(--bg-elev); }
+  .card-create .plus {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: var(--bg-elev); border: 1px solid var(--border);
+    display: grid; place-items: center; color: var(--accent);
+    margin: 0 auto 12px;
+    font-size: 22px;
+  }
+  .card-create h3 { margin: 0 0 6px; font-size: 16px; font-weight: 600; }
+  .card-create p { margin: 0; font-size: 13px; color: var(--text-2); line-height: 1.5; max-width: 240px; }
+
+  /* Outcome-framed cards (alt layout — accent gold strip + serif accents) */
+  .grid-outcomes { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  @media (max-width: 900px) { .grid-outcomes { grid-template-columns: 1fr; } }
+  .outcome-card {
+    display: flex; gap: 16px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    cursor: pointer;
+    transition: border-color 0.18s ease, transform 0.18s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .outcome-card:hover { border-color: var(--accent-2); transform: translateY(-1px); }
+  .outcome-card::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: var(--accent-2);
+    opacity: 0; transition: opacity 0.18s ease;
+  }
+  .outcome-card:hover::before { opacity: 1; }
+  .outcome-icon {
+    flex: 0 0 56px; height: 56px;
+    border-radius: 12px;
+    background: rgba(245, 165, 36, 0.12);
+    display: grid; place-items: center;
+    color: var(--accent-2);
+    font-size: 24px;
+  }
+  .outcome-card h3 { margin: 0 0 6px; font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
+  .outcome-card h3 .serif { font-style: italic; color: var(--accent-2); font-weight: 400; font-size: 18px; }
+  .outcome-card p { margin: 0 0 8px; font-size: 13px; color: var(--text-2); line-height: 1.5; }
+  .outcome-card .ghost-link { font-size: 12px; color: var(--text-3); display: inline-flex; align-items: center; gap: 4px; }
+  .outcome-card .ghost-link strong { color: var(--text); font-weight: 500; }
+
+  /* RAIL */
+  .rail {
+    display: flex; flex-direction: column; gap: 18px;
+    position: sticky; top: 90px;
+    align-self: start;
+  }
+  .rail-card {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+  }
+  .rail-card h3 {
+    font-size: 13px; margin: 0 0 14px;
+    color: var(--text-2);
+    text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .rail-card h3 .dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent-2);
+    box-shadow: 0 0 0 4px rgba(245, 165, 36, 0.15);
+  }
+
+  .suggestion {
+    display: flex; gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .suggestion:last-child { border-bottom: 0; padding-bottom: 0; }
+  .suggestion:first-child { padding-top: 0; }
+  .sg-avatar {
+    flex: 0 0 36px; height: 36px; border-radius: 50%;
+    display: grid; place-items: center;
+    color: #fff; font-weight: 600; font-size: 13px;
+  }
+  .sg-body { flex: 1; min-width: 0; }
+  .sg-body .name { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+  .sg-body .reason { font-size: 12px; color: var(--text-3); line-height: 1.45; margin-bottom: 8px; }
+  .sg-body .reason em { color: var(--accent-2); font-style: normal; }
+  .sg-rec {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11.5px; padding: 4px 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+  }
+  .sg-rec .arrow { color: var(--accent); }
+
+  .rail-stat {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+  .rail-stat .stat {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+  }
+  .rail-stat .stat .num { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; font-feature-settings: 'tnum'; }
+  .rail-stat .stat .lbl { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; font-weight: 500; }
+  .rail-stat .stat .delta { font-size: 11px; color: var(--success); margin-top: 4px; display: inline-flex; align-items: center; gap: 3px; }
+
+  .rail-recent { display: flex; flex-direction: column; gap: 8px; }
+  .recent {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .recent:hover { border-color: var(--border-strong); }
+  .recent .dot-mini { width: 28px; height: 28px; border-radius: 7px; flex-shrink: 0; }
+  .recent .recent-meta { font-size: 11px; color: var(--text-3); margin-left: auto; }
+
+  /* Tip */
+  .rail-tip {
+    background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(59,130,246,0.04));
+    border: 1px solid rgba(59,130,246,0.25);
+  }
+  .rail-tip h4 { margin: 0 0 6px; font-size: 14px; font-weight: 600; }
+  .rail-tip h4 .serif { font-style: italic; color: var(--accent); font-weight: 400; font-size: 16px; }
+  .rail-tip p { margin: 0 0 12px; font-size: 12.5px; color: var(--text-2); line-height: 1.5; }
+
+</style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="brand">
+      <div class="brand-logo">M</div>
+      <span>ManagerPlatform</span>
+    </div>
+    <div class="search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
+      <input placeholder="Search templates, talking points, outcomes…" />
+      <kbd>⌘K</kbd>
+    </div>
+    <div class="nav-spacer"></div>
+    <div class="nav-links">
+      <a href="#">Dashboard</a>
+      <a href="#">Team</a>
+      <a href="#" class="active">Templates</a>
+      <a href="#">Reports</a>
+    </div>
+    <button class="icon-btn" aria-label="Notifications">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+    </button>
+    <button class="icon-btn" aria-label="Help">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 1 1 5.8 1c0 2-3 3-3 3"/><circle cx="12" cy="17" r="0.5" fill="currentColor"/></svg>
+    </button>
+    <div class="avatar">JM</div>
+  </nav>
+
+  <div id="root"></div>
+
+  <script type="text/babel" data-presets="env,react">
+  const { useState, useMemo } = React;
+
+  /* ---------- Generated thumbnails ---------- */
+  /* We avoid stock photos; each template gets a parametric gradient/mesh signature */
+  function Thumb({ id, hue1, hue2, hue3, motif }) {
+    const gradId = `g-${id}`;
+    const blurId = `b-${id}`;
+    const c1 = `oklch(0.55 0.18 ${hue1})`;
+    const c2 = `oklch(0.42 0.16 ${hue2})`;
+    const c3 = `oklch(0.32 0.14 ${hue3})`;
+    return (
+      <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs>
+          <linearGradient id={gradId} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor={c1} />
+            <stop offset="55%" stopColor={c2} />
+            <stop offset="100%" stopColor={c3} />
+          </linearGradient>
+          <filter id={blurId}>
+            <feGaussianBlur stdDeviation="22" />
+          </filter>
+        </defs>
+        <rect width="320" height="180" fill={`url(#${gradId})`} />
+        {/* mesh blobs */}
+        <g filter={`url(#${blurId})`} opacity="0.7">
+          <circle cx="60" cy="40" r="60" fill={c1} />
+          <circle cx="280" cy="140" r="80" fill={c3} />
+          <circle cx="180" cy="60" r="40" fill={c2} />
+        </g>
+        {/* motif overlay */}
+        {motif === 'rings' && (
+          <g stroke="rgba(255,255,255,0.18)" fill="none" strokeWidth="1">
+            <circle cx="160" cy="90" r="30" />
+            <circle cx="160" cy="90" r="50" />
+            <circle cx="160" cy="90" r="70" />
+          </g>
+        )}
+        {motif === 'grid' && (
+          <g stroke="rgba(255,255,255,0.12)" strokeWidth="1">
+            {[40,80,120,160,200,240,280].map(x => <line key={x} x1={x} y1="0" x2={x} y2="180" />)}
+            {[30,60,90,120,150].map(y => <line key={y} x1="0" y1={y} x2="320" y2={y} />)}
+          </g>
+        )}
+        {motif === 'arc' && (
+          <g stroke="rgba(255,255,255,0.22)" fill="none" strokeWidth="1.5">
+            <path d="M-20 160 Q 160 -20 340 160" />
+            <path d="M-20 180 Q 160 20 340 180" opacity="0.6"/>
+          </g>
+        )}
+        {motif === 'wave' && (
+          <g stroke="rgba(255,255,255,0.18)" fill="none" strokeWidth="1">
+            <path d="M0 110 Q 80 80 160 110 T 320 110" />
+            <path d="M0 130 Q 80 100 160 130 T 320 130" />
+            <path d="M0 90 Q 80 60 160 90 T 320 90" />
+          </g>
+        )}
+        {motif === 'dots' && (
+          <g fill="rgba(255,255,255,0.18)">
+            {Array.from({length: 8}).map((_,r) =>
+              Array.from({length: 14}).map((_,c) =>
+                <circle key={`${r}-${c}`} cx={20 + c*22} cy={15 + r*22} r="1.4" />
+              )
+            )}
+          </g>
+        )}
+        {motif === 'split' && (
+          <g>
+            <path d="M0 130 L 160 30 L 320 130 L 320 180 L 0 180 Z" fill="rgba(0,0,0,0.18)" />
+            <path d="M0 150 L 160 50 L 320 150" stroke="rgba(255,255,255,0.22)" fill="none" strokeWidth="1.5" />
+          </g>
+        )}
+      </svg>
+    );
+  }
+
+  /* ---------- Data ---------- */
+  const TEMPLATES = [
+    { id: 'weekly-sync', title: 'Weekly Sync', category: 'Weekly Sync',
+      outcome: 'Catch blockers early and align on the week ahead in 30 minutes.',
+      points: 4, mins: 30, usage: '12.4k uses', rating: 4.7,
+      hue1: 230, hue2: 250, hue3: 220, motif: 'wave', tags: ['popular'],
+      preview: ['Wins since last sync', 'Blockers and risks', 'Top priority for the week', 'Anything else on your mind?'] },
+    { id: 'quarterly', title: 'Quarterly Growth', category: 'Quarterly Growth',
+      outcome: 'Surface long-term aspirations, gaps, and the next 90-day focus.',
+      points: 6, mins: 60, usage: '8.1k uses', rating: 4.9,
+      hue1: 160, hue2: 190, hue3: 200, motif: 'rings', tags: [],
+      preview: ['Reflect on the past quarter', 'Strengths showing up most', 'Skills you want to develop', 'Career aspirations check-in', 'Quarter goals & metrics', 'Support you need from me'] },
+    { id: 'career', title: 'Career Pathing', category: 'Career Pathing',
+      outcome: 'Map skill gaps, certifications, and the path to the next role.',
+      points: 5, mins: 45, usage: '5.6k uses', rating: 4.8,
+      hue1: 280, hue2: 250, hue3: 230, motif: 'split', tags: [],
+      preview: ['Where do you see yourself in 2 years?', 'Skill gap audit', 'Stretch projects available', 'Certifications & learning', 'Promotion criteria & timeline'] },
+    { id: 'recovery', title: 'Performance Recovery', category: 'Performance',
+      outcome: 'Address output gaps with empathy and a clear improvement roadmap.',
+      points: 4, mins: 45, usage: '2.3k uses', rating: 4.6,
+      hue1: 25, hue2: 15, hue3: 350, motif: 'arc', tags: ['outcome'],
+      preview: ['Acknowledge what\u2019s working', 'Specific gaps observed (with examples)', '30/60/90-day improvement plan', 'Support and resources you need'] },
+    { id: 'onboarding', title: 'Onboarding Check-in', category: 'Onboarding',
+      outcome: 'Build feedback loops for new hires through their first 90 days.',
+      points: 7, mins: 30, usage: '4.0k uses', rating: 4.8,
+      hue1: 140, hue2: 170, hue3: 200, motif: 'dots', tags: ['new'],
+      preview: ['How is ramp pace feeling?', 'Tools & access fully working?', 'First impressions of the team', 'Clarity of role & expectations', 'Anything blocking your first project?', 'Buddy/mentor working out?', 'What would make week 4 a win?'] },
+    { id: 'feedback', title: 'Feedback Exchange', category: 'Feedback',
+      outcome: 'Run a two-way feedback conversation that builds trust, not defensiveness.',
+      points: 5, mins: 45, usage: '3.2k uses', rating: 4.9,
+      hue1: 200, hue2: 230, hue3: 260, motif: 'grid', tags: [],
+      preview: ['Set intent: this is two-way', 'What\u2019s working well from your side?', 'One thing I could do differently', 'My feedback for you (specific, behavioral)', 'Commitments going forward'] },
+  ];
+
+  const OUTCOMES = [
+    { id: 'unblock', icon: '⛏', headline: ['Unblock a ', 'stalled', ' report'],
+      desc: 'For when output has slowed but you can\u2019t pinpoint why. Diagnose, then unstick.',
+      template: 'Diagnostic 1:1', pairs: '~35 min' },
+    { id: 'tough', icon: '◆', headline: ['Run a ', 'tough', ' feedback chat'],
+      desc: 'Deliver hard feedback without breaking trust. Script, openers, and recovery prompts.',
+      template: 'Direct Feedback', pairs: '~45 min' },
+    { id: 'reignite', icon: '✦', headline: ['Reignite a ', 'disengaged', ' teammate'],
+      desc: 'Surface the source of disengagement and co-create a path back to ownership.',
+      template: 'Re-engagement', pairs: '~50 min' },
+    { id: 'promo', icon: '↗', headline: ['Build a ', 'promotion', ' case'],
+      desc: 'Co-author the evidence trail your report needs for the next level.',
+      template: 'Promo Path', pairs: '~60 min' },
+  ];
+
+  const SUGGESTIONS = [
+    { initials: 'SR', name: 'Sarah Rodriguez', color: 'linear-gradient(135deg,#3B82F6,#1E40AF)',
+      reason: 'It\u2019s been ', em: '6 weeks', after: ' since you discussed career growth.',
+      rec: 'Career Pathing' },
+    { initials: 'MK', name: 'Marcus Kim', color: 'linear-gradient(135deg,#10B981,#047857)',
+      reason: 'Output dipped this sprint, last 1:1 was ', em: 'mostly tactical', after: '.',
+      rec: 'Performance Recovery' },
+    { initials: 'AP', name: 'Aisha Patel', color: 'linear-gradient(135deg,#F5A524,#B45309)',
+      reason: 'Day ', em: '14 of onboarding', after: ' — perfect window for a ramp check.',
+      rec: 'Onboarding Check-in' },
+    { initials: 'DC', name: 'Diego Chen', color: 'linear-gradient(135deg,#A855F7,#6B21A8)',
+      reason: 'Quarter ends in ', em: '11 days', after: ' — schedule the growth review.',
+      rec: 'Quarterly Growth' },
+  ];
+
+  /* ---------- App ---------- */
+  function App() {
+    const [tab, setTab] = useState('All');
+    const [filters, setFilters] = useState({ duration: 'Any', size: 'Any' });
+    const [sort, setSort] = useState('Most used');
+    const [activeChips, setActiveChips] = useState(new Set());
+
+    const tabs = ['All Templates', 'Weekly Sync', 'Quarterly Growth', 'Career Pathing', 'Onboarding', 'Performance', 'Feedback'];
+
+    const filtered = useMemo(() => {
+      let list = TEMPLATES.slice();
+      if (tab !== 'All Templates' && tab !== 'All') {
+        list = list.filter(t => t.category === tab);
+      }
+      if (filters.duration === '< 30 min') list = list.filter(t => t.mins <= 30);
+      if (filters.duration === '30–45 min') list = list.filter(t => t.mins > 30 && t.mins <= 45);
+      if (filters.duration === '45+ min') list = list.filter(t => t.mins > 45);
+      if (sort === 'Highest rated') list.sort((a,b) => b.rating - a.rating);
+      if (sort === 'Most used') list.sort((a,b) => parseFloat(b.usage) - parseFloat(a.usage));
+      if (sort === 'Shortest') list.sort((a,b) => a.mins - b.mins);
+      return list;
+    }, [tab, filters, sort]);
+
+    function toggleChip(c) {
+      const next = new Set(activeChips);
+      if (next.has(c)) next.delete(c); else next.add(c);
+      setActiveChips(next);
+    }
+
+    return (
+      <div className="page">
+        <main>
+          {/* Header */}
+          <div className="page-header">
+            <div className="page-title">
+              <h1>1:1 <span className="serif">Templates</span></h1>
+              <p>Research-backed agenda frameworks tied to outcomes — pick by what you need to accomplish, not just by cadence.</p>
+            </div>
+            <button className="btn btn-primary">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14M5 12h14"/></svg>
+              Create Custom Template
+            </button>
+          </div>
+
+          {/* Filter bar */}
+          <div className="filter-bar">
+            <div className="seg">
+              {tabs.map(t => (
+                <button key={t} className={tab === t ? 'active' : ''} onClick={() => setTab(t)}>{t}</button>
+              ))}
+            </div>
+            <div className="filter-divider"></div>
+            <button className={'chip' + (activeChips.has('< 30 min') ? ' active' : '')} onClick={() => { setFilters(f=>({...f, duration: filters.duration==='< 30 min' ? 'Any' : '< 30 min'})); toggleChip('< 30 min'); }}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+              {'< 30 min'}
+            </button>
+            <button className={'chip' + (activeChips.has('30–45') ? ' active' : '')} onClick={() => { setFilters(f=>({...f, duration: filters.duration==='30–45 min' ? 'Any' : '30–45 min'})); toggleChip('30–45'); }}>30–45 min</button>
+            <button className={'chip' + (activeChips.has('45+') ? ' active' : '')} onClick={() => { setFilters(f=>({...f, duration: filters.duration==='45+ min' ? 'Any' : '45+ min'})); toggleChip('45+'); }}>45+ min</button>
+            <button className="chip">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>
+              Evidence: high
+            </button>
+            <button className="chip">+ Add filter</button>
+            <div className="filter-spacer"></div>
+            <span style={{ fontSize: 12, color: 'var(--text-3)' }}>Sort</span>
+            <div className="select-wrap">
+              <select value={sort} onChange={e => setSort(e.target.value)}>
+                <option>Most used</option>
+                <option>Highest rated</option>
+                <option>Shortest</option>
+                <option>Recently added</option>
+              </select>
+            </div>
+          </div>
+
+          {/* OUTCOMES (new framing) */}
+          <div className="section-head outcome">
+            <h2>Start with an <span className="serif">outcome</span></h2>
+            <span className="pill">New framing</span>
+          </div>
+          <div className="grid-outcomes" style={{ marginBottom: 36 }}>
+            {OUTCOMES.map(o => (
+              <div key={o.id} className="outcome-card">
+                <div className="outcome-icon">{o.icon}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <h3>{o.headline[0]}<span className="serif">{o.headline[1]}</span>{o.headline[2]}</h3>
+                  <p>{o.desc}</p>
+                  <div className="ghost-link">
+                    <strong>{o.template}</strong>
+                    <span>·</span>
+                    <span>{o.pairs}</span>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginLeft: 4 }}><path d="m9 18 6-6-6-6"/></svg>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* FEATURED grid */}
+          <div className="section-head">
+            <h2>Featured templates</h2>
+            <span className="pill">{filtered.length} results</span>
+          </div>
+          <div className="grid">
+            {filtered.map(t => (
+              <article key={t.id} className="card">
+                <div className="thumb">
+                  <Thumb id={t.id} hue1={t.hue1} hue2={t.hue2} hue3={t.hue3} motif={t.motif} />
+                  <div className="badge-row">
+                    {t.tags.includes('popular') && <span className="badge popular">Popular</span>}
+                    {t.tags.includes('new') && <span className="badge new">New</span>}
+                    {t.tags.includes('outcome') && <span className="badge outcome">High impact</span>}
+                  </div>
+                  <div className="preview">
+                    <h4>Talking points</h4>
+                    <ol>
+                      {t.preview.slice(0, 4).map((p, i) => (
+                        <li key={i}><span className="num">{String(i+1).padStart(2,'0')}</span><span>{p}</span></li>
+                      ))}
+                      {t.preview.length > 4 && <li style={{ justifyContent: 'center', color: 'var(--text-3)' }}>+{t.preview.length - 4} more</li>}
+                    </ol>
+                  </div>
+                </div>
+                <div className="card-body">
+                  <h3 className="card-title">{t.title}</h3>
+                  <p className="card-outcome">{t.outcome}</p>
+                  <div className="card-meta">
+                    <span className="meta-item">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                      {t.points} talking points
+                    </span>
+                    <span className="meta-item">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                      {t.mins} min
+                    </span>
+                    <span className="meta-item">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.6 6.5L21 9.3l-4.9 4.4L17.5 21 12 17.7 6.5 21l1.4-7.3L3 9.3l6.4-.8z"/></svg>
+                      {t.rating}
+                    </span>
+                    <span className="usage">{t.usage}</span>
+                  </div>
+                </div>
+              </article>
+            ))}
+            {/* Create custom */}
+            <article className="card card-create">
+              <div>
+                <div className="plus">+</div>
+                <h3>Create custom</h3>
+                <p>Design a framework that perfectly fits your team's culture and workflow.</p>
+              </div>
+            </article>
+          </div>
+        </main>
+
+        {/* RAIL */}
+        <aside className="rail">
+          <div className="rail-card">
+            <h3><span className="dot"></span>Suggested for you</h3>
+            <div>
+              {SUGGESTIONS.map((s, i) => (
+                <div className="suggestion" key={i}>
+                  <div className="sg-avatar" style={{ background: s.color }}>{s.initials}</div>
+                  <div className="sg-body">
+                    <div className="name">{s.name}</div>
+                    <div className="reason">{s.reason}<em>{s.em}</em>{s.after}</div>
+                    <span className="sg-rec">
+                      Try <strong style={{ color: 'var(--text)', fontWeight: 600 }}>{s.rec}</strong>
+                      <span className="arrow">→</span>
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rail-card">
+            <h3>Your activity</h3>
+            <div className="rail-stat">
+              <div className="stat">
+                <div className="num">23</div>
+                <div className="lbl">1:1s this month</div>
+                <div className="delta">↗ 12% vs last</div>
+              </div>
+              <div className="stat">
+                <div className="num">4.6</div>
+                <div className="lbl">Avg report rating</div>
+                <div className="delta">↗ 0.3 vs Q2</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="rail-card">
+            <h3>Recently used</h3>
+            <div className="rail-recent">
+              <div className="recent">
+                <div className="dot-mini" style={{ background: 'linear-gradient(135deg, oklch(0.55 0.18 230), oklch(0.32 0.14 220))' }}></div>
+                <span>Weekly Sync</span>
+                <span className="recent-meta">2d ago</span>
+              </div>
+              <div className="recent">
+                <div className="dot-mini" style={{ background: 'linear-gradient(135deg, oklch(0.55 0.18 160), oklch(0.32 0.14 200))' }}></div>
+                <span>Quarterly Growth</span>
+                <span className="recent-meta">1w ago</span>
+              </div>
+              <div className="recent">
+                <div className="dot-mini" style={{ background: 'linear-gradient(135deg, oklch(0.55 0.18 25), oklch(0.32 0.14 350))' }}></div>
+                <span>Performance Recovery</span>
+                <span className="recent-meta">3w ago</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="rail-card rail-tip">
+            <h4>A <span className="serif">small</span> nudge</h4>
+            <p>Managers who run outcome-based 1:1s report 31% higher team retention. Try one of the outcome cards above this week.</p>
+            <button className="btn btn-ghost" style={{ height: 32, padding: '0 12px', fontSize: 12 }}>See the research →</button>
+          </div>
+        </aside>
+      </div>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
